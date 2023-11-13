@@ -8,7 +8,7 @@ import (
 
 func AddProduct(product models.Product) (domain.Product, error) {
 	var Product domain.Product
-	result := initialisers.DB.Exec("INSERT INTO products(name,description,category_id,size,stock,price) values(?,?,?,?,?,?)", product.Name, product.Description, product.Category, product.Size, product.Stock, product.Price).Scan(&Product)
+	result := initialisers.DB.Raw("INSERT INTO products(name,description,category_id,size,stock,price) values(?,?,?,?,?,?)", product.Name, product.Description, product.CategoryId, product.Size, product.Stock, product.Price).Scan(&Product)
 	if result.Error != nil {
 		return domain.Product{}, result.Error
 	}

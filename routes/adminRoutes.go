@@ -15,7 +15,7 @@ func AdminRoutes(r *gin.Engine) {
 	r.POST("/admin/users/unblock",middlewares.AdminAuthMiddleware,handlers.UnBlockUser)
 	
 	//product
-	r.POST("/admin/product/add",middlewares.AdminAuthMiddleware,handlers.AddProduct)
+	r.POST("/admin/product/add",handlers.AddProduct)
 	r.PUT("/admin/product/edit",middlewares.AdminAuthMiddleware,handlers.EditProductDetails)
 	r.DELETE("/product/remove",middlewares.AdminAuthMiddleware,handlers.DeleteProduct)
 
