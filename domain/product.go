@@ -9,6 +9,8 @@ type Product struct {
 	Size        int      `json:"size"`
 	Stock       int      `json:"stock"`
 	Price       float64  `json:"price"`
+	Color       string   `json:"color"`
+	Deleted     bool     `json:"delete" default:"false"`
 }
 type Category struct {
 	ID       uint   `json:"id" gorm:"unique; not null"`
