@@ -8,9 +8,6 @@ import (
 	"main.go/usecase"
 )
 
-
-
-
 func AddProduct(c *gin.Context) {
 	var product models.Product
 
@@ -25,10 +22,6 @@ func AddProduct(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "product added successfully", "product": product})
 }
-
-
-
-
 
 func EditProductDetails(c *gin.Context) {
 	var product models.Product
@@ -46,10 +39,6 @@ func EditProductDetails(c *gin.Context) {
 	// err:=usecase.EditProductDetails(product)
 }
 
-
-
-
-
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 
@@ -61,10 +50,6 @@ func DeleteProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "product removed successfully"})
 }
 
-
-
-
-
 func GetAllProducts(c *gin.Context) {
 	products, err := usecase.GetAllProducts()
 	if err != nil {
@@ -72,5 +57,15 @@ func GetAllProducts(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "products list", "products": products})
+
+}
+
+func AllProducts(c *gin.Context) {
+	products, err := usecase.SeeAllProducts()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "successfully retrieved products", "products": products})
 
 }

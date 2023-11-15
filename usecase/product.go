@@ -50,3 +50,13 @@ func ShowProductsByCategory() ([]models.Product, error) {
 
 	return []models.Product{}, nil
 }
+
+
+
+func SeeAllProducts() ([]domain.Product, error) {
+	products, err := repository.SeeAllProducts()
+	if err != nil {
+		return []domain.Product{}, err
+	}
+	return products, nil
+}
