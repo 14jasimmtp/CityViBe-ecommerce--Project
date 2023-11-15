@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"errors"
+
+	"github.com/jinzhu/copier"
 	initialisers "main.go/Initialisers"
 	"main.go/domain"
 	"main.go/models"
@@ -15,12 +18,30 @@ func AddProduct(product models.Product) (domain.Product, error) {
 	return Product, nil
 }
 
-func EditProductDetails(id string, product domain.Product) (domain.Product, error) {
+func EditProductDetails(id string, product models.Product) (models.Product, error) {
 	var updatedProduct domain.Product
 
-	result := initialisers.DB.Exec("UPDATE products SET stock=stock+$1 WHERE id = $2", product.Stock, id).Scan(&updatedProduct)
+	result := initialisers.DB.Raw("UPDATE products SET id=?,name=?,description=?,category_id=?,size=?,stock=?,price=?,color=? WHERE id=?", product.ID, product.Name, product.Description, product.CategoryId, product.Size, product.Stock, product.Price, product.Color, id).Scan(&updatedProduct)
 	if result.Error != nil {
-		return domain.Product{}, result.Error
+		return models.Product{}, result.Error
 	}
-	return updatedProduct, nil
+	copier.Copy(&product, &updatedProduct)
+	return product, nil
+}
+
+func DeleteProduct(id int) error {
+	query := initialisers.DB.Exec(`UPDATE products SET deleted = true WHERE id = ?`, id)
+	if query.Error != nil {
+		return errors.New("no product found to delete")
+	}
+	return nil
+}
+
+func GetAllProducts() ([]models.Product, error) {
+	var products []models.Product
+	query := initialisers.DB.Raw(`SELECT * FROM products`).Scan(&products)
+	if query.Error != nil {
+		return []models.Product{}, query.Error
+	}
+	return products, nil
 }

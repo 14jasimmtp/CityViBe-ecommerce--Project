@@ -10,17 +10,19 @@ import (
 )
 
 type ClientClaims struct {
-	ID    uint
-	Phone string
-	Email string
-	Role  string
+	ID    uint   `jsom:"id"`
+	Email string `json:"email"`
+	Role  string `json:"role"`
 	jwt.RegisteredClaims
 }
+
+
+
+
 
 func TokenGenerate(user *models.ClientToken, role string) (string, error) {
 	claims := ClientClaims{
 		ID:    user.ID,
-		Phone: user.Phone,
 		Email: user.Email,
 		Role:  role,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -36,6 +38,11 @@ func TokenGenerate(user *models.ClientToken, role string) (string, error) {
 	}
 	return TokenString, nil
 }
+
+
+
+
+
 
 func AdminTokenGenerate(user models.Admin, role string) (string, error) {
 	claims := ClientClaims{
@@ -56,19 +63,28 @@ func AdminTokenGenerate(user models.Admin, role string) (string, error) {
 	return TokenString, nil
 }
 
+
+
+
+
+
 func GetRoleFromToken(Token string) (string, error) {
-	TokenUnpacked, err := jwt.ParseWithClaims(Token, ClientClaims{}, func(token *jwt.Token) (interface{}, error) {
+	TokenUnpacked, err := jwt.ParseWithClaims(Token, &ClientClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			fmt.Println("1")
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("SECRETKEY")), nil
+		return []byte(os.Getenv("TOKENSECRETKEY")), nil
 	})
 	if err != nil {
+		fmt.Println("2")
+		fmt.Println(err)
 		return "", err
 	}
 
 	if claims, ok := TokenUnpacked.Claims.(*ClientClaims); ok && TokenUnpacked.Valid {
 		return claims.Role, nil
 	}
+	fmt.Println("3")
 	return "", fmt.Errorf("invalid token")
 }

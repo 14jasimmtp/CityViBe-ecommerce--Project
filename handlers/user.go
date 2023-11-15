@@ -25,7 +25,7 @@ func UserSignup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Enter otp to signup"})
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully signed up.Enter otp to login."})
 
 }
 
