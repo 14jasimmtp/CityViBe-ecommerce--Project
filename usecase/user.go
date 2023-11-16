@@ -61,19 +61,23 @@ func SignUp(User models.UserSignUpDetails) error {
 }
 
 func UserLogin(user models.UserLoginDetails) error {
-	CheckEmail, err := repository.CheckUserExistsByPhone(user.Phone)
+	CheckPhone, err := repository.CheckUserExistsByPhone(user.Phone)
 	if err != nil {
 		return errors.New("error with server")
 	}
-	if CheckEmail == nil {
-		return errors.New("email doesn't exist")
+	if CheckPhone == nil {
+		return errors.New("phone number doesn't exist")
 	}
 	userdetails, err := repository.FindUserByPhone(user.Phone)
 	fmt.Println(userdetails, user.Password)
-
 	if err != nil {
 		return err
 	}
+
+	if userdetails.Blocked == true {
+		return errors.New("user is blocked")
+	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(userdetails.Password), []byte(user.Password))
 	if err != nil {
 		return errors.New("password not matching")

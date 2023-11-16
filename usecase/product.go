@@ -8,10 +8,10 @@ import (
 	"main.go/repository"
 )
 
-func AddProduct(product models.Product) (domain.Product, error) {
+func AddProduct(product models.Product) (models.Product, error) {
 	ProductResponse, err := repository.AddProduct(product)
 	if err != nil {
-		return domain.Product{}, err
+		return models.Product{}, err
 	}
 	return ProductResponse, nil
 }
