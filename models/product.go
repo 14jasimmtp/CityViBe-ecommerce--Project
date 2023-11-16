@@ -2,13 +2,13 @@ package models
 
 type Product struct {
 	ID          int    `json:"id"`
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	Price       int    `json:"price" binding:"required"`
-	CategoryId  int    `json:"category" binding:"required"`
-	Stock       int    `json:"stock" binding:"required"`
-	Size        int    `json:"size" binding:"required"`
-	Color       string `json:"color" binding:"required"`
+	Name        string `json:"name" `
+	Description string `json:"description"`
+	Price       int    `json:"price" `
+	CategoryId  int    `json:"category"`
+	Stock       int    `json:"stock" `
+	Size        int    `json:"size" `
+	Color       string `json:"color" `
 }
 
 type Category struct {

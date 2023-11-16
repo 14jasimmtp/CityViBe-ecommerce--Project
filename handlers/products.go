@@ -33,6 +33,7 @@ func EditProductDetails(c *gin.Context) {
 	UpdatedProduct, err := usecase.EditProductDetails(id, product)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "product updated successfully", "product": UpdatedProduct})
@@ -54,6 +55,7 @@ func GetAllProducts(c *gin.Context) {
 	products, err := usecase.GetAllProducts()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "products list", "products": products})

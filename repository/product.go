@@ -46,11 +46,9 @@ func GetAllProducts() ([]models.Product, error) {
 	return products, nil
 }
 
-
-
 func SeeAllProducts() ([]domain.Product, error) {
 	var products []domain.Product
-	err := initialisers.DB.Raw("SELECT * FROM products").Scan(&products).Error
+	err := initialisers.DB.Raw("SELECT * FROM products WHERE deleted = false").Scan(&products).Error
 	if err != nil {
 		return nil, err
 	}
