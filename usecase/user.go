@@ -57,7 +57,7 @@ func SignUp(User models.UserSignUpDetails) error {
 		return err
 	}
 	initialisers.DB.Create(&Userdt)
-	return errors.New("otp sent successfully.Enter otp to verify")
+	return nil
 }
 
 func UserLogin(user models.UserLoginDetails) error {
