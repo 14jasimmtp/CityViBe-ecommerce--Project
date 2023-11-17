@@ -46,6 +46,9 @@ func DeleteCategory(id string) error {
 	if err := initialisers.DB.Exec("DELETE FROM categories WHERE id=?", category_id).Error; err != nil {
 		return err
 	}
+	if query := initialisers.DB.Raw(`UPDATE products SET deleted = true WHERE category_id = ?`, category_id).Error; err != nil {
+		return query
+	}
 	return nil
 }
 func UpdateCategory(current string, new string) (domain.Category, error) {

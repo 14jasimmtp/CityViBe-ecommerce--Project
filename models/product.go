@@ -5,7 +5,7 @@ type Product struct {
 	Name        string `json:"name" `
 	Description string `json:"description"`
 	Category    string `json:"category"`
-	Size        int    `json:"size"`
+	Size        string `json:"size"`
 	Stock       int    `json:"stock"`
 	Price       int    `json:"price"`
 	Color       string `json:"color"`
@@ -15,7 +15,7 @@ type AddProduct struct {
 	ID          int    `json:"-"`
 	Name        string `json:"name" `
 	Description string `json:"description"`
-	CategoryID  int   `json:"category"`
+	CategoryID  int    `json:"category"`
 	Size        int    `json:"size"`
 	Stock       int    `json:"stock"`
 	Price       int    `json:"price"`
