@@ -9,9 +9,6 @@ import (
 	"main.go/usecase"
 )
 
-
-
-
 func AdminLogin(c *gin.Context) {
 	var admin models.Admin
 
@@ -29,12 +26,9 @@ func AdminLogin(c *gin.Context) {
 
 	c.SetCookie("Authorisation", admindetails.TokenString, 36000, "", "", false, true)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Admin logged in successfully", "admin": admindetails})
+	c.JSON(http.StatusOK, gin.H{"message": "Admin logged in successfully"})
 
 }
-
-
-
 
 func GetAllUsers(c *gin.Context) {
 	Users, err := usecase.GetAllUsers()
@@ -47,10 +41,6 @@ func GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "users are", "users": Users})
 }
 
-
-
-
-
 func BlockUser(c *gin.Context) {
 	id := c.Query("id")
 	err := usecase.BlockUser(id)
@@ -61,9 +51,6 @@ func BlockUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "user successfully blocked"})
 }
-
-
-
 
 func UnBlockUser(c *gin.Context) {
 	id := c.Query("id")

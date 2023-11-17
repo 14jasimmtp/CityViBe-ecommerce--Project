@@ -9,34 +9,34 @@ import (
 )
 
 func AddProduct(c *gin.Context) {
-	var product models.Product
+	var product models.AddProduct
 
 	if c.ShouldBindJSON(&product) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Product details correctly"})
 		return
 	}
-	updatedProduct, err := usecase.AddProduct(product)
+	_, err := usecase.AddProduct(product)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "product added successfully", "product":updatedProduct})
+	c.JSON(http.StatusOK, gin.H{"message": "product added successfully", "product": product})
 }
 
 func EditProductDetails(c *gin.Context) {
-	var product models.Product
+	var product models.AddProduct
 	id := c.Query("id")
 	if c.ShouldBindJSON(&product) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter details correctly"})
 		return
 	}
-	UpdatedProduct, err := usecase.EditProductDetails(id, product)
+	_, err := usecase.EditProductDetails(id, product)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "product updated successfully", "product": UpdatedProduct})
+	c.JSON(http.StatusOK, gin.H{"message": "product updated successfully", "product": product})
 	// err:=usecase.EditProductDetails(product)
 }
 

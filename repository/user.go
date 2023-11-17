@@ -47,7 +47,7 @@ func SignUpUser(user models.UserSignUpDetails) (*models.UserDetailsResponse, err
 
 func FindUserByPhone(phone string) (*domain.User, error) {
 	var user domain.User
-	result := initialisers.DB.Raw("SELECT * FROM users WHERE phone = ? and blocked = false", phone).Scan(&user)
+	result := initialisers.DB.Raw("SELECT * FROM users WHERE phone = ?", phone).Scan(&user)
 	if result.Error != nil {
 		return &domain.User{}, result.Error
 	}

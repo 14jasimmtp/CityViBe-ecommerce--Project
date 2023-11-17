@@ -10,26 +10,6 @@ import (
 	"main.go/utils"
 )
 
-func VerifySignupOtp(c *gin.Context) {
-	var otp models.OTP
-
-	if c.Bind(&otp) != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Enter otp to login",
-		})
-		return
-	}
-
-	err := utils.CheckOtp(otp.Phone, otp.Otp)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid otp"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "successfully  signed up"})
-
-}
-
 func VerifyLoginOtp(c *gin.Context) {
 	var otp models.OTP
 
@@ -45,7 +25,7 @@ func VerifyLoginOtp(c *gin.Context) {
 	}
 
 	user, err := repository.FindUserByPhone(otp.Phone)
-	if err != nil{
+	if err != nil {
 		return
 	}
 	var client models.ClientToken
@@ -58,6 +38,7 @@ func VerifyLoginOtp(c *gin.Context) {
 		return
 	}
 	c.SetCookie("Authorisation", Tokenstring, 3600, "", "", false, true)
-
-	c.JSON(http.StatusOK, gin.H{"message": "user successfully logged in", "user": user})
+	var ResUser models.UserLoginResponse
+	copier.Copy(&ResUser, &user)
+	c.JSON(http.StatusOK, gin.H{"message": "user successfully logged in", "user": ResUser})
 }

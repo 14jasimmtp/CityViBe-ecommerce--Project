@@ -8,10 +8,10 @@ import (
 	"main.go/repository"
 )
 
-func AddProduct(product models.Product) (models.Product, error) {
+func AddProduct(product models.AddProduct) (models.AddProduct, error) {
 	ProductResponse, err := repository.AddProduct(product)
 	if err != nil {
-		return models.Product{}, err
+		return models.AddProduct{}, err
 	}
 	return ProductResponse, nil
 }
@@ -24,10 +24,10 @@ func GetAllProducts() ([]models.Product, error) {
 	return ProductDetails, nil
 }
 
-func EditProductDetails(id string, product models.Product) (models.Product, error) {
+func EditProductDetails(id string, product models.AddProduct) (models.AddProduct, error) {
 	UpdatedProduct, err := repository.EditProductDetails(id, product)
 	if err != nil {
-		return models.Product{}, err
+		return models.AddProduct{}, err
 	}
 	return UpdatedProduct, nil
 }

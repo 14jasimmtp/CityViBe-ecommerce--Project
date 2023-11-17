@@ -1,10 +1,21 @@
 package models
 
 type Product struct {
-	ID          int    `json:"id"`
+	ID          int    `json:"-"`
 	Name        string `json:"name" `
 	Description string `json:"description"`
-	CategoryId  int    `json:"category"`
+	Category    string `json:"category"`
+	Size        int    `json:"size"`
+	Stock       int    `json:"stock"`
+	Price       int    `json:"price"`
+	Color       string `json:"color"`
+}
+
+type AddProduct struct {
+	ID          int    `json:"-"`
+	Name        string `json:"name" `
+	Description string `json:"description"`
+	CategoryID  int   `json:"category"`
 	Size        int    `json:"size"`
 	Stock       int    `json:"stock"`
 	Price       int    `json:"price"`

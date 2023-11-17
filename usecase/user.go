@@ -74,7 +74,7 @@ func UserLogin(user models.UserLoginDetails) error {
 		return err
 	}
 
-	if userdetails.Blocked == true {
+	if userdetails.Blocked  {
 		return errors.New("user is blocked")
 	}
 

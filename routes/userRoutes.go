@@ -12,7 +12,7 @@ func UserRoutes(r *gin.Engine) {
 	r.POST("/login", handlers.UserLogin)
 	r.POST("/verify", handlers.VerifyLoginOtp)
 	r.POST("/logout", handlers.UserLogout)
-	r.GET("/products", handlers.AllProducts)
+	r.GET("/products",  handlers.GetAllProducts)
 
 	// r.POST("/address",middlewares.UserAuthMiddleware,handlers.UserAddress)
 
