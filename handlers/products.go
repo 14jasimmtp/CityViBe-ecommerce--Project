@@ -15,12 +15,12 @@ func AddProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Product details correctly"})
 		return
 	}
-	_, err := usecase.AddProduct(product)
+	NewProduct, err := usecase.AddProduct(product)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "product added successfully", "product": product})
+	c.JSON(http.StatusOK, gin.H{"message": "product added successfully", "product": NewProduct})
 }
 
 func EditProductDetails(c *gin.Context) {
@@ -30,13 +30,13 @@ func EditProductDetails(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter details correctly"})
 		return
 	}
-	_, err := usecase.EditProductDetails(id, product)
+	UpdatedProduct, err := usecase.EditProductDetails(id, product)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "product updated successfully", "product": product})
+	c.JSON(http.StatusOK, gin.H{"message": "product updated successfully", "product": UpdatedProduct})
 	// err:=usecase.EditProductDetails(product)
 }
 
