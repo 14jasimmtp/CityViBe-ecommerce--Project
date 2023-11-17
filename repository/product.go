@@ -28,11 +28,11 @@ func AddProduct(product models.AddProduct) (domain.Product, error) {
 func EditProductDetails(id string, product models.AddProduct) (domain.Product, error) {
 	var updatedProduct domain.Product
 
-	result := initialisers.DB.Raw("UPDATE products SET name=?,description=?,category_id=?,size=?,stock=?,price=?,color=? WHERE id=?", product.Name, product.Description, product.CategoryID, product.Size, product.Stock, product.Price, product.Color, id).Scan(&updatedProduct)
+	result := initialisers.DB.Raw("UPDATE products SET name=?,description=?,category_id=?,size_id=?,stock=?,price=?,color=? WHERE id=?", product.Name, product.Description, product.CategoryID, product.Size, product.Stock, product.Price, product.Color, id).Scan(&updatedProduct)
 	if result.Error != nil {
 		return domain.Product{}, result.Error
 	}
-	query := initialisers.DB.Raw(`SELECT products.id,name,description,category_id,size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id WHERE products.id = ?`, id).Scan(&updatedProduct)
+	query := initialisers.DB.Raw(`SELECT products.id,name,description,category_id,size_id,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id WHERE products.id = ?`, id).Scan(&updatedProduct)
 	if query.Error != nil {
 		return domain.Product{}, query.Error
 
