@@ -24,8 +24,8 @@ type UserToken struct {
 }
 
 type UserLoginDetails struct {
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
+	Phone    string `json:"phone" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type UserLoginResponse struct {

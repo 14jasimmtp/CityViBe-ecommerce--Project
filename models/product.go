@@ -13,20 +13,20 @@ type Product struct {
 
 type AddProduct struct {
 	ID          int    `json:"-"`
-	Name        string `json:"name" `
+	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
-	CategoryID  int    `json:"category"`
-	Size        int    `json:"size"`
-	Stock       int    `json:"stock"`
-	Price       int    `json:"price"`
-	Color       string `json:"color"`
+	CategoryID  int    `json:"category" binding:"required"`
+	Size        int    `json:"size" binding:"required"`
+	Stock       int    `json:"stock" binding:"required"`
+	Price       int    `json:"price" binding:"required"`
+	Color       string `json:"color" binding:"required"`
 }
 
 type Category struct {
-	Category string `json:"category"`
+	Category string `json:"category" binding:"required"`
 }
 
 type SetNewName struct {
-	Current string `json:"current"`
-	New     string `json:"new"`
+	Current string `json:"current" binding:"required"`
+	New     string `json:"new" binding:"required"`
 }
