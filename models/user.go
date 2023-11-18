@@ -3,9 +3,9 @@ package models
 type UserSignUpDetails struct {
 	FirstName       string `json:"firstname" binding:"required"`
 	LastName        string `json:"lastname" binding:"required"`
-	Email           string `json:"email" binding:"required"`
+	Email           string `json:"email" binding:"required" validate:"email"`
 	Phone           string `json:"phone" binding:"required"`
-	Password        string `json:"password" binding:"required"`
+	Password        string `json:"password" binding:"required" validate:"min=6,max=20"`
 	ConfirmPassword string `json:"confirm password" binding:"required"`
 }
 
@@ -24,8 +24,8 @@ type UserToken struct {
 }
 
 type UserLoginDetails struct {
-	Phone    string `json:"phone" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Phone    string `json:"phone" binding:"required" validate:"min=10,max=10"`
+	Password string `json:"password" binding:"required" validate:"min=6,max=20"`
 }
 
 type UserLoginResponse struct {

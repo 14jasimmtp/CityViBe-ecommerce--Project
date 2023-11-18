@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"main.go/models"
 	"main.go/usecase"
 )
@@ -17,8 +18,13 @@ func UserSignup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details in correct format"})
 		return
 	}
+	err := validator.New().Struct(User)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		return
+	}
 
-	err := usecase.SignUp(User)
+	err = usecase.SignUp(User)
 	if err != nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -37,7 +43,13 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	err := usecase.UserLogin(User)
+	err := validator.New().Struct(User)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		return
+	}
+
+	err = usecase.UserLogin(User)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
