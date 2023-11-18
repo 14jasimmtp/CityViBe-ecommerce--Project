@@ -4,7 +4,7 @@ type UserSignUpDetails struct {
 	FirstName       string `json:"firstname" binding:"required"`
 	LastName        string `json:"lastname" binding:"required"`
 	Email           string `json:"email" binding:"required" validate:"email"`
-	Phone           string `json:"phone" binding:"required"`
+	Phone           string `json:"phone" binding:"required" validate:"min=10,max=10"`
 	Password        string `json:"password" binding:"required" validate:"min=6,max=20"`
 	ConfirmPassword string `json:"confirm password" binding:"required"`
 }
