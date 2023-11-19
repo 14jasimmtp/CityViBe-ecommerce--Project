@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	initialisers "main.go/Initialisers"
 	"main.go/domain"
@@ -50,7 +51,7 @@ func DeleteProduct(id int) error {
 
 func GetAllProducts() ([]models.Product, error) {
 	var products []models.Product
-	query := initialisers.DB.Raw(`SELECT name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE deleted = false`).Scan(&products)
+	query := initialisers.DB.Raw(`SELECT name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE deleted = false `).Scan(&products)
 	if query.Error != nil {
 		return []models.Product{}, query.Error
 	}
@@ -59,9 +60,28 @@ func GetAllProducts() ([]models.Product, error) {
 
 func SeeAllProducts() ([]domain.Product, error) {
 	var products []domain.Product
-	err := initialisers.DB.Raw("SELECT * FROM products ").Scan(&products).Error
+	err := initialisers.DB.Raw("SELECT * FROM products ORDER BY id ASC").Scan(&products).Error
 	if err != nil {
 		return nil, err
 	}
 	return products, nil
+}
+
+func GetSingleProduct(id string) (models.Product, error) {
+	var product models.Product
+	idint, err := strconv.Atoi(id)
+	if err != nil {
+		return models.Product{}, errors.New("error while converting id to int")
+	}
+
+	query := initialisers.DB.Raw("SELECT name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE products.id = ?", idint).Scan(&product)
+	if product.Name == "" {
+		return models.Product{}, errors.New("no products found with this id")
+	}
+
+	if query.Error != nil {
+		return models.Product{}, errors.New("something went wrong")
+	}
+
+	return product, nil
 }

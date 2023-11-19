@@ -51,12 +51,19 @@ func ShowProductsByCategory() ([]models.Product, error) {
 	return []models.Product{}, nil
 }
 
-
-
 func SeeAllProducts() ([]domain.Product, error) {
 	products, err := repository.SeeAllProducts()
 	if err != nil {
 		return []domain.Product{}, err
 	}
 	return products, nil
+}
+
+func GetSingleProduct(id string) (models.Product, error) {
+	product, err := repository.GetSingleProduct(id)
+	if err != nil {
+		return models.Product{}, err
+	}
+
+	return product, nil
 }

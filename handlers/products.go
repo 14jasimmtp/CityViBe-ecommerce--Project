@@ -71,3 +71,14 @@ func AllProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "successfully retrieved products", "products": products})
 
 }
+
+func ShowSingleProduct(c *gin.Context) {
+	id := c.Param("id")
+	product, err := usecase.GetSingleProduct(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "product details", "product": product})
+}
