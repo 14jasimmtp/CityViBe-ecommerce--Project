@@ -109,6 +109,10 @@ func ForgotPassword(phone string) error {
 }
 
 func ResetForgottenPassword(Newpassword models.ForgotPassword) error {
+	err := utils.CheckOtp(Newpassword.Phone, Newpassword.OTP)
+	if err != nil {
+		return err
+	}
 	hashed, err := bcrypt.GenerateFromPassword([]byte(Newpassword.NewPassword), 10)
 	if err != nil {
 		return errors.New("error while hashing password")

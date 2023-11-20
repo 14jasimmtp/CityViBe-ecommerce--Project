@@ -10,9 +10,9 @@ import (
 )
 
 func SendOtp(to string) error {
-	var TWILIO_ACCOUNT_SID string = "ACcc260921006b51564e8f1337c035d061"
-	var TWILIO_AUTH_TOKEN string = "cf5126f4392db4175de3655a2bc57c67"
-	var VERIFY_SERVICE_SID string = "VA831378f254c79c7f81693b3753c2f023"
+	var TWILIO_ACCOUNT_SID string = os.Getenv("TWILIO_ACCOUNT_SID")
+	var TWILIO_AUTH_TOKEN string = os.Getenv("TWILIO_AUTH_TOKEN")
+	var VERIFY_SERVICE_SID string = os.Getenv("VERIFY_SERVICE_SID")
 	var client *twilio.RestClient = twilio.NewRestClientWithParams(twilio.ClientParams{
 		Username: TWILIO_ACCOUNT_SID,
 		Password: TWILIO_AUTH_TOKEN,

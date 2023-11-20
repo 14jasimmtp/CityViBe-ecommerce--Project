@@ -26,7 +26,7 @@ func AdminRoutes(r *gin.Engine) {
 	r.PUT("admin/category", middlewares.AdminAuthMiddleware, handlers.UpdateCategory)
 	r.DELETE("admin/category", middlewares.AdminAuthMiddleware, handlers.DeleteCategory)
 
-	r.POST("/password/forgot",handlers.ForgotPassword)
+	
 
 	//cart
 	r.POST("/cart",middlewares.UserAuthMiddleware,handlers.AddToCart)
