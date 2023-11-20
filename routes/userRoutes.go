@@ -14,6 +14,7 @@ func UserRoutes(r *gin.Engine) {
 	r.POST("/logout", handlers.UserLogout)
 	r.GET("/products", handlers.GetAllProducts)
 	r.GET("/products/:id", handlers.ShowSingleProduct)
+	r.GET("/")
 
 	// r.POST("/address",middlewares.UserAuthMiddleware,handlers.UserAddress)
 

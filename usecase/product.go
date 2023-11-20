@@ -67,3 +67,11 @@ func GetSingleProduct(id string) (models.Product, error) {
 
 	return product, nil
 }
+
+func ViewProductCategoryWise(category string) ([]models.Product,error){
+	products,err:=repository.ViewProductsCategorywise(category)
+	if err != nil{
+		return []models.Product{},err
+	}
+	return products,nil
+}

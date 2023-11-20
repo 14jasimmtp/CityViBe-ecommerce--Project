@@ -66,3 +66,52 @@ func UserLogout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "user logged out successfully"})
 	fmt.Println("cookie deleted")
 }
+
+func ForgotPassword(c *gin.Context) {
+	var forgotPassword models.Phone
+	if c.ShouldBindJSON(&forgotPassword) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter constraints correctly"})
+	}
+	err := usecase.ForgotPassword(forgotPassword.Phone)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "password changed successfully"})
+
+}
+
+func ResetForgottenPassword(c *gin.Context){
+	var Newpassword models.ForgotPassword
+
+	if c.ShouldBindJSON(&Newpassword) != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter details in correct format"})
+		return
+	}
+
+	err:=usecase.ResetForgottenPassword(Newpassword)
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"message":err.Error()})
+	}
+
+	c.JSON(http.StatusOK,gin.H{"message":"password changed successfully"})
+}
+
+
+func ViewUserAddress (c *gin .Context){
+
+}
+
+func EditUserAddress (c *gin.Context){
+
+}
+
+func RemoveUserAddress (c *gin.Context){
+
+}
+
+func AddNewAddressDetails (c *gin.Context){
+
+}
+

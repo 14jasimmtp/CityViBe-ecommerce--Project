@@ -74,7 +74,7 @@ func UserLogin(user models.UserLoginDetails) error {
 		return err
 	}
 
-	if userdetails.Blocked  {
+	if userdetails.Blocked {
 		return errors.New("user is blocked")
 	}
 
@@ -86,6 +86,38 @@ func UserLogin(user models.UserLoginDetails) error {
 	if sentOtp != nil {
 		fmt.Println("error gen otp")
 		return errors.New("error occured generating otp")
+	}
+
+	return nil
+}
+
+func ForgotPassword(phone string) error {
+	user, err := repository.FindUserByPhone(phone)
+	if err != nil {
+		return errors.New("user doesn't found with this number")
+	}
+
+	if user.Blocked {
+		return errors.New("user is blocked")
+	}
+	err = utils.SendOtp(phone)
+	if err != nil {
+		return errors.New("error generating otp ")
+	}
+
+	return nil
+}
+
+func ResetForgottenPassword(Newpassword models.ForgotPassword) error {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(Newpassword.NewPassword), 10)
+	if err != nil {
+		return errors.New("error while hashing password")
+	}
+	Newpassword.NewPassword = string(hashed)
+
+	err = repository.ChangePassword(Newpassword)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -64,3 +64,11 @@ func GetUserById(id int) (models.UserDetailsResponse, error) {
 	}
 	return user, nil
 }
+
+func ChangePassword(ResetUser models.ForgotPassword)error{
+	query:=initialisers.DB.Raw(`UPDATE users SET password = ? WHERE phone = ?`,ResetUser.NewPassword,ResetUser.Phone)
+	if query.Error != nil{
+		return query.Error
+	}
+	return nil
+}

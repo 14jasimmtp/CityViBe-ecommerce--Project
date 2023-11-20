@@ -42,3 +42,12 @@ type ClientToken struct {
 	ID    uint
 	Role  string
 }
+
+type Phone struct {
+	Phone string `json:"phone" binding:"required" validate:"max=10,min=10"`
+}
+type ForgotPassword struct{
+	Phone string `json:"phone" binding:"required" validate:"max=10,min=10"`
+	OTP string `json:"otp" binding:"required"`
+	NewPassword string `json:"new password" binding:"required" validate:"min=6 max=20"`
+}
