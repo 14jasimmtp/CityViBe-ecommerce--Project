@@ -141,3 +141,18 @@ func AddAddress(Address models.Address,Token string) (models.AddressRes,error){
 
 	return AddressRes,nil
 }
+
+func ViewUserAddress(Token string) ([]models.AddressRes,error){
+	UserId,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil{
+		return []models.AddressRes{},err
+	}
+
+	Address,err:=repository.ViewAddress(UserId)
+	if err != nil{
+		return []models.AddressRes{},err
+	}
+
+	return Address,nil
+}
+

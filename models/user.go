@@ -62,11 +62,25 @@ type Address struct {
 }
 
 type AddressRes struct {
-	
+
 	Name      string `json:"name" validate:"required"`
 	HouseName string `json:"house_name" validate:"required"`
 	Street    string `json:"street"`
 	City      string `json:"city"`
 	State     string `json:"state" validate:"required"`
 	Pin       string `json:"pin" validate:"required"`
+}
+
+type UserProfile struct{
+	FirstName string `json:"firstname"`
+	LastName string `json:"lastname"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
+
+}
+
+type ChangePassword struct{
+	Oldpassword string `json:"Current password" binding:"required"`
+	Newpassword string `json:"New password" binding:"required"`
+	ConfirmPassword string `json:"Confirm new password" binding:"required"`
 }

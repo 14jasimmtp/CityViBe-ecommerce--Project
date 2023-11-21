@@ -73,9 +73,9 @@ func ChangePassword(ResetUser models.ForgotPassword) error {
 	return nil
 }
 
-func AddAddress(Address models.Address, UserId int) (models.AddressRes, error) {
+func AddAddress(Address models.Address, UserId uint) (models.AddressRes, error) {
 	var AddressRes models.AddressRes
-	query := initialisers.DB.Exec(`INSERT INTO address(name,house_name,street,city,state,pin) VALUES (?,?,?,?,?,?)`, Address.Name, Address.HouseName, Address.Street, Address.State, Address.Pin).Scan(&AddressRes)
+	query := initialisers.DB.Raw(`INSERT INTO addresses(user_id,name,house_name,street,city,state,pin) VALUES (?,?,?,?,?,?,?)`, UserId, Address.Name, Address.HouseName, Address.Street, Address.City, Address.State, Address.Pin).Scan(&AddressRes)
 	if query.Error != nil {
 		return models.AddressRes{}, query.Error
 	}
@@ -84,17 +84,16 @@ func AddAddress(Address models.Address, UserId int) (models.AddressRes, error) {
 
 func EditAddress(Address models.Address, UserId int) (models.AddressRes, error) {
 	var AddressRes models.AddressRes
-	query := initialisers.DB.Exec(`UPDATE address SET name = ?,house_name = ?,street = ?,city = ?,state = ?,pin=?`, Address.Name, Address.HouseName, Address.Street, Address.State, Address.Pin).Scan(&AddressRes)
+	query := initialisers.DB.Exec(`UPDATE addresses SET name = ?,house_name = ?,street = ?,city = ?,state = ?,pin=?`, Address.Name, Address.HouseName, Address.Street, Address.State, Address.Pin).Scan(&AddressRes)
 	if query.Error != nil {
 		return models.AddressRes{}, query.Error
 	}
 	return AddressRes, nil
 }
 
-
-func ViewAddress(id int) ([]models.AddressRes, error) {
+func ViewAddress(id uint) ([]models.AddressRes, error) {
 	var Address []models.AddressRes
-	query := initialisers.DB.Raw(`SELECT * FROM address WHERE user_id = ?`, id).Scan(&Address)
+	query := initialisers.DB.Raw(`SELECT * FROM addresses WHERE user_id = ?`, id).Scan(&Address)
 	if query.Error != nil {
 		return []models.AddressRes{}, query.Error
 	}
@@ -106,8 +105,11 @@ func ViewAddress(id int) ([]models.AddressRes, error) {
 	return Address, nil
 }
 
-
 func DeleteAddress(AddressId int, UserId int) error {
-	
-}
+	query := initialisers.DB.Exec(`DELETE FROM addresses WHERE id = ? && user_id = ?`, AddressId, UserId)
+	if query.Error != nil {
+		return query.Error
+	}
 
+	return nil
+}

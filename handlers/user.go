@@ -100,6 +100,22 @@ func ResetForgottenPassword(c *gin.Context){
 
 
 func ViewUserAddress (c *gin .Context){
+	Token,err:=c.Cookie("Authorisation")
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
+
+	Address,err:=usecase.ViewUserAddress(Token)
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK,gin.H{"message":"User Address","Address":Address})
+
+
+
 
 }
 

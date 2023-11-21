@@ -35,10 +35,10 @@ func AdminRoutes(r *gin.Engine) {
 	r.PUT("/cart",middlewares.UserAuthMiddleware,handlers.ProductQuantity)
 
 	//Address
-	r.GET("/address",middlewares.UserAuthMiddleware,handlers.ViewUserAddress)
-	r.PUT("/address",middlewares.UserAuthMiddleware,handlers.EditUserAddress)
-	r.DELETE("/address",middlewares.UserAuthMiddleware,handlers.RemoveUserAddress)
-	r.POST("/address",middlewares.UserAuthMiddleware,handlers.AddNewAddressDetails)
+	// r.GET("/address",middlewares.UserAuthMiddleware,handlers.ViewUserAddress)
+	// r.PUT("/address",middlewares.UserAuthMiddleware,handlers.EditUserAddress)
+	// r.DELETE("/address",middlewares.UserAuthMiddleware,handlers.RemoveUserAddress)
+	// r.POST("/address",middlewares.UserAuthMiddleware,handlers.AddNewAddressDetails)
 
 	//wishlist
 	r.GET("/wishlist",middlewares.UserAuthMiddleware,handlers.ViewUserWishlist)
