@@ -78,7 +78,7 @@ func ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "password changed successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Enter otp and new password"})
 
 }
 
@@ -112,6 +112,24 @@ func RemoveUserAddress (c *gin.Context){
 }
 
 func AddNewAddressDetails (c *gin.Context){
+	var Address models.Address
 
+	if c.ShouldBindJSON(&Address) != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter Details correctly"})
+	}
+
+	validator.New().Struct(Address)
+
+	Token,err:=c.Cookie("Authorisation")
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+	}
+
+	AddressRes,err:=usecase.AddAddress(Address,Token)
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+	}
+
+	c.JSON(http.StatusOK,gin.H{"message":"Address added successfully" ,"Address":AddressRes})
 }
 

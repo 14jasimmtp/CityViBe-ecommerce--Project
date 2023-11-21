@@ -31,4 +31,5 @@ func DBInitialise() {
 	DB.AutoMigrate(&domain.Product{})
 	DB.AutoMigrate(&domain.Category{})
 	DB.AutoMigrate(&domain.Size{})
+	DB.AutoMigrate(&domain.Address{})
 }

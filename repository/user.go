@@ -72,3 +72,42 @@ func ChangePassword(ResetUser models.ForgotPassword) error {
 	}
 	return nil
 }
+
+func AddAddress(Address models.Address, UserId int) (models.AddressRes, error) {
+	var AddressRes models.AddressRes
+	query := initialisers.DB.Exec(`INSERT INTO address(name,house_name,street,city,state,pin) VALUES (?,?,?,?,?,?)`, Address.Name, Address.HouseName, Address.Street, Address.State, Address.Pin).Scan(&AddressRes)
+	if query.Error != nil {
+		return models.AddressRes{}, query.Error
+	}
+	return AddressRes, nil
+}
+
+func EditAddress(Address models.Address, UserId int) (models.AddressRes, error) {
+	var AddressRes models.AddressRes
+	query := initialisers.DB.Exec(`UPDATE address SET name = ?,house_name = ?,street = ?,city = ?,state = ?,pin=?`, Address.Name, Address.HouseName, Address.Street, Address.State, Address.Pin).Scan(&AddressRes)
+	if query.Error != nil {
+		return models.AddressRes{}, query.Error
+	}
+	return AddressRes, nil
+}
+
+
+func ViewAddress(id int) ([]models.AddressRes, error) {
+	var Address []models.AddressRes
+	query := initialisers.DB.Raw(`SELECT * FROM address WHERE user_id = ?`, id).Scan(&Address)
+	if query.Error != nil {
+		return []models.AddressRes{}, query.Error
+	}
+
+	if query.RowsAffected < 1 {
+		return []models.AddressRes{}, errors.New("no address found. add new address")
+	}
+
+	return Address, nil
+}
+
+
+func DeleteAddress(AddressId int, UserId int) error {
+	
+}
+
