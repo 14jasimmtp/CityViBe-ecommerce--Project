@@ -119,13 +119,6 @@ func ViewUserAddress (c *gin .Context){
 
 }
 
-func EditUserAddress (c *gin.Context){
-
-}
-
-func RemoveUserAddress (c *gin.Context){
-
-}
 
 func AddNewAddressDetails (c *gin.Context){
 	var Address models.Address
@@ -149,3 +142,10 @@ func AddNewAddressDetails (c *gin.Context){
 	c.JSON(http.StatusOK,gin.H{"message":"Address added successfully" ,"Address":AddressRes})
 }
 
+func EditUserAddress (c *gin.Context){
+	
+}
+
+func RemoveUserAddress (c *gin.Context){
+
+}

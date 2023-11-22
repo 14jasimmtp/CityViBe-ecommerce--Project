@@ -18,6 +18,7 @@ type Address struct {
 	UserID    uint   `json:"user_id"`
 	User      User   `json:"-" gorm:"foreignkey:UserID"`
 	Name      string `json:"name" validate:"required"`
+	Phone     string `json:"phone" validate:"required min=10 max=10"`
 	HouseName string `json:"house_name" validate:"required"`
 	Street    string `json:"street" validate:"required"`
 	City      string `json:"city" validate:"required"`

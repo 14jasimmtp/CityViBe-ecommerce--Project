@@ -91,3 +91,12 @@ func ViewProductsCategorywise(category string) ([]models.Product, error) {
 	initialisers.DB.Raw(`SELECT name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE categories.category = ? `, category).Scan(&product)
 	return product, nil
 }
+
+func CheckStock(pid int) error{
+	var stock int 
+	initialisers.DB.Raw(`SELECT stock from products WHERE id = ?`,pid).Scan(&stock)
+	if stock <1{
+		return errors.New("product out of stock")
+	}
+	return nil
+}

@@ -1,18 +1,61 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
 
-func AddToCart(c *gin.Context){
+	"github.com/gin-gonic/gin"
+	"main.go/usecase"
+)
+
+func AddToCart(c *gin.Context) {
+	pid := c.Query("id")
+
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = usecase.AddToCart(pid, Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "product added to cart successfully"})
+}
+
+func ViewCart(c *gin.Context) {
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	UserCart, err := usecase.ViewCart(Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Cart details", "Cart": UserCart})
 
 }
 
+func RemoveProductsFromCart(c *gin.Context) {
+	id := c.Query("id")
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-func ViewCart(c *gin.Context){
+	err = usecase.RemoveProductsFromCart(id, Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "product removed from cart successfully"})
 
 }
-
-func RemoveProductsFromCart(c *gin.Context){
-
-}
-
-func ProductQuantity(c *gin.Context){}

@@ -29,10 +29,10 @@ func AdminRoutes(r *gin.Engine) {
 	
 
 	//cart
-	r.POST("/cart",middlewares.UserAuthMiddleware,handlers.AddToCart)
-	r.GET("/cart",middlewares.UserAuthMiddleware,handlers.ViewCart)
-	r.DELETE("/cart",middlewares.UserAuthMiddleware,handlers.RemoveProductsFromCart)
-	r.PUT("/cart",middlewares.UserAuthMiddleware,handlers.ProductQuantity)
+	// r.POST("/cart",middlewares.UserAuthMiddleware,handlers.AddToCart)
+	// r.GET("/cart",middlewares.UserAuthMiddleware,handlers.ViewCart)
+	// r.DELETE("/cart",middlewares.UserAuthMiddleware,handlers.RemoveProductsFromCart)
+	// r.PUT("/cart",middlewares.UserAuthMiddleware,handlers.ProductQuantity)
 
 	//Address
 	// r.GET("/address",middlewares.UserAuthMiddleware,handlers.ViewUserAddress)

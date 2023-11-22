@@ -32,5 +32,10 @@ func UserRoutes(r *gin.Engine) {
 	//profile
 	// r.GET("/profile",middlewares.UserAuthMiddleware,handlers.ViewUserProfile)
 	// r.PUT("/profile",middlewares.UserAuthMiddleware,handlers.UpdateUserprofile)
+	//Cart
+	r.GET("/cart",middlewares.UserAuthMiddleware,handlers.ViewCart)
+	r.POST("/cart",middlewares.UserAuthMiddleware,handlers.AddToCart)
+	r.DELETE("/cart",middlewares.UserAuthMiddleware,handlers.RemoveProductsFromCart)
+	
 
 }
