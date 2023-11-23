@@ -18,7 +18,7 @@ func AdminRoutes(r *gin.Engine) {
 	r.GET("/admin/products", middlewares.AdminAuthMiddleware, handlers.AllProducts)
 	r.POST("/admin/products", middlewares.AdminAuthMiddleware, handlers.AddProduct)
 	r.PUT("/admin/products", middlewares.AdminAuthMiddleware, handlers.EditProductDetails)
-	r.DELETE("/product/:id/remove", middlewares.AdminAuthMiddleware, handlers.DeleteProduct)
+	r.DELETE("admin/products/:id/remove", middlewares.AdminAuthMiddleware, handlers.DeleteProduct)
 
 	//category
 	r.GET("admin/category", middlewares.AdminAuthMiddleware, handlers.GetCategory)
@@ -26,28 +26,12 @@ func AdminRoutes(r *gin.Engine) {
 	r.PUT("admin/category", middlewares.AdminAuthMiddleware, handlers.UpdateCategory)
 	r.DELETE("admin/category", middlewares.AdminAuthMiddleware, handlers.DeleteCategory)
 
+	//order
+	r.GET("admin/order-details", middlewares.AdminAuthMiddleware, handlers.OrderDetailsForAdmin)
+	r.GET("admin/approve-order", middlewares.AdminAuthMiddleware, handlers.ApproveOrder)
+	r.GET("admin/cancel-order", middlewares.AdminAuthMiddleware, handlers.CancelOrderFromAdmin)
+
 	
-
-	//cart
-	// r.POST("/cart",middlewares.UserAuthMiddleware,handlers.AddToCart)
-	// r.GET("/cart",middlewares.UserAuthMiddleware,handlers.ViewCart)
-	// r.DELETE("/cart",middlewares.UserAuthMiddleware,handlers.RemoveProductsFromCart)
-	// r.PUT("/cart",middlewares.UserAuthMiddleware,handlers.ProductQuantity)
-
-	//Address
-	// r.GET("/address",middlewares.UserAuthMiddleware,handlers.ViewUserAddress)
-	// r.PUT("/address",middlewares.UserAuthMiddleware,handlers.EditUserAddress)
-	// r.DELETE("/address",middlewares.UserAuthMiddleware,handlers.RemoveUserAddress)
-	// r.POST("/address",middlewares.UserAuthMiddleware,handlers.AddNewAddressDetails)
-
-	//wishlist
-	r.GET("/wishlist",middlewares.UserAuthMiddleware,handlers.ViewUserWishlist)
-	r.POST("/wishlist",middlewares.UserAuthMiddleware,handlers.AddProductToWishlist)
-	r.DELETE("/wishlist",middlewares.UserAuthMiddleware,handlers.RemoveProductFromWishlist)
-
-	//orders
-	r.GET("/orders",middlewares.UserAuthMiddleware,handlers.ViewOrderDetails)
-
 
 
 }

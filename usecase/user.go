@@ -156,3 +156,61 @@ func ViewUserAddress(Token string) ([]models.AddressRes,error){
 	return Address,nil
 }
 
+func UpdateAddress(Token,aid string,NewAddress models.Address)(models.AddressRes,error){
+	UserId,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil{
+		return models.AddressRes{},err
+	}
+
+	UpdatedAddress,err:=repository.UpdateAddress(UserId,aid,NewAddress)
+	if err != nil{
+		return models.AddressRes{},err
+	}
+
+	return UpdatedAddress,nil
+
+}
+
+func DeleteAddress(Token,aid string)(error){
+	UserId,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil{
+		return err
+	}
+
+	err=repository.RemoveAddress(UserId,aid)
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func UserProfile(Token string) (models.UserProfile,error){
+	UserId,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil{
+		return models.UserProfile{},err
+	}
+
+	User,err:=repository.UserProfile(UserId)
+	if err != nil{
+		return models.UserProfile{},err
+	}
+
+	return User,nil
+}
+
+
+func UpdateUserProfile(Token string,User models.UserProfile)(models.UserProfile,error){
+	UserId,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil{
+		return models.UserProfile{},err
+	}
+
+	UpdatedUser,err:=repository.UpdateUserProfile(UserId,User)
+	if err != nil{
+		return models.UserProfile{},err
+	}
+
+	return UpdatedUser,nil
+}
+

@@ -46,15 +46,16 @@ type ClientToken struct {
 type Phone struct {
 	Phone string `json:"phone" binding:"required" validate:"max=10,min=10"`
 }
-type ForgotPassword struct{
-	Phone string `json:"phone" binding:"required" validate:"max=10,min=10"`
-	OTP string `json:"otp" binding:"required"`
+type ForgotPassword struct {
+	Phone       string `json:"phone" binding:"required" validate:"max=10,min=10"`
+	OTP         string `json:"otp" binding:"required"`
 	NewPassword string `json:"new password" binding:"required" validate:"min=6 max=20"`
 }
 
 type Address struct {
 	Name      string `json:"name" validate:"required"`
-	HouseName string `json:"house_name" validate:"required"`
+	HouseName string `json:"house name" validate:"required"`
+	Phone     string `json:"phone" validate:"required min=10 max=10"`
 	Street    string `json:"street"`
 	City      string `json:"city"`
 	State     string `json:"state" validate:"required"`
@@ -62,25 +63,25 @@ type Address struct {
 }
 
 type AddressRes struct {
-
+	ID        int    `json:"id"`
 	Name      string `json:"name" validate:"required"`
 	HouseName string `json:"house_name" validate:"required"`
+	Phone     string `json:"phone"`
 	Street    string `json:"street"`
 	City      string `json:"city"`
 	State     string `json:"state" validate:"required"`
 	Pin       string `json:"pin" validate:"required"`
 }
 
-type UserProfile struct{
+type UserProfile struct {
 	FirstName string `json:"firstname"`
-	LastName string `json:"lastname"`
-	Email string `json:"email"`
-	Phone string `json:"phone"`
-
+	LastName  string `json:"lastname"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
 }
 
-type ChangePassword struct{
-	Oldpassword string `json:"Current password" binding:"required"`
-	Newpassword string `json:"New password" binding:"required"`
+type ChangePassword struct {
+	Oldpassword     string `json:"Current password" binding:"required"`
+	Newpassword     string `json:"New password" binding:"required"`
 	ConfirmPassword string `json:"Confirm new password" binding:"required"`
 }

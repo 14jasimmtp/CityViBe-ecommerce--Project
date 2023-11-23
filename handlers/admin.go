@@ -62,3 +62,10 @@ func UnBlockUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "user successfully unblocked"})
 }
+
+
+func OrderDetailsForAdmin(c *gin.Context){}
+
+func ApproveOrder(c *gin.Context){}
+
+func CancelOrderFromAdmin(c *gin.Context){}

@@ -31,6 +31,17 @@ func AddToCart(pid, Token string) error {
 		return errors.New("no products exist with this id")
 	}
 
+	UserId, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return err
+	}
+
+
+	err=repository.CheckProductExistInCart(UserId,pid)
+	if err != nil{
+		return errors.New(`product already exist in cart`)
+	}
+
 	ProId, err := strconv.Atoi(pid)
 	if err != nil {
 		return err
@@ -41,10 +52,6 @@ func AddToCart(pid, Token string) error {
 		return errors.New("product out of stock")
 	}
 
-	UserId, err := utils.ExtractUserIdFromToken(Token)
-	if err != nil {
-		return err
-	}
 
 	err = repository.AddToCart(ProId, UserId)
 	if err != nil {
@@ -71,4 +78,18 @@ func RemoveProductsFromCart(pid, Token string) error {
 	}
 
 	return nil
+}
+
+func UpdateQuantityFromCart(Token,pid,quantity string)([]models.Cart,error){
+	UserId,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil{
+		return []models.Cart{},err
+	}
+
+	updatedCart,err:=repository.UpdateQuantity(UserId,pid,quantity)
+	if err != nil{
+		return []models.Cart{},err
+	}
+
+	return updatedCart,nil
 }

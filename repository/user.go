@@ -82,11 +82,14 @@ func AddAddress(Address models.Address, UserId uint) (models.AddressRes, error) 
 	return AddressRes, nil
 }
 
-func EditAddress(Address models.Address, UserId int) (models.AddressRes, error) {
+func UpdateAddress(userid uint, aid string, Address models.Address) (models.AddressRes, error) {
 	var AddressRes models.AddressRes
-	query := initialisers.DB.Exec(`UPDATE addresses SET name = ?,house_name = ?,street = ?,city = ?,state = ?,pin=?`, Address.Name, Address.HouseName, Address.Street, Address.State, Address.Pin).Scan(&AddressRes)
+	query := initialisers.DB.Exec(`UPDATE addresses SET name = ?,phone = ?,house_name = ?,street = ?,city = ?,state = ?,pin=? WHERE id = ? AND user_id = ?`, Address.Name, Address.Phone, Address.HouseName, Address.Street, Address.State, Address.Pin, aid, userid).Scan(&AddressRes)
 	if query.Error != nil {
 		return models.AddressRes{}, query.Error
+	}
+	if query.RowsAffected < 1 {
+		return models.AddressRes{}, errors.New(`no address found to update with this id`)
 	}
 	return AddressRes, nil
 }
@@ -105,11 +108,195 @@ func ViewAddress(id uint) ([]models.AddressRes, error) {
 	return Address, nil
 }
 
-func DeleteAddress(AddressId int, UserId int) error {
-	query := initialisers.DB.Exec(`DELETE FROM addresses WHERE id = ? && user_id = ?`, AddressId, UserId)
+func RemoveAddress(Userid uint, aid string) error {
+	query := initialisers.DB.Exec(`DELETE FROM addresses WHERE id = ? && user_id = ?`, aid, Userid)
 	if query.Error != nil {
 		return query.Error
 	}
 
 	return nil
 }
+
+func UserProfile(userid uint) (models.UserProfile, error) {
+	var User models.UserProfile
+	query := initialisers.DB.Raw(`SELECT * FROM users WHERE id = ?`, userid).Scan(&User)
+	if query.Error != nil {
+		return models.UserProfile{}, query.Error
+	}
+
+	if query.RowsAffected < 1 {
+		return models.UserProfile{}, errors.New(`no user profile found`)
+	}
+
+	return User, nil
+}
+
+func UpdateUserProfile(userid uint, user models.UserProfile) (models.UserProfile, error) {
+	var UpdatedUser models.UserProfile
+	query := initialisers.DB.Exec(`UPDATE users SET firstname = ?,lastname = ?,email = ?,phone = ? WHERE id = ?`, user.FirstName, user.LastName, user.Email, user.Phone, userid).Scan(&UpdatedUser)
+	if query.Error != nil {
+		return models.UserProfile{}, query.Error
+	}
+
+	return UpdatedUser, nil
+}
+
+// func UpdateUserEmail(email string, userID int) error {
+// 	err := initialisers.DB.Exec("UPDATE users SET email= ? WHERE id = ?", email, userID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func UpdateUserPhone(phone string, userID int) error {
+// 	if err := initialisers.DB.Exec("UPDATE users SET phone = ? WHERE id = ?", phone, userID).Error; err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func UpdateFirstName(name string, userID int) error {
+
+// 	err := initialisers.DB.Exec("update users set firstname = ? where id = ?", name, userID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+
+// }
+// func UpdateLastName(name string, userID int) error {
+
+// 	err := initialisers.DB.Exec("update users set lastname = ? where id = ?", name, userID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+
+// }
+// func CheckAddressAvailabilityWithAddressID(addressID, userID int) bool {
+// 	var count int
+// 	if err := initialisers.DB.Raw("SELECT COUNT(*) FROM addresses WHERE id = ? AND user_id = ?", addressID, userID).Scan(&count).Error; err != nil {
+// 		return false
+// 	}
+// 	return count > 0
+// }
+// func UpdateName(name string, addressID int) error {
+// 	err := initialisers.DB.Exec("UPDATE addresses SET name= ? WHERE id = ?", name, addressID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func UpdateHouseName(HouseName string, addressID int) error {
+// 	err := initialisers.DB.Exec("UPDATE addresses SET house_name= ? WHERE id = ?", HouseName, addressID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func UpdateStreet(street string, addressID int) error {
+// 	err := initialisers.DB.Exec("UPDATE addresses SET street= ? WHERE id = ?", street, addressID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func UpdateCity(city string, addressID int) error {
+// 	err := initialisers.DB.Exec("UPDATE addresses SET city= ? WHERE id = ?", city, addressID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func UpdateState(state string, addressID int) error {
+// 	err := initialisers.DB.Exec("UPDATE addresses SET state= ? WHERE id = ?", state, addressID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func UpdatePin(pin string, addressID int) error {
+// 	err := initialisers.DB.Exec("UPDATE addresses SET pin= ? WHERE id = ?", pin, addressID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func AddressDetails(addressID int) (models.AddressInfoResponse, error) {
+// 	var addressDetails models.AddressInfoResponse
+// 	err := initialisers.DB.Raw("SELECT a.id, a.name, a.house_name, a.street, a.city, a.state, a.pin FROM addresses a WHERE a.id = ?", addressID).Row().Scan(&addressDetails.ID, &addressDetails.Name, &addressDetails.HouseName, &addressDetails.Street, &addressDetails.City, &addressDetails.State, &addressDetails.Pin)
+// 	if err != nil {
+// 		return models.AddressInfoResponse{}, err
+// 	}
+// 	return addressDetails, nil
+// }
+
+// func ChangePassword(id int, password string) error {
+// 	err := initialisers.DB.Exec("UPDATE users SET password = $1 WHERE id = $2", password, id).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func GetPassword(id int) (string, error) {
+// 	var userPassword string
+// 	err := initialisers.DB.Raw("SELECT password FROM users WHERE id = ?", id).Scan(&userPassword).Error
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return userPassword, nil
+// }
+// func UpdateQuantityAdd(id, prdt_id int) error {
+// 	err := initialisers.DB.Exec("UPDATE Carts SET quantity = quantity + 1 WHERE user_id=$1 AND product_id = $2 ", id, prdt_id).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
+// func UpdateTotalPrice(id, product_id int) error {
+// 	err := initialisers.DB.Exec("UPDATE carts SET total_price = carts.quantity * products.price FROM products  WHERE carts.product_id = products.id AND carts.user_id = $1 AND carts.product_id = $2", id, product_id).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
+// func UpdateQuantityless(id, prdt_id int) error {
+// 	err := initialisers.DB.Exec("UPDATE Carts SET quantity = quantity - 1 WHERE user_id=$1 AND product_id = $2 ", id, prdt_id).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+// func FindUserByMobileNumber(phone string) bool {
+
+// 	var count int
+// 	if err := initialisers.DB.Raw("SELECT count(*) FROM users WHERE phone = ?", phone).Scan(&count).Error; err != nil {
+// 		return false
+// 	}
+
+// 	return count > 0
+
+// }
+// func FindIdFromPhone(phone string) (int, error) {
+// 	var id int
+// 	if err := initialisers.DB.Raw("SELECT id FROM users WHERE phone=?", phone).Scan(&id).Error; err != nil {
+// 		return id, err
+// 	}
+// 	return id, nil
+// }
+// func AddressExistInUserProfile(addressID, userID int) (bool, error) {
+// 	var count int
+// 	err := initialisers.DB.Raw("SELECT COUNT (*) FROM addresses WHERE user_id = $1 AND id = $2", userID, addressID).Scan(&count).Error
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	return count > 0, nil
+// }
+// func RemoveFromUserProfile(userID, addressID int) error {
+// 	err := initialisers.DB.Exec("DELETE FROM addresses WHERE user_id = ? AND  id= ?", userID, addressID).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }

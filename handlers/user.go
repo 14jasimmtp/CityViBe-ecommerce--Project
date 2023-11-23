@@ -82,70 +82,137 @@ func ForgotPassword(c *gin.Context) {
 
 }
 
-func ResetForgottenPassword(c *gin.Context){
+func ResetForgottenPassword(c *gin.Context) {
 	var Newpassword models.ForgotPassword
 
-	if c.ShouldBindJSON(&Newpassword) != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter details in correct format"})
+	if c.ShouldBindJSON(&Newpassword) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter details in correct format"})
 		return
 	}
 
-	err:=usecase.ResetForgottenPassword(Newpassword)
-	if err != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"message":err.Error()})
+	err := usecase.ResetForgottenPassword(Newpassword)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 	}
 
-	c.JSON(http.StatusOK,gin.H{"message":"password changed successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "password changed successfully"})
 }
 
-
-func ViewUserAddress (c *gin .Context){
-	Token,err:=c.Cookie("Authorisation")
-	if err != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+func ViewUserAddress(c *gin.Context) {
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	Address,err:=usecase.ViewUserAddress(Token)
-	if err != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+	Address, err := usecase.ViewUserAddress(Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK,gin.H{"message":"User Address","Address":Address})
-
-
-
+	c.JSON(http.StatusOK, gin.H{"message": "User Address", "Address": Address})
 
 }
 
-
-func AddNewAddressDetails (c *gin.Context){
+func AddNewAddressDetails(c *gin.Context) {
 	var Address models.Address
 
-	if c.ShouldBindJSON(&Address) != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter Details correctly"})
+	if c.ShouldBindJSON(&Address) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
 	}
 
 	validator.New().Struct(Address)
 
-	Token,err:=c.Cookie("Authorisation")
-	if err != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	AddressRes,err:=usecase.AddAddress(Address,Token)
-	if err != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+	AddressRes, err := usecase.AddAddress(Address, Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK,gin.H{"message":"Address added successfully" ,"Address":AddressRes})
+	c.JSON(http.StatusOK, gin.H{"message": "Address added successfully", "Address": AddressRes})
 }
 
-func EditUserAddress (c *gin.Context){
-	
+func EditUserAddress(c *gin.Context) {
+	var UpdateAddress models.Address
+
+	if c.ShouldBindJSON(&UpdateAddress) != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter constraints correctly"})
+	}
+	Aid := c.Query("id")
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+
+	UpdatedAddress, err := usecase.UpdateAddress(Token, Aid,UpdateAddress)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Address updated successfully", "Address": UpdatedAddress})
+
 }
 
-func RemoveUserAddress (c *gin.Context){
+func RemoveUserAddress(c *gin.Context) {
+	Aid := c.Query("id")
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = usecase.DeleteAddress(Token, Aid)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Address removed successfully"})
+}
+
+func UserProfile(c *gin.Context) {
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	UserDetails, err := usecase.UserProfile(Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User Profile", "profile": UserDetails})
+
+}
+
+func UpdateUserProfile(c *gin.Context) {
+	var UserDetails models.UserProfile
+
+	if c.ShouldBindJSON(&UserDetails) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
+	}
+
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedUserDetails, err := usecase.UpdateUserProfile(Token, UserDetails)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Updated User Profile", "profile": updatedUserDetails})
 
 }
