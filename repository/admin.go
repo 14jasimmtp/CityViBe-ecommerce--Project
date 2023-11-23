@@ -42,3 +42,14 @@ func UnBlockUserByID(user models.UserDetailsResponse) error {
 
 	return nil
 }
+
+func GetAllOrderDetailsBrief() ([]models.CombinedOrderDetails, error) {
+
+	var orderDatails []models.CombinedOrderDetails
+	err := initialisers.DB.Raw("SELECT orders.order_id,orders.final_price,orders.shipment_status,orders.payment_status,users.firstname,users.email,users.phone,addresses.house_name,addresses.street,addresses.city,addresses.state,addresses.pin FROM orders INNER JOIN users ON orders.user_id = users.id INNER JOIN addresses ON orders.address_id = addresses.id ").Scan(&orderDatails).Error
+	if err != nil {
+		return []models.CombinedOrderDetails{}, nil
+	}
+	return orderDatails, nil
+
+}

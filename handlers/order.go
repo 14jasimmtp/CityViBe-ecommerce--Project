@@ -14,10 +14,10 @@ func OrderFromCart(c *gin.Context) {
 		return
 	}
 
-	CartId:=c.Query("cartId")
-	AddressId:=c.Query("AddressId")
+	CartId := c.Query("cartId")
+	AddressId := c.Query("AddressId")
 
-	OrderDetails, err := usecase.OrderFromCart(Token,CartId,AddressId)
+	OrderDetails, err := usecase.OrderFromCart(Token, CartId, AddressId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -77,4 +77,26 @@ func CancelOrder(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "order cancelled successfully"})
 
+}
+
+
+func CancelOrderByAdmin(c *gin.Context) {
+	orderID := c.Query("id")
+	err := usecase.CancelOrderByAdmin(orderID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "couldn't cancel the order"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Order cancelled successfully"})
+}
+
+func ShipOrderByAdmin(c *gin.Context) {
+	orderId:=c.Query("id")
+	err:=usecase.ShipOrders(orderId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,gin.H{"error":"couldn't ship order"})
+		return
+	}
+
+	c.JSON(http.StatusOK,gin.H{"message":"Order Shipped successfully"})
 }

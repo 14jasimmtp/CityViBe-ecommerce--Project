@@ -27,7 +27,7 @@ func UserRoutes(r *gin.Engine) {
 	r.PUT("/address", middlewares.UserAuthMiddleware, handlers.EditUserAddress)
 	r.DELETE("/address", middlewares.UserAuthMiddleware, handlers.RemoveUserAddress)
 
-	///cart
+	//cart
 	r.GET("/cart",middlewares.UserAuthMiddleware,handlers.ViewCart)
 	r.POST("/cart",middlewares.UserAuthMiddleware,handlers.AddToCart)
 	r.DELETE("/cart",middlewares.UserAuthMiddleware,handlers.RemoveProductsFromCart)

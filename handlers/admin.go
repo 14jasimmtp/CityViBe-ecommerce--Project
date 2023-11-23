@@ -64,8 +64,11 @@ func UnBlockUser(c *gin.Context) {
 }
 
 
-func OrderDetailsForAdmin(c *gin.Context){}
+func OrderDetailsForAdmin(c *gin.Context){
+	allOrderDetails,err:=usecase.GetAllOrderDetailsForAdmin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,gin.H{"error":"couldn't retrieve order details"})
+	}
 
-func ApproveOrder(c *gin.Context){}
-
-func CancelOrderFromAdmin(c *gin.Context){}
+	c.JSON(http.StatusOK,gin.H{"message":"Order details retrieved successfully","All orders":allOrderDetails})
+}
