@@ -9,7 +9,6 @@ type Cart struct {
 }
 
 type CartResponse struct {
-	UserName   string
 	TotalPrice float64
 	Cart       []Cart
 }

@@ -9,51 +9,137 @@ import (
 	"main.go/utils"
 )
 
-func ViewCart(Token string) ([]models.Cart, error) {
+func ViewCart(Token string) (models.CartResponse, error) {
 	UserId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
-		return []models.Cart{}, err
+		return models.CartResponse{}, err
 	}
 
 	Cart, err := repository.DisplayCart(UserId)
 	if err != nil {
-		return []models.Cart{}, err
+		return models.CartResponse{}, err
 	}
 
-	return Cart, nil
+	cartTotal, err := repository.CartTotalAmount(UserId)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+
+	return models.CartResponse{
+		TotalPrice: cartTotal,
+		Cart:       Cart,
+	}, nil
 
 }
 
-func AddToCart(pid, Token string) error {
+func AddToCart(pid, Token string) (models.CartResponse, error) {
 
 	_, err := repository.GetSingleProduct(pid)
 	if err != nil {
-		return errors.New("no products exist with this id")
+		return models.CartResponse{}, errors.New("product doesn't exist")
 	}
 
 	UserId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
-		return err
-	}
-
-
-	err=repository.CheckProductExistInCart(UserId,pid)
-	if err != nil{
-		return errors.New(`product already exist in cart`)
+		return models.CartResponse{}, err
 	}
 
 	ProId, err := strconv.Atoi(pid)
 	if err != nil {
+		return models.CartResponse{}, err
+	}
+
+	productPrize, err := repository.GetProductAmountFromID(pid)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+	true, err := repository.CheckProductExistInCart(UserId, pid)
+	if err != nil{
+		return models.CartResponse{},err
+	}
+	if true {
+		TotalProductAmount, err := repository.TotalPrizeOfProductInCart(UserId, pid)
+		if err != nil {
+			return models.CartResponse{}, err
+		}
+
+		err = repository.UpdateCart(1, TotalProductAmount+productPrize, UserId, pid)
+		if err != nil {
+			return models.CartResponse{}, err
+		}
+	} else {
+		err := repository.AddToCart(ProId, UserId)
+		if err != nil {
+			return models.CartResponse{}, err
+		}
+	}
+
+	CartDetails, err := repository.DisplayCart(UserId)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+
+	cartTotalAmount, err := repository.CartTotalAmount(UserId)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+
+	return models.CartResponse{
+		TotalPrice: cartTotalAmount,
+		Cart:       CartDetails,
+	}, nil
+}
+
+func RemoveProductsFromCart(pid, Token string) (models.CartResponse,error) {
+	ProId, err := strconv.Atoi(pid)
+	if err != nil {
+		return models.CartResponse{},err
+	}
+
+	UserId, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return models.CartResponse{},err
+	}
+
+	err = repository.RemoveProductFromCart(ProId, UserId)
+	if err != nil {
+		return models.CartResponse{},err
+	}
+
+	updatedCart, err := repository.DisplayCart(UserId)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+	cartTotal, err := repository.CartTotalAmount(UserId)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+	return models.CartResponse{
+		TotalPrice: cartTotal,
+		Cart:       updatedCart,
+	}, nil
+}
+
+func UpdateQuantityFromCart(Token, pid, quantity string) ([]models.Cart, error) {
+	UserId, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return []models.Cart{}, err
+	}
+
+	updatedCart, err := repository.UpdateQuantity(UserId, pid, quantity)
+	if err != nil {
+		return []models.Cart{}, err
+	}
+
+	return updatedCart, nil
+}
+
+func UpdateQuantityIncrease(Token, pid string) error {
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
 		return err
 	}
-
-	err = repository.CheckStock(ProId)
-	if err != nil {
-		return errors.New("product out of stock")
-	}
-
-
-	err = repository.AddToCart(ProId, UserId)
+	err = repository.UpdateQuantityAdd(userID, pid)
 	if err != nil {
 		return err
 	}
@@ -61,35 +147,69 @@ func AddToCart(pid, Token string) error {
 	return nil
 }
 
-func RemoveProductsFromCart(pid, Token string) error {
-	ProId,err:=strconv.Atoi(pid)
-	if err != nil{
+func UpdatePriceAdd(Token, pid string) error {
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
 		return err
 	}
-
-	UserId,err:=utils.ExtractUserIdFromToken(Token)
-	if err != nil{
+	err = repository.UpdateTotalPrice(userID, pid)
+	if err != nil {
 		return err
 	}
-
-	err=repository.RemoveProductFromCart(ProId,UserId)
-	if err != nil{
-		return err
-	}
-
 	return nil
 }
 
-func UpdateQuantityFromCart(Token,pid,quantity string)([]models.Cart,error){
-	UserId,err:=utils.ExtractUserIdFromToken(Token)
-	if err != nil{
-		return []models.Cart{},err
+func UpdateQuantityDecrease(Token, pid string) error {
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return err
 	}
 
-	updatedCart,err:=repository.UpdateQuantity(UserId,pid,quantity)
-	if err != nil{
-		return []models.Cart{},err
+	err = repository.UpdateQuantityless(userID, pid)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdatePriceDecrease(Token, pid string) error {
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return err
+	}
+	err = repository.UpdateTotalPrice(userID, pid)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func EraseCart(Token string) (models.CartResponse, error) {
+	userID,err:=utils.ExtractUserIdFromToken(Token)
+	if err !=  nil{
+		return models.CartResponse{},err
+	}
+	ok, err := repository.CartExist(userID)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+	if !ok {
+		return models.CartResponse{}, errors.New("cart already empty")
+	}
+	if err := repository.EmptyCart(userID); err != nil {
+		return models.CartResponse{}, err
 	}
 
-	return updatedCart,nil
+	cartTotal, err := repository.CartTotalAmount(userID)
+
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+
+	cartResponse := models.CartResponse{
+		TotalPrice: cartTotal,
+		Cart:       []models.Cart{},
+	}
+
+	return cartResponse, nil
 }

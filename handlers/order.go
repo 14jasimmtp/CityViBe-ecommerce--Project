@@ -14,7 +14,10 @@ func OrderFromCart(c *gin.Context) {
 		return
 	}
 
-	OrderDetails, err := usecase.OrderFromCart(Token)
+	CartId:=c.Query("cartId")
+	AddressId:=c.Query("AddressId")
+
+	OrderDetails, err := usecase.OrderFromCart(Token,CartId,AddressId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -24,7 +27,7 @@ func OrderFromCart(c *gin.Context) {
 
 }
 
-func ViewCheckOut(c *gin.Context){
+func ViewCheckOut(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,7 +43,7 @@ func ViewCheckOut(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"message": "ordered products successfully", "order Details": OrderDetails})
 }
 
-func ViewOrders(c *gin.Context){
+func ViewOrders(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -57,7 +60,21 @@ func ViewOrders(c *gin.Context){
 
 }
 
+func CancelOrder(c *gin.Context) {
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-func CancelOrder(c *gin.Context){
-	
+	orderId := c.Query("id")
+
+	err = usecase.CancelOrder(Token, orderId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "order cancelled successfully"})
+
 }

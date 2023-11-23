@@ -100,3 +100,12 @@ func CheckStock(pid int) error{
 	}
 	return nil
 }
+
+func GetProductAmountFromID(pid string) (float64, error) {
+	var productPrice float64
+
+	if err := initialisers.DB.Raw("select price from products where id = ?", pid).Scan(&productPrice).Error; err != nil {
+		return 0.0, err
+	}
+	return productPrice, nil
+}

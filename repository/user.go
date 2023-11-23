@@ -141,6 +141,14 @@ func UpdateUserProfile(userid uint, user models.UserProfile) (models.UserProfile
 	return UpdatedUser, nil
 }
 
+func CheckAddressExist(userid uint,address string) bool{
+	var count int
+	if err := initialisers.DB.Raw("SELECT COUNT(*) FROM addresses WHERE id = ? AND user_id = ?", address, userid).Scan(&count).Error; err != nil {
+		return false
+	}
+	return count > 0
+}
+
 // func UpdateUserEmail(email string, userID int) error {
 // 	err := initialisers.DB.Exec("UPDATE users SET email= ? WHERE id = ?", email, userID).Error
 // 	if err != nil {

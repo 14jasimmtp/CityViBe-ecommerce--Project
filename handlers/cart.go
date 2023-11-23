@@ -16,13 +16,13 @@ func AddToCart(c *gin.Context) {
 		return
 	}
 
-	err = usecase.AddToCart(pid, Token)
+	Cart, err := usecase.AddToCart(pid, Token)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "product added to cart successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "product added to cart successfully", "Cart": Cart})
 }
 
 func ViewCart(c *gin.Context) {
@@ -50,19 +50,18 @@ func RemoveProductsFromCart(c *gin.Context) {
 		return
 	}
 
-	err = usecase.RemoveProductsFromCart(id, Token)
+	Cart,err := usecase.RemoveProductsFromCart(id, Token)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "product removed from cart successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "product removed from cart successfully","Cart":Cart})
 
 }
 
-func UpdateQuantityFromCart(c *gin.Context){
-	pid:=c.Query("id")
-	quantity:=c.Query("quantity")
+func IncreaseQuantityUpdate(c *gin.Context) {
+	pid := c.Query("product")
 
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -70,13 +69,58 @@ func UpdateQuantityFromCart(c *gin.Context){
 		return
 	}
 
-	UpdatedCart,err:=usecase.UpdateQuantityFromCart(Token,pid,quantity)
+	err=usecase.UpdateQuantityIncrease(Token,pid)
 	if err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to add quantity"})
+		return
+	}
+
+	err=usecase.UpdatePriceAdd(Token,pid)
+	if err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to add quantity"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "quantity added successfully"})
+
+}
+
+
+func DecreaseQuantityUpdate(c *gin.Context) {
+	pid := c.Query("product")
+
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message":"quantity updated successfully" ,"Cart":UpdatedCart})
+	err=usecase.UpdateQuantityDecrease(Token,pid)
+	if err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to decrease quantity"})
+		return
+	}
 
+	err=usecase.UpdatePriceDecrease(Token,pid)
+	if err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to decrease quantity"})
+		return
+	}
 
+	c.JSON(http.StatusOK, gin.H{"message": "quantity decreased by 1 successfully"})
+}
+
+func EraseCartAfterOrder(c *gin.Context){
+	Token,err:=c.Cookie("Authorisation")
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	cart,err:=usecase.EraseCart(Token)
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK,gin.H{"message":"cart emptied successfully","cart":cart})
 }
