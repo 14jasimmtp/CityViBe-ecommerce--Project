@@ -7,7 +7,7 @@ import (
 
 type Admin struct {
 	gorm.Model
-	Email string `gorm:"UNIQUE"`
+	Email    string `gorm:"UNIQUE"`
 	Name     string
 	AdminID  uuid.UUID `gorm:"PRIMARY KEY"`
 	Password string
