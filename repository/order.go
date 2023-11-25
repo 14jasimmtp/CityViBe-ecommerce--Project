@@ -53,7 +53,7 @@ func GetOrder(orderID int) (domain.Order, error) {
 
 func GetOrderDetails(userID uint) ([]models.ViewOrderDetails, error) {
 	var orderDatails []models.OrderDetails
-	initialisers.DB.Raw("SELECT id, final_price, order_status, payment_status FROM orders WHERE user_id = ? ", userID).Scan(&orderDatails)
+	initialisers.DB.Raw("SELECT id, final_price, order_status,payment_method, payment_status FROM orders WHERE user_id = ? ", userID).Scan(&orderDatails)
 	var fullOrderDetails []models.ViewOrderDetails
 	for _, ok := range orderDatails {
 		var OrderProductDetails []models.OrderProductDetails

@@ -51,7 +51,7 @@ func OrderFromCart(Token, AddressId string) (domain.Order, error) {
 
 	cartExist := repository.CheckCartExist(userId)
 	if !cartExist {
-		return domain.Order{}, errors.New(`cart doesn't exist`)
+		return domain.Order{}, errors.New(`cart is empty`)
 
 	}
 
@@ -215,7 +215,7 @@ func DeliverOrder(orderId string) error{
 	}
 
 	if OrderStatus == "pending" {
-		return errors.New("the order is not shipped yet.")
+		return errors.New("the order is not shipped yet")
 	}
 
 	if OrderStatus == "Shipped" {

@@ -20,6 +20,7 @@ type OrderDetails struct {
 	Id            string
 	FinalPrice    float64
 	OrderStatus   string
+	PaymentMethod string
 	PaymentStatus string
 }
 
