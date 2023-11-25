@@ -39,7 +39,7 @@ func ViewCheckOut(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "ordered products successfully", "order Details": OrderDetails})
+	c.JSON(http.StatusOK, gin.H{"message": "CheckOut Page loaded successfully", "order Details": OrderDetails})
 }
 
 func ViewOrders(c *gin.Context) {
@@ -98,4 +98,16 @@ func ShipOrderByAdmin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK,gin.H{"message":"Order Shipped successfully"})
+}
+
+func DeliverOrderByAdmin(c *gin.Context){
+	id:=c.Query("orderId")
+
+	err:=usecase.DeliverOrder(id)
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK,gin.H{"message":"order delivered successfully"})
+
 }

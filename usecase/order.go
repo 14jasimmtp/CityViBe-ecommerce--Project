@@ -129,7 +129,7 @@ func CancelOrder(Token, orderId string) error {
 	}
 
 	if OrderStatus == "Delivered" {
-		return errors.New(`the order is delivered .You can return the product `)
+		return errors.New(`the order is delivered .Can't Cancel`)
 	}
 
 	if OrderStatus == "Cancelled" {
@@ -191,6 +191,35 @@ func ShipOrders(orderId string) error{
 
 	if OrderStatus == "pending" {
 		err := repository.ShipOrder(orderId)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	// if the shipment status is not processing or cancelled. Then it is defenetely cancelled
+	return nil
+}
+
+func DeliverOrder(orderId string) error{
+	
+	OrderStatus, err := repository.GetOrderStatus(orderId)
+	if err != nil {
+		return err
+	}
+	if OrderStatus == "Cancelled" {
+		return errors.New("the order is cancelled,cannot deliver it")
+	}
+
+	if OrderStatus == "Delivered" {
+		return errors.New("the order is already delivered")
+	}
+
+	if OrderStatus == "pending" {
+		return errors.New("the order is not shipped yet.")
+	}
+
+	if OrderStatus == "Shipped" {
+		err := repository.DeliverOrder(orderId)
 		if err != nil {
 			return err
 		}

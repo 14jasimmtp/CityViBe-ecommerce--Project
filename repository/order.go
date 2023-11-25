@@ -94,7 +94,7 @@ func GetOrderStatus(orderId string) (string, error) {
 }
 
 func CancelOrder(order_id string, userID uint) error {
-	status := "cancelled"
+	status := "Cancelled"
 	err := initialisers.DB.Exec("UPDATE orders SET order_status = ? ,payment_status = 'refunded', approval='false' WHERE id = ? AND user_id = ?", status, order_id, userID).Error
 	if err != nil {
 		return err
@@ -147,8 +147,9 @@ func ShipOrder(orderId string) error {
 	return nil
 }
 
-func PlaceOrder(orderId string) error {
-	err := initialisers.DB.Exec("UPDATE orders SET order_status = 'Delivered' ,payment_status = 'paid' approval = 'true' WHERE id = ?", orderId).Error
+func DeliverOrder(orderId string) error {
+	status := "Delivered"
+	err := initialisers.DB.Exec("UPDATE orders SET order_status = ? ,payment_status = 'paid', approval='false' WHERE id = ? ", status, orderId).Error
 	if err != nil {
 		return err
 	}

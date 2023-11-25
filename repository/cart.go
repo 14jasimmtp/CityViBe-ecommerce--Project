@@ -29,7 +29,7 @@ func DisplayCart(userid uint) ([]models.Cart, error) {
 
 	var Cart []models.Cart
 
-	if err := initialisers.DB.Raw("SELECT carts.user_id,users.firstname as user_name,carts.product_id,products.name as product_name,carts.quantity,carts.price FROM carts inner join users on carts.user_id = users.id inner join products on carts.product_id = products.id where user_id = ?", userid).First(&Cart).Error; err != nil {
+	if err := initialisers.DB.Raw("SELECT carts.user_id,users.firstname as user_name,carts.product_id,products.name as product_name,categories.category as category,carts.quantity,carts.price FROM carts inner join users on carts.user_id = users.id inner join products on carts.product_id = products.id inner join categories on categories.id = products.category_id where user_id = ?", userid).First(&Cart).Error; err != nil {
 		return []models.Cart{}, err
 	}
 

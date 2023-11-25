@@ -86,7 +86,7 @@ func GetSingleProduct(id string) (models.Product, error) {
 	return product, nil
 }
 
-func ViewProductsCategorywise(category string) ([]models.Product, error) {
+func FilterProductCategoryWise(category string) ([]models.Product, error) {
 	var product []models.Product
 	initialisers.DB.Raw(`SELECT name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE categories.category = ? `, category).Scan(&product)
 	return product, nil
