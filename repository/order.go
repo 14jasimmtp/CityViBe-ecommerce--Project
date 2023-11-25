@@ -116,6 +116,18 @@ func UpdateStock(orderProducts []models.OrderProducts) error {
 	return nil
 }
 
+func UpdateSingleStock(pid string) error {
+	var quantity int
+	if err := initialisers.DB.Raw("SELECT stock FROM products WHERE id = ?", pid).Scan(&quantity).Error; err != nil {
+		return err
+	}
+	quantity = quantity + 1
+	if err := initialisers.DB.Exec("UPDATE products SET stock  = ? WHERE id = ?", quantity, pid).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func UpdateCartAndStockAfterOrder(userID uint, productID int, quantity float64) error {
 	err := initialisers.DB.Exec("DELETE FROM carts WHERE user_id = ? and product_id = ?", userID, productID).Error
 	if err != nil {
@@ -127,6 +139,26 @@ func UpdateCartAndStockAfterOrder(userID uint, productID int, quantity float64) 
 		return err
 	}
 
+	return nil
+}
+
+func CheckSingleOrder(pid, orderId string, userId uint) error {
+	var count int
+	err := initialisers.DB.Raw("SELECT COUNT(*) FROM order_items WHERE product_id = ? AND order_id =? AND user_id = ?", pid, orderId, userId).Scan(&count).Error
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return errors.New(`no orders found`)
+	}
+	return nil
+}
+
+func CancelSingleOrder(pid, orderId string, userId uint) error {
+	err := initialisers.DB.Exec("DELETE FROM order_items WHERE product_id = ? AND order_id = ? AND user_id = ? ", pid, orderId, userId).Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

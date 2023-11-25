@@ -65,17 +65,14 @@ func OrderFromCart(Token, AddressId string) (domain.Order, error) {
 		return domain.Order{}, err
 	}
 
-	OrderID, err := repository.OrderFromCart(AddressId, userId,TotalAmount)
+	OrderID, err := repository.OrderFromCart(AddressId, userId, TotalAmount)
 	if err != nil {
 		return domain.Order{}, err
 	}
 
-
 	if err := repository.AddOrderProducts(OrderID, cartItems); err != nil {
 		return domain.Order{}, err
 	}
-
-	
 
 	body, err := repository.GetOrder(OrderID)
 	if err != nil {
@@ -136,7 +133,7 @@ func CancelOrder(Token, orderId string) error {
 		return errors.New(`the order is already cancelled`)
 	}
 
-	err = repository.CancelOrder(orderId,UserID)
+	err = repository.CancelOrder(orderId, UserID)
 	if err != nil {
 		return err
 	}
@@ -153,7 +150,7 @@ func CancelOrder(Token, orderId string) error {
 func CancelOrderByAdmin(order_id string) error {
 	err := repository.CheckOrder(order_id)
 	fmt.Println(err)
-	if err !=nil{
+	if err != nil {
 		return errors.New(`no orders found with this id`)
 	}
 	orderProduct, err := repository.GetProductDetailsFromOrders(order_id)
@@ -172,7 +169,7 @@ func CancelOrderByAdmin(order_id string) error {
 	return nil
 }
 
-func ShipOrders(orderId string) error{
+func ShipOrders(orderId string) error {
 	OrderStatus, err := repository.GetOrderStatus(orderId)
 	if err != nil {
 		return err
@@ -200,8 +197,8 @@ func ShipOrders(orderId string) error{
 	return nil
 }
 
-func DeliverOrder(orderId string) error{
-	
+func DeliverOrder(orderId string) error {
+
 	OrderStatus, err := repository.GetOrderStatus(orderId)
 	if err != nil {
 		return err
@@ -227,4 +224,48 @@ func DeliverOrder(orderId string) error{
 	}
 	// if the shipment status is not processing or cancelled. Then it is defenetely cancelled
 	return nil
+}
+
+func CancelSingleProduct(pid, Token, orderID string) ([]models.OrderProducts, error) {
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return []models.OrderProducts{}, err
+	}
+
+	err = repository.CheckSingleOrder(pid, orderID, userID)
+	if err != nil {
+		return []models.OrderProducts{}, errors.New(`no orders found with this id`)
+	}
+
+	OrderStatus, err := repository.GetOrderStatus(orderID)
+	if err != nil {
+		return []models.OrderProducts{}, err
+	}
+
+	if OrderStatus == "Delivered" {
+		return []models.OrderProducts{}, errors.New(`the order is delivered .Can't Cancel`)
+	}
+
+	if OrderStatus == "Cancelled" {
+		return []models.OrderProducts{}, errors.New(`the order is already cancelled`)
+	}
+
+	err = repository.CancelSingleOrder(pid, orderID, userID)
+	if err != nil {
+		return []models.OrderProducts{}, err
+	}
+
+	err = repository.UpdateSingleStock(pid)
+	if err != nil {
+		return []models.OrderProducts{}, err
+	}
+
+	orderDetails, err := repository.GetProductDetailsFromOrders(orderID)
+	if err != nil {
+		return []models.OrderProducts{}, err
+	}
+
+
+	return orderDetails, nil
+
 }

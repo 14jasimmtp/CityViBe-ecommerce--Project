@@ -44,6 +44,7 @@ func UserRoutes(r *gin.Engine) {
 	r.POST("/orders", middlewares.UserAuthMiddleware, handlers.OrderFromCart)
 	r.GET("/checkout", middlewares.UserAuthMiddleware, handlers.ViewCheckOut)
 	r.PUT("/orders", middlewares.UserAuthMiddleware, handlers.CancelOrder)
+	r.PUT("/orders/cancel",middlewares.UserAuthMiddleware,handlers.CancelSingleProduct)
 
 	//wishlist
 	r.GET("/wishlist", middlewares.UserAuthMiddleware, handlers.ViewUserWishlist)

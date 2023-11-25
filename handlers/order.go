@@ -111,3 +111,22 @@ func DeliverOrderByAdmin(c *gin.Context){
 	c.JSON(http.StatusOK,gin.H{"message":"order delivered successfully"})
 
 }
+
+func CancelSingleProduct(c *gin.Context){
+	id:=c.Query("pid")
+	orderID:=c.Query("oid")
+
+	Token,err:=c.Cookie("Authorisation")
+if err != nil{
+	c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+	return 
+}
+
+	orderDetails,err:=usecase.CancelSingleProduct(id,Token,orderID)
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK,gin.H{"message":"Cancelled product from orders","Order Details":orderDetails})
+}
