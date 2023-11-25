@@ -28,20 +28,21 @@ func UserRoutes(r *gin.Engine) {
 	r.DELETE("/address", middlewares.UserAuthMiddleware, handlers.RemoveUserAddress)
 
 	//cart
-	r.GET("/cart",middlewares.UserAuthMiddleware,handlers.ViewCart)
-	r.POST("/cart",middlewares.UserAuthMiddleware,handlers.AddToCart)
-	r.DELETE("/cart",middlewares.UserAuthMiddleware,handlers.RemoveProductsFromCart)
+	r.GET("/cart", middlewares.UserAuthMiddleware, handlers.ViewCart)
+	r.POST("/cart", middlewares.UserAuthMiddleware, handlers.AddToCart)
+	r.DELETE("/cart", middlewares.UserAuthMiddleware, handlers.RemoveProductsFromCart)
+	r.PUT("/cart/add-quantity", middlewares.UserAuthMiddleware, handlers.IncreaseQuantityUpdate)
+	r.PUT("/cart/reduce-quantity", middlewares.UserAuthMiddleware, handlers.DecreaseQuantityUpdate)
 
 	//orders
-	r.GET("/orders",middlewares.UserAuthMiddleware,handlers.ViewOrders)
-	r.POST("/orders",middlewares.UserAuthMiddleware,handlers.OrderFromCart)
-	r.GET("/checkout",middlewares.UserAuthMiddleware,handlers.ViewCheckOut)
-	r.PUT("/orders",middlewares.UserAuthMiddleware,handlers.CancelOrder)
+	r.GET("/orders", middlewares.UserAuthMiddleware, handlers.ViewOrders)
+	r.POST("/orders", middlewares.UserAuthMiddleware, handlers.OrderFromCart)
+	r.GET("/checkout", middlewares.UserAuthMiddleware, handlers.ViewCheckOut)
+	r.PUT("/orders", middlewares.UserAuthMiddleware, handlers.CancelOrder)
 
 	//wishlist
-	r.GET("/wishlist",middlewares.UserAuthMiddleware,handlers.ViewUserWishlist)
-	r.POST("/wishlist",middlewares.UserAuthMiddleware,handlers.AddProductToWishlist)
-	r.DELETE("/wishlist",middlewares.UserAuthMiddleware,handlers.RemoveProductFromWishlist)
-	
+	r.GET("/wishlist", middlewares.UserAuthMiddleware, handlers.ViewUserWishlist)
+	r.POST("/wishlist", middlewares.UserAuthMiddleware, handlers.AddProductToWishlist)
+	r.DELETE("/wishlist", middlewares.UserAuthMiddleware, handlers.RemoveProductFromWishlist)
 
 }

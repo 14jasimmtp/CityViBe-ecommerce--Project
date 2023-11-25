@@ -38,7 +38,7 @@ func CheckOut(Token string) (models.CheckOutInfo, error) {
 	}, nil
 }
 
-func OrderFromCart(Token, cartId, AddressId string) (domain.Order, error) {
+func OrderFromCart(Token, AddressId string) (domain.Order, error) {
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return domain.Order{}, err
@@ -49,7 +49,7 @@ func OrderFromCart(Token, cartId, AddressId string) (domain.Order, error) {
 		return domain.Order{}, errors.New(`address doesn't exist`)
 	}
 
-	cartExist := repository.CheckCartExist(userId, cartId)
+	cartExist := repository.CheckCartExist(userId)
 	if !cartExist {
 		return domain.Order{}, errors.New(`cart doesn't exist`)
 
@@ -60,17 +60,35 @@ func OrderFromCart(Token, cartId, AddressId string) (domain.Order, error) {
 		return domain.Order{}, errors.New(`error while calculating total amount`)
 	}
 
-	Order, err := repository.OrderFromCart(cartId, AddressId, userId)
+	cartItems, err := repository.DisplayCart(userId)
 	if err != nil {
 		return domain.Order{}, err
 	}
 
-	if err := repository.AddAmountToOrder(TotalAmount, Order.ID); err != nil {
-		return domain.Order{}, err
-	}
-	body, err := repository.GetOrder(int(Order.ID))
+	OrderID, err := repository.OrderFromCart(AddressId, userId,TotalAmount)
 	if err != nil {
 		return domain.Order{}, err
+	}
+
+
+	if err := repository.AddOrderProducts(OrderID, cartItems); err != nil {
+		return domain.Order{}, err
+	}
+
+
+	body, err := repository.GetOrder(OrderID)
+	if err != nil {
+		return domain.Order{}, err
+	}
+
+	var orderItemDetails domain.OrderItem
+	for _, c := range cartItems {
+		orderItemDetails.ProductID = c.ProductID
+		orderItemDetails.Quantity = c.Quantity
+		err := repository.UpdateCartAfterOrder(userId, int(orderItemDetails.ProductID), orderItemDetails.Quantity)
+		if err != nil {
+			return domain.Order{}, err
+		}
 	}
 	return body, nil
 

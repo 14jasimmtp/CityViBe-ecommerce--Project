@@ -6,20 +6,21 @@ type CheckOutInfo struct {
 	TotalAmount float64      `json:"Total Amount"`
 }
 
-type OrderResponse struct{
-
+type OrderSuccessResponse struct {
+	OrderID        uint   `json:"order_id"`
+	ShipmentStatus string `json:"shipment_status"`
 }
 
-type ViewOrderDetails struct{
+type ViewOrderDetails struct {
 	OrderDetails        OrderDetails
 	OrderProductDetails []OrderProductDetails
 }
 
 type OrderDetails struct {
-	OrderId        string
-	FinalPrice     float64
-	ShipmentStatus string
-	PaymentStatus  string
+	Id            string
+	FinalPrice    float64
+	OrderStatus   string
+	PaymentStatus string
 }
 
 type OrderProductDetails struct {
@@ -35,16 +36,16 @@ type OrderProducts struct {
 }
 
 type CombinedOrderDetails struct {
-	OrderId        string  `json:"order_id"`
-	FinalPrice     float64 `json:"final_price"`
-	ShipmentStatus string  `json:"shipment_status"`
-	PaymentStatus  string  `json:"payment_status"`
-	Firstname      string  `json:"firstname"`
-	Email          string  `json:"email"`
-	Phone          string  `json:"phone"`
-	HouseName      string  `json:"house_name" validate:"required"`
-	Street         string  `json:"street"`
-	City           string  `json:"city"`
-	State          string  `json:"state" validate:"required"`
-	Pin            string  `json:"pin" validate:"required"`
+	Id            string  `json:"order_id"`
+	FinalPrice    float64 `json:"final_price"`
+	OrderStatus   string  `json:"order_status"`
+	PaymentStatus string  `json:"payment_status"`
+	Firstname     string  `json:"firstname"`
+	Email         string  `json:"email"`
+	Phone         string  `json:"phone"`
+	HouseName     string  `json:"house_name" validate:"required"`
+	Street        string  `json:"street"`
+	City          string  `json:"city"`
+	State         string  `json:"state" validate:"required"`
+	Pin           string  `json:"pin" validate:"required"`
 }

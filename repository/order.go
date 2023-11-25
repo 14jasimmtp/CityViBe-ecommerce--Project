@@ -8,20 +8,36 @@ import (
 	"main.go/models"
 )
 
-func OrderFromCart(cartid, addressid string, userid uint) (domain.Order, error) {
-	var Order domain.Order
-	err := initialisers.DB.Exec("INSERT INTO orders (created_at, user_id, address_id, cart_id) SELECT NOW(), c.user_id, a.id, c.id FROM carts c JOIN addresses a ON c.user_id = a.user_id WHERE a.id = ? AND c.id = ? AND c.user_id = ? ", cartid, addressid, userid).Scan(&Order).Error
-	if err != nil {
-		return domain.Order{}, err
-	}
-
-	return Order, nil
+func OrderFromCart(addressid string, userid uint, price float64) (int, error) {
+	var id int
+	query := `
+    INSERT INTO orders (created_at , user_id , address_id , final_price)
+    VALUES (NOW(),?, ?, ?)
+    RETURNING id`
+	initialisers.DB.Raw(query, userid, addressid, price).Scan(&id)
+	return id, nil
 }
 
 func AddAmountToOrder(Amount float64, orderID uint) error {
 	err := initialisers.DB.Exec("UPDATE orders SET final_price = ? WHERE id = ?", Amount, orderID).Error
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func AddOrderProducts(order_id int, cart []models.Cart) error {
+	query := `
+    INSERT INTO order_items (order_id,product_id,quantity,total_price)
+    VALUES (?, ?, ?, ?) `
+	for _, v := range cart {
+		var productID int
+		if err := initialisers.DB.Raw("SELECT id FROM products WHERE name = $1", v.ProductName).Scan(&productID).Error; err != nil {
+			return err
+		}
+		if err := initialisers.DB.Exec(query, order_id, productID, v.Quantity, v.Price).Error; err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -37,11 +53,11 @@ func GetOrder(orderID int) (domain.Order, error) {
 
 func GetOrderDetails(userID uint) ([]models.ViewOrderDetails, error) {
 	var orderDatails []models.OrderDetails
-	initialisers.DB.Raw("SELECT order_id, final_price, order_status, payment_status FROM orders WHERE user_id = ? ", userID).Scan(&orderDatails)
+	initialisers.DB.Raw("SELECT id, final_price, order_status, payment_status FROM orders WHERE user_id = ? ", userID).Scan(&orderDatails)
 	var fullOrderDetails []models.ViewOrderDetails
 	for _, ok := range orderDatails {
 		var OrderProductDetails []models.OrderProductDetails
-		initialisers.DB.Raw("select order_items.product_id,products.name as product_name,order_items.quantity,order_items.total_price from order_items inner join products on order_items.product_id = products.id where order_items.order_id = ?", ok.OrderId).Scan(&OrderProductDetails)
+		initialisers.DB.Raw("SELECT order_items.product_id,products.name AS product_name,order_items.quantity,order_items.total_price FROM order_items INNER JOIN products ON order_items.product_id = products.id WHERE order_items.order_id = ?", ok.Id).Scan(&OrderProductDetails)
 		fullOrderDetails = append(fullOrderDetails, models.ViewOrderDetails{OrderDetails: ok, OrderProductDetails: OrderProductDetails})
 	}
 	return fullOrderDetails, nil
@@ -50,7 +66,7 @@ func GetOrderDetails(userID uint) ([]models.ViewOrderDetails, error) {
 
 func CheckOrder(orderid string) error {
 	var count int
-	err := initialisers.DB.Raw("SELECT * FROM orders WHERE order_id = ?", orderid).Scan(&count).Error
+	err := initialisers.DB.Raw("SELECT COUNT(*) FROM orders WHERE id = ?", orderid).Scan(&count).Error
 	if err != nil {
 		return err
 	}
@@ -62,7 +78,7 @@ func CheckOrder(orderid string) error {
 
 func GetProductDetailsFromOrders(order_id string) ([]models.OrderProducts, error) {
 	var OrderProductDetails []models.OrderProducts
-	if err := initialisers.DB.Raw("SELECT product_id,quantity FROM order_items WHERE order_id = ?", order_id).Scan(&OrderProductDetails).Error; err != nil {
+	if err := initialisers.DB.Raw("SELECT product_id,quantity FROM order_items WHERE id = ?", order_id).Scan(&OrderProductDetails).Error; err != nil {
 		return []models.OrderProducts{}, err
 	}
 	return OrderProductDetails, nil
@@ -70,16 +86,16 @@ func GetProductDetailsFromOrders(order_id string) ([]models.OrderProducts, error
 
 func GetOrderStatus(orderId string) (string, error) {
 	var status string
-	err := initialisers.DB.Raw("SELECT order_status FROM orders WHERE order_id= ?", orderId).Scan(&status).Error
+	err := initialisers.DB.Raw("SELECT order_status FROM orders WHERE id= ?", orderId).Scan(&status).Error
 	if err != nil {
 		return "", err
 	}
 	return status, nil
 }
 
-func CancelOrder(order_id string,userID uint) error {
+func CancelOrder(order_id string, userID uint) error {
 	status := "cancelled"
-	err := initialisers.DB.Exec("UPDATE orders SET order_status = ? ,payment_status = refunded, approval='false' WHERE order_id = ? AND user_id = ?", status, order_id,userID).Error
+	err := initialisers.DB.Exec("UPDATE orders SET order_status = ? ,payment_status = 'refunded', approval='false' WHERE id = ? AND user_id = ?", status, order_id, userID).Error
 	if err != nil {
 		return err
 	}
@@ -100,7 +116,21 @@ func UpdateStock(orderProducts []models.OrderProducts) error {
 	return nil
 }
 
-func CancelOrderByAdmin(orderID string) error{
+func UpdateCartAfterOrder(userID uint, productID int, quantity float64) error {
+	err := initialisers.DB.Exec("DELETE FROM carts WHERE user_id = ? and product_id = ?", userID, productID).Error
+	if err != nil {
+		return err
+	}
+
+	err = initialisers.DB.Exec("UPDATE products SET stock = stock - ? WHERE id = ?", quantity, productID).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CancelOrderByAdmin(orderID string) error {
 	status := "cancelled"
 	err := initialisers.DB.Exec("UPDATE orders SET order_status = ? ,payment_status = refunded, approval='false' WHERE order_id = ? ", status, orderID).Error
 	if err != nil {
@@ -109,7 +139,7 @@ func CancelOrderByAdmin(orderID string) error{
 	return nil
 }
 
-func ShipOrder(orderId string) error{
+func ShipOrder(orderId string) error {
 	err := initialisers.DB.Exec("UPDATE orders SET order_status = 'Shipped' , approval = 'true' WHERE order_id = ?", orderId).Error
 	if err != nil {
 		return err

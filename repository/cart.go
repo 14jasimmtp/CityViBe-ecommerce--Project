@@ -1,12 +1,14 @@
 package repository
 
 import (
+	"fmt"
+
 	initialisers "main.go/Initialisers"
 	"main.go/models"
 )
 
-func AddToCart(pid int, userid uint) error {
-	query := initialisers.DB.Exec(`INSERT INTO carts (user_id,product_id,quantity) VALUES (?,?,?)`, userid, pid, 1)
+func AddToCart(pid int, userid uint, productAmount float64) error {
+	query := initialisers.DB.Exec(`INSERT INTO carts (user_id,product_id,quantity,price) VALUES (?,?,?,?)`, userid, pid, 1, productAmount)
 	if query.Error != nil {
 		return query.Error
 	}
@@ -44,12 +46,14 @@ func RemoveProductFromCart(pid int, userid uint) error {
 }
 
 func CheckProductExistInCart(userId uint, pid string) (bool, error) {
-	query := initialisers.DB.Raw(`SELECT * FROM carts WHERE user_id = ? AND product_id = ?`, userId, pid)
+	var count int
+	query := initialisers.DB.Raw(`SELECT COUNT(*) FROM carts WHERE user_id = ? AND product_id = ?`, userId, pid).Scan(&count)
 	if query.Error != nil {
 		return false, query.Error
 	}
+	fmt.Println(count)
 
-	if query.RowsAffected > 0 {
+	if count > 0 {
 		return true, nil
 	}
 
@@ -72,21 +76,21 @@ func UpdateQuantity(userid uint, pid, quantity string) ([]models.Cart, error) {
 
 func CartTotalAmount(userid uint) (float64, error) {
 	var Amount float64
-	err := initialisers.DB.Raw(`SELECT SUM(price) WHERE user_id = ?`, userid).Scan(&Amount).Error
+	err := initialisers.DB.Raw(`SELECT SUM(price) FROM carts WHERE user_id = ?`, userid).Scan(&Amount).Error
+
 	if err != nil {
-		return 0.0, err
+		return 0.0, nil
 	}
 	return Amount, nil
 }
 
-func CheckCartExist(userID uint, cartID string) bool {
+func CheckCartExist(userID uint) bool {
 	var count int
-	if err := initialisers.DB.Raw("SELECT COUNT(*) FROM carts WHERE id = ? AND user_id = ?", cartID, userID).Scan(&count).Error; err != nil {
+	if err := initialisers.DB.Raw("SELECT COUNT(*) FROM carts WHERE  user_id = ?", userID).Scan(&count).Error; err != nil {
 		return false
 	}
 	return count > 0
 }
-
 
 func UpdateCart(quantity int, price float64, userID uint, product_id string) error {
 
@@ -130,7 +134,6 @@ func UpdateQuantityless(id uint, prdt_id string) error {
 	}
 	return nil
 }
-
 
 func CartExist(userID uint) (bool, error) {
 	var count int

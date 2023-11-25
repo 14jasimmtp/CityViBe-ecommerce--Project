@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"main.go/models"
@@ -54,9 +55,10 @@ func AddToCart(pid, Token string) (models.CartResponse, error) {
 		return models.CartResponse{}, err
 	}
 	true, err := repository.CheckProductExistInCart(UserId, pid)
-	if err != nil{
-		return models.CartResponse{},err
+	if err != nil {
+		return models.CartResponse{}, err
 	}
+	fmt.Println(true)
 	if true {
 		TotalProductAmount, err := repository.TotalPrizeOfProductInCart(UserId, pid)
 		if err != nil {
@@ -68,7 +70,7 @@ func AddToCart(pid, Token string) (models.CartResponse, error) {
 			return models.CartResponse{}, err
 		}
 	} else {
-		err := repository.AddToCart(ProId, UserId)
+		err := repository.AddToCart(ProId, UserId, productPrize)
 		if err != nil {
 			return models.CartResponse{}, err
 		}
@@ -90,20 +92,20 @@ func AddToCart(pid, Token string) (models.CartResponse, error) {
 	}, nil
 }
 
-func RemoveProductsFromCart(pid, Token string) (models.CartResponse,error) {
+func RemoveProductsFromCart(pid, Token string) (models.CartResponse, error) {
 	ProId, err := strconv.Atoi(pid)
 	if err != nil {
-		return models.CartResponse{},err
+		return models.CartResponse{}, err
 	}
 
 	UserId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
-		return models.CartResponse{},err
+		return models.CartResponse{}, err
 	}
 
 	err = repository.RemoveProductFromCart(ProId, UserId)
 	if err != nil {
-		return models.CartResponse{},err
+		return models.CartResponse{}, err
 	}
 
 	updatedCart, err := repository.DisplayCart(UserId)
@@ -185,9 +187,9 @@ func UpdatePriceDecrease(Token, pid string) error {
 }
 
 func EraseCart(Token string) (models.CartResponse, error) {
-	userID,err:=utils.ExtractUserIdFromToken(Token)
-	if err !=  nil{
-		return models.CartResponse{},err
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return models.CartResponse{}, err
 	}
 	ok, err := repository.CartExist(userID)
 	if err != nil {

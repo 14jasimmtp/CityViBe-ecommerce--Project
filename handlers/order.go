@@ -14,10 +14,9 @@ func OrderFromCart(c *gin.Context) {
 		return
 	}
 
-	CartId := c.Query("cartId")
 	AddressId := c.Query("AddressId")
 
-	OrderDetails, err := usecase.OrderFromCart(Token, CartId, AddressId)
+	OrderDetails, err := usecase.OrderFromCart(Token, AddressId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
