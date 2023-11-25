@@ -116,7 +116,7 @@ func UpdateStock(orderProducts []models.OrderProducts) error {
 	return nil
 }
 
-func UpdateCartAfterOrder(userID uint, productID int, quantity float64) error {
+func UpdateCartAndStockAfterOrder(userID uint, productID int, quantity float64) error {
 	err := initialisers.DB.Exec("DELETE FROM carts WHERE user_id = ? and product_id = ?", userID, productID).Error
 	if err != nil {
 		return err
@@ -131,8 +131,8 @@ func UpdateCartAfterOrder(userID uint, productID int, quantity float64) error {
 }
 
 func CancelOrderByAdmin(orderID string) error {
-	status := "cancelled"
-	err := initialisers.DB.Exec("UPDATE orders SET order_status = ? ,payment_status = refunded, approval='false' WHERE order_id = ? ", status, orderID).Error
+	status := "Cancelled"
+	err := initialisers.DB.Exec("UPDATE orders SET order_status = ? ,payment_status = 'refunded', approval='false' WHERE id = ? ", status, orderID).Error
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,15 @@ func CancelOrderByAdmin(orderID string) error {
 }
 
 func ShipOrder(orderId string) error {
-	err := initialisers.DB.Exec("UPDATE orders SET order_status = 'Shipped' , approval = 'true' WHERE order_id = ?", orderId).Error
+	err := initialisers.DB.Exec("UPDATE orders SET order_status = 'Shipped' , approval = 'true' WHERE id = ?", orderId).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func PlaceOrder(orderId string) error {
+	err := initialisers.DB.Exec("UPDATE orders SET order_status = 'Delivered' ,payment_status = 'paid' approval = 'true' WHERE id = ?", orderId).Error
 	if err != nil {
 		return err
 	}

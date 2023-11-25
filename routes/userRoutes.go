@@ -17,6 +17,10 @@ func UserRoutes(r *gin.Engine) {
 	r.GET("/products", handlers.GetAllProducts)
 	r.GET("/products/:id", handlers.ShowSingleProduct)
 
+	//profile
+	r.GET("/profile",middlewares.UserAuthMiddleware,handlers.UserProfile)
+	r.PUT("/profile",middlewares.UserAuthMiddleware,handlers.UpdateUserProfile)
+
 	//password change
 	r.POST("/password/forgot", handlers.ForgotPassword)
 	r.POST("password/forgot/change", handlers.ResetForgottenPassword)

@@ -68,7 +68,20 @@ func OrderDetailsForAdmin(c *gin.Context){
 	allOrderDetails,err:=usecase.GetAllOrderDetailsForAdmin()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,gin.H{"error":"couldn't retrieve order details"})
+		return
 	}
 
 	c.JSON(http.StatusOK,gin.H{"message":"Order details retrieved successfully","All orders":allOrderDetails})
+}
+
+func OrderDetailsforAdminWithID(c *gin.Context){
+	orderID:=c.Query("orderID")
+
+	OrderDetails,err:=usecase.GetOrderDetails(orderID)
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK,gin.H{"Order Products":OrderDetails})
 }

@@ -84,11 +84,11 @@ func AddAddress(Address models.Address, UserId uint) (models.AddressRes, error) 
 
 func UpdateAddress(userid uint, aid string, Address models.Address) (models.AddressRes, error) {
 	var AddressRes models.AddressRes
-	query := initialisers.DB.Exec(`UPDATE addresses SET name = ?,phone = ?,house_name = ?,street = ?,city = ?,state = ?,pin=? WHERE id = ? AND user_id = ?`, Address.Name, Address.Phone, Address.HouseName, Address.Street, Address.State, Address.Pin, aid, userid).Scan(&AddressRes)
+	query := initialisers.DB.Raw(`UPDATE addresses SET name = ?,phone = ?,house_name = ?,street = ?,city = ?,state = ?,pin=? WHERE id = ? AND user_id = ? RETURNING id,name,phone,house_name,street,city,state,pin`, Address.Name, Address.Phone, Address.HouseName, Address.Street, Address.City, Address.State, Address.Pin, aid, userid).Scan(&AddressRes)
 	if query.Error != nil {
 		return models.AddressRes{}, query.Error
 	}
-	if query.RowsAffected < 1 {
+	if query.RowsAffected == 0 {
 		return models.AddressRes{}, errors.New(`no address found to update with this id`)
 	}
 	return AddressRes, nil
@@ -133,7 +133,7 @@ func UserProfile(userid uint) (models.UserProfile, error) {
 
 func UpdateUserProfile(userid uint, user models.UserProfile) (models.UserProfile, error) {
 	var UpdatedUser models.UserProfile
-	query := initialisers.DB.Exec(`UPDATE users SET firstname = ?,lastname = ?,email = ?,phone = ? WHERE id = ?`, user.FirstName, user.LastName, user.Email, user.Phone, userid).Scan(&UpdatedUser)
+	query := initialisers.DB.Raw(`UPDATE users SET firstname = ?,lastname = ?,email = ?,phone = ? WHERE id = ? RETURNING firstname,lastname,email,phone`, user.Firstname, user.Lastname, user.Email, user.Phone, userid).Scan(&UpdatedUser)
 	if query.Error != nil {
 		return models.UserProfile{}, query.Error
 	}
@@ -141,7 +141,7 @@ func UpdateUserProfile(userid uint, user models.UserProfile) (models.UserProfile
 	return UpdatedUser, nil
 }
 
-func CheckAddressExist(userid uint,address string) bool{
+func CheckAddressExist(userid uint, address string) bool {
 	var count int
 	if err := initialisers.DB.Raw("SELECT COUNT(*) FROM addresses WHERE id = ? AND user_id = ?", address, userid).Scan(&count).Error; err != nil {
 		return false

@@ -75,6 +75,7 @@ func OrderFromCart(Token, AddressId string) (domain.Order, error) {
 		return domain.Order{}, err
 	}
 
+	
 
 	body, err := repository.GetOrder(OrderID)
 	if err != nil {
@@ -85,7 +86,7 @@ func OrderFromCart(Token, AddressId string) (domain.Order, error) {
 	for _, c := range cartItems {
 		orderItemDetails.ProductID = c.ProductID
 		orderItemDetails.Quantity = c.Quantity
-		err := repository.UpdateCartAfterOrder(userId, int(orderItemDetails.ProductID), orderItemDetails.Quantity)
+		err := repository.UpdateCartAndStockAfterOrder(userId, int(orderItemDetails.ProductID), orderItemDetails.Quantity)
 		if err != nil {
 			return domain.Order{}, err
 		}

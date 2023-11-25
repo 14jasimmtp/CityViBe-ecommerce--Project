@@ -93,7 +93,7 @@ func ShipOrderByAdmin(c *gin.Context) {
 	orderId:=c.Query("id")
 	err:=usecase.ShipOrders(orderId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError,gin.H{"error":"couldn't ship order"})
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
 		return
 	}
 

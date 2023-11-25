@@ -53,3 +53,12 @@ func GetAllOrderDetailsBrief() ([]models.CombinedOrderDetails, error) {
 	return orderDatails, nil
 
 }
+
+func GetSingleOrderDetails(orderID string) ([]models.OrderProductDetails, error) {
+	var Order []models.OrderProductDetails
+	query := initialisers.DB.Raw(`SELECT product_id,products.name AS product_name,quantity,Total_price FROM order_items INNER JOIN products ON product_id=products.id WHERE order_id = ?`, orderID).Scan(&Order)
+	if query.Error != nil {
+		return []models.OrderProductDetails{}, query.Error
+	}
+	return Order, nil
+}

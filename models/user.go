@@ -74,8 +74,8 @@ type AddressRes struct {
 }
 
 type UserProfile struct {
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
 	Email     string `json:"email"`
 	Phone     string `json:"phone"`
 }

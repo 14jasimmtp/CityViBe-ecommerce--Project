@@ -36,16 +36,16 @@ type OrderProducts struct {
 }
 
 type CombinedOrderDetails struct {
-	Id            string  `json:"order_id"`
-	FinalPrice    float64 `json:"final_price"`
-	OrderStatus   string  `json:"order_status"`
-	PaymentStatus string  `json:"payment_status"`
-	Firstname     string  `json:"firstname"`
-	Email         string  `json:"email"`
-	Phone         string  `json:"phone"`
-	HouseName     string  `json:"house_name" validate:"required"`
-	Street        string  `json:"street"`
-	City          string  `json:"city"`
-	State         string  `json:"state" validate:"required"`
-	Pin           string  `json:"pin" validate:"required"`
+	Id                  string `json:"order_id"`
+	FinalPrice          float64 `json:"final_price"`
+	OrderStatus         string  `json:"order_status"`
+	PaymentStatus       string  `json:"payment_status"`
+	Firstname           string  `json:"firstname"`
+	Email               string  `json:"email"`
+	Phone               string  `json:"phone"`
+	HouseName           string  `json:"house_name" validate:"required"`
+	Street              string  `json:"street"`
+	City                string  `json:"city"`
+	State               string  `json:"state" validate:"required"`
+	Pin                 string  `json:"pin" validate:"required"`
 }
