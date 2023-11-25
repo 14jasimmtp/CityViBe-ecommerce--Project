@@ -74,10 +74,10 @@ type AddressRes struct {
 }
 
 type UserProfile struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
+	Firstname string `json:"firstname" binding:"required"`
+	Lastname  string `json:"lastname" binding:"required"`
+	Email     string `json:"email" binding:"required"`
+	Phone     string `json:"phone" binding:"required" validate:"min=10 max=10"`
 }
 
 type ChangePassword struct {

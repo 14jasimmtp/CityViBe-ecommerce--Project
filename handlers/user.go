@@ -72,7 +72,13 @@ func ForgotPassword(c *gin.Context) {
 	if c.ShouldBindJSON(&forgotPassword) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter constraints correctly"})
 	}
-	err := usecase.ForgotPassword(forgotPassword.Phone)
+
+	err:=validator.New().Struct(forgotPassword)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		return
+	}
+	err = usecase.ForgotPassword(forgotPassword.Phone)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -90,7 +96,12 @@ func ResetForgottenPassword(c *gin.Context) {
 		return
 	}
 
-	err := usecase.ResetForgottenPassword(Newpassword)
+	err:=validator.New().Struct(Newpassword)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		return
+	}
+	err = usecase.ResetForgottenPassword(Newpassword)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 	}
@@ -122,7 +133,11 @@ func AddNewAddressDetails(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
 	}
 
-	validator.New().Struct(Address)
+	err:=validator.New().Struct(Address)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		return
+	}
 
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -142,6 +157,12 @@ func EditUserAddress(c *gin.Context) {
 
 	if c.ShouldBindJSON(&UpdateAddress) != nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter constraints correctly"})
+	}
+
+	err:=validator.New().Struct(UpdateAddress)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		return
 	}
 	Aid := c.Query("id")
 	Token, err := c.Cookie("Authorisation")
@@ -199,6 +220,12 @@ func UpdateUserProfile(c *gin.Context) {
 
 	if c.ShouldBindJSON(&UserDetails) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
+	}
+
+	err:=validator.New().Struct(UserDetails)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		return
 	}
 
 	Token, err := c.Cookie("Authorisation")
