@@ -38,7 +38,7 @@ func CheckOut(Token string) (models.CheckOutInfo, error) {
 	}, nil
 }
 
-func OrderFromCart(Token, AddressId string) (domain.Order, error) {
+func OrderFromCart(Token string, AddressId uint) (domain.Order, error) {
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return domain.Order{}, err
@@ -259,6 +259,11 @@ func CancelSingleProduct(pid, Token, orderID string) ([]models.OrderProducts, er
 	if err != nil {
 		return []models.OrderProducts{}, err
 	}
+
+	// err = repository.updateAmount(orderID)
+	// if err !=nil{
+	// 	return []models.OrderProducts{},err
+	// }
 
 	orderDetails, err := repository.GetProductDetailsFromOrders(orderID)
 	if err != nil {

@@ -73,12 +73,7 @@ func ForgotPassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter constraints correctly"})
 	}
 
-	err:=validator.New().Struct(forgotPassword)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
-		return
-	}
-	err = usecase.ForgotPassword(forgotPassword.Phone)
+	err := usecase.ForgotPassword(forgotPassword.Phone)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -96,12 +91,8 @@ func ResetForgottenPassword(c *gin.Context) {
 		return
 	}
 
-	err:=validator.New().Struct(Newpassword)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
-		return
-	}
-	err = usecase.ResetForgottenPassword(Newpassword)
+	
+	err := usecase.ResetForgottenPassword(Newpassword)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 	}
@@ -133,12 +124,6 @@ func AddNewAddressDetails(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
 	}
 
-	err:=validator.New().Struct(Address)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
-		return
-	}
-
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -155,15 +140,10 @@ func AddNewAddressDetails(c *gin.Context) {
 func EditUserAddress(c *gin.Context) {
 	var UpdateAddress models.Address
 
-	if c.ShouldBindJSON(&UpdateAddress) != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter constraints correctly"})
+	if c.ShouldBindJSON(&UpdateAddress) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter constraints correctly"})
 	}
 
-	err:=validator.New().Struct(UpdateAddress)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
-		return
-	}
 	Aid := c.Query("id")
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -171,7 +151,7 @@ func EditUserAddress(c *gin.Context) {
 		return
 	}
 
-	UpdatedAddress, err := usecase.UpdateAddress(Token, Aid,UpdateAddress)
+	UpdatedAddress, err := usecase.UpdateAddress(Token, Aid, UpdateAddress)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
 		return
@@ -222,11 +202,6 @@ func UpdateUserProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
 	}
 
-	err:=validator.New().Struct(UserDetails)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
-		return
-	}
 
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {

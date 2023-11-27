@@ -49,13 +49,13 @@ type Phone struct {
 type ForgotPassword struct {
 	Phone       string `json:"phone" binding:"required" validate:"max=10,min=10"`
 	OTP         string `json:"otp" binding:"required"`
-	NewPassword string `json:"new password" binding:"required" validate:"min=6 max=20"`
+	NewPassword string `json:"new password" binding:"required" validate:"min=6,max=20"`
 }
 
 type Address struct {
 	Name      string `json:"name" validate:"required"`
-	HouseName string `json:"house name" validate:"required"`
-	Phone     string `json:"phone" validate:"required min=10 max=10"`
+	Housename string `json:"house_name" validate:"required"`
+	Phone     string `json:"phone"`
 	Street    string `json:"street"`
 	City      string `json:"city"`
 	State     string `json:"state" validate:"required"`
@@ -65,7 +65,7 @@ type Address struct {
 type AddressRes struct {
 	ID        int    `json:"id"`
 	Name      string `json:"name" validate:"required"`
-	HouseName string `json:"house_name" validate:"required"`
+	House_name string `json:"house_name" validate:"required"`
 	Phone     string `json:"phone"`
 	Street    string `json:"street"`
 	City      string `json:"city"`
@@ -77,7 +77,7 @@ type UserProfile struct {
 	Firstname string `json:"firstname" binding:"required"`
 	Lastname  string `json:"lastname" binding:"required"`
 	Email     string `json:"email" binding:"required"`
-	Phone     string `json:"phone" binding:"required" validate:"min=10 max=10"`
+	Phone     string `json:"phone" binding:"required" validate:"min=10,max=10"`
 }
 
 type ChangePassword struct {

@@ -33,7 +33,7 @@ type OrderProductDetails struct {
 
 type OrderProducts struct {
 	ProductId string `json:"product_id"`
-	Stock     int    `json:"stock"`
+	Stock     int    `json:"-"`
 }
 
 type CombinedOrderDetails struct {
@@ -49,4 +49,9 @@ type CombinedOrderDetails struct {
 	City                string  `json:"city"`
 	State               string  `json:"state" validate:"required"`
 	Pin                 string  `json:"pin" validate:"required"`
+}
+
+type CheckOut struct{
+	AddressID uint `json:"address_id" binding:"required"`
+	PaymentID uint `json:"payment_id"`
 }

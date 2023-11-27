@@ -8,7 +8,7 @@ import (
 	"main.go/models"
 )
 
-func OrderFromCart(addressid string, userid uint, price float64) (int, error) {
+func OrderFromCart(addressid uint, userid uint, price float64) (int, error) {
 	var id int
 	query := `
     INSERT INTO orders (created_at , user_id , address_id , final_price)
@@ -187,3 +187,7 @@ func DeliverOrder(orderId string) error {
 	}
 	return nil
 }
+
+// func updateAmount(oid string) error {
+// query:=initialisers.DB.Raw(`UPDATE from orders SET final_price = `)
+// }
