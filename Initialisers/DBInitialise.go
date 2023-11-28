@@ -36,4 +36,5 @@ func DBInitialise() {
 	DB.AutoMigrate(&domain.Order{})
 	DB.AutoMigrate(&domain.OrderItem{})
 	DB.AutoMigrate(&domain.Wishlist{})
+	DB.AutoMigrate(&domain.Wallet{})
 }
