@@ -16,7 +16,7 @@ func UserRoutes(r *gin.Engine) {
 	//products
 	r.GET("/products", handlers.GetAllProducts)
 	r.GET("/products/:id", handlers.ShowSingleProduct)
-	r.GET("/products/c",handlers.FilterProductsByCategory)
+	r.GET("/products/c",handlers.FilterProducts)
 	r.GET("/products/search",handlers.SearchProducts)//search
 
 	//profile
