@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"strconv"
 
 	initialisers "main.go/Initialisers"
 	"main.go/models"
@@ -20,7 +21,11 @@ func CheckExistInWishlist(userID uint, pid string) error {
 }
 
 func AddProductToWishlist(pid string, userID uint) error {
-	query := initialisers.DB.Raw(`INSERT INTO wishlists(user_id,product_id) VALUES(?,?)`, userID, pid)
+	Pid, err := strconv.Atoi(pid)
+	if err != nil{
+		return err
+	}
+	query := initialisers.DB.Exec(`INSERT INTO wishlists(user_id,product_id) VALUES(?,?)`, userID, Pid)
 	if query.Error != nil {
 		return errors.New(`something got wrong`)
 	}

@@ -148,4 +148,3 @@ func CheckAddressExist(userid uint, address uint) bool {
 	}
 	return count > 0
 }
-

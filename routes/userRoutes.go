@@ -19,6 +19,10 @@ func UserRoutes(r *gin.Engine) {
 	r.GET("/products/c",handlers.FilterProducts)
 	r.GET("/products/search",handlers.SearchProducts)//search
 
+	//wishlist
+	r.POST("/products/wishlist",middlewares.UserAuthMiddleware,handlers.AddProductToWishlist)
+	r.GET("/products/wishlist",middlewares.UserAuthMiddleware,handlers.ViewUserWishlist)
+
 	//profile
 	r.GET("/profile",middlewares.UserAuthMiddleware,handlers.UserProfile)
 	r.PUT("/profile",middlewares.UserAuthMiddleware,handlers.UpdateUserProfile)

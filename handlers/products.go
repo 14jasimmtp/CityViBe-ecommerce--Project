@@ -83,8 +83,10 @@ func ShowSingleProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "product details", "product": product})
 }
 
-func FilterProductsByCategory(c *gin.Context){
+func FilterProducts(c *gin.Context){
 	category:=c.Query("category")
+	// size:=c.Query("size")
+	// price:=c.Query()
 	Products,err:=usecase.FilterProductCategoryWise(category)
 	if err != nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
