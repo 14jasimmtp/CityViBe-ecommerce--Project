@@ -25,3 +25,10 @@ type Address struct {
 	State     string `json:"state" validate:"required"`
 	Pin       string `json:"pin" validate:"required"`
 }
+
+type Wallet struct {
+	ID     uint `` 
+	UserID uint ``
+	Users  User
+	Amount float64
+}
