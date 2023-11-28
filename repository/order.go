@@ -188,6 +188,15 @@ func DeliverOrder(orderId string) error {
 	return nil
 }
 
-// func updateAmount(oid string) error {
-// query:=initialisers.DB.Raw(`UPDATE from orders SET final_price = `)
-// }
+func UpdateAmount(oid string, userID uint) error {
+	var Amount float64
+	query := initialisers.DB.Raw(`SELECT SUM(total_price) FROM order_items WHERE order_id = ? AND user_id = ?`, oid, userID).Scan(&Amount)
+	if query.Error != nil {
+		return errors.New(`something went wrong`)
+	}
+	query = initialisers.DB.Exec(`UPDATE FROM orders SET final_price = final_price - ? WHERE id = ?`, Amount, oid)
+	if query.Error != nil {
+		return errors.New(`something went wrong`)
+	}
+	return nil
+}

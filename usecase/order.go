@@ -260,10 +260,10 @@ func CancelSingleProduct(pid, Token, orderID string) ([]models.OrderProducts, er
 		return []models.OrderProducts{}, err
 	}
 
-	// err = repository.updateAmount(orderID)
-	// if err !=nil{
-	// 	return []models.OrderProducts{},err
-	// }
+	err = repository.UpdateAmount(orderID,userID)
+	if err !=nil{
+		return []models.OrderProducts{},err
+	}
 
 	orderDetails, err := repository.GetProductDetailsFromOrders(orderID)
 	if err != nil {
