@@ -92,10 +92,10 @@ func FilterProductCategoryWise(category string) ([]models.Product, error) {
 	return product, nil
 }
 
-func CheckStock(pid int) error{
-	var stock int 
-	initialisers.DB.Raw(`SELECT stock from products WHERE id = ?`,pid).Scan(&stock)
-	if stock <1{
+func CheckStock(pid int) error {
+	var stock int
+	initialisers.DB.Raw(`SELECT stock from products WHERE id = ?`, pid).Scan(&stock)
+	if stock < 1 {
 		return errors.New("product out of stock")
 	}
 	return nil
@@ -108,4 +108,23 @@ func GetProductAmountFromID(pid string) (float64, error) {
 		return 0.0, err
 	}
 	return productPrice, nil
+}
+
+func SearchProduct(search string) ([]models.Product, error) {
+	var products []models.Product
+
+	query := initialisers.DB.Raw(
+		`SELECT name,description,Categories.category,Sizes.size,stock,price,color
+	 	 FROM products INNER JOIN categories ON categories.id=products.category_id
+		 INNER JOIN sizes ON sizes.id = products.size_id
+		 WHERE name ILIKE $1 OR description ILIKE $1 OR sizes.size ILIKE $1 OR categories.category ILIKE $1`, search+"%",
+	).Scan(&products)
+	if query.Error != nil {
+		return []models.Product{}, errors.New(`something went wrong`)
+	}
+	if query.RowsAffected < 1 {
+		return []models.Product{}, errors.New(`no products found`)
+	}
+
+	return products, nil
 }

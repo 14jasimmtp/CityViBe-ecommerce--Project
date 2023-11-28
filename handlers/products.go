@@ -88,7 +88,26 @@ func FilterProductsByCategory(c *gin.Context){
 	Products,err:=usecase.FilterProductCategoryWise(category)
 	if err != nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK,gin.H{"message":"Categoried products","products":Products})
+}
+
+
+func SearchProducts(c *gin.Context){
+	var Search struct{
+		Search string `json:"search"`
+	}
+
+	if c.ShouldBindJSON(&Search) != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter Constraints correctly"})
+		return
+	}
+	products,err:=usecase.SearchProduct(Search.Search)
+	if err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return 
+	}
+	c.JSON(http.StatusOK,gin.H{"Products":products,"message":"Searched Products"})
 }

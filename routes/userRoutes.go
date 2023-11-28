@@ -17,6 +17,7 @@ func UserRoutes(r *gin.Engine) {
 	r.GET("/products", handlers.GetAllProducts)
 	r.GET("/products/:id", handlers.ShowSingleProduct)
 	r.GET("/products/c",handlers.FilterProductsByCategory)
+	r.GET("/products/search",handlers.SearchProducts)//search
 
 	//profile
 	r.GET("/profile",middlewares.UserAuthMiddleware,handlers.UserProfile)

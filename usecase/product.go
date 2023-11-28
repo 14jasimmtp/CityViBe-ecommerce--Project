@@ -75,3 +75,12 @@ func FilterProductCategoryWise(category string) ([]models.Product,error){
 	}
 	return products,nil
 }
+
+func SearchProduct(search string)([]models.Product,error){
+	products,err:=repository.SearchProduct(search)
+	if err != nil{
+		return []models.Product{},err
+	}
+
+	return products,nil
+}
