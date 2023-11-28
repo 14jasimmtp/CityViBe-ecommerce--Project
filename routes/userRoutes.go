@@ -22,6 +22,7 @@ func UserRoutes(r *gin.Engine) {
 	//wishlist
 	r.POST("/products/wishlist",middlewares.UserAuthMiddleware,handlers.AddProductToWishlist)
 	r.GET("/products/wishlist",middlewares.UserAuthMiddleware,handlers.ViewUserWishlist)
+	r.DELETE("/products/wishlist",middlewares.UserAuthMiddleware,handlers.RemoveProductFromWishlist)
 
 	//profile
 	r.GET("/profile",middlewares.UserAuthMiddleware,handlers.UserProfile)

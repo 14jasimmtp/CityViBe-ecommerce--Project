@@ -32,10 +32,10 @@ func AddProductToWishlist(pid string, userID uint) error {
 	return nil
 }
 
-func GetWishlistProducts(userID uint) ([]models.Product, error) {
-	var Products []models.Product
+func GetWishlistProducts(userID uint) ([]models.UpdateProduct, error) {
+	var Products []models.UpdateProduct
 	query := initialisers.DB.Raw(
-		`SELECT products.name,products.description,categories.category,sizes.size,products.stock,products.price,products.color
+		`SELECT products.id,products.name,products.description,categories.category,sizes.size,products.stock,products.price,products.color
 		 FROM products 
 		 INNER JOIN wishlists ON products.id=wishlists.product_id
 		 INNER JOIN categories ON products.category_id=categories.id
@@ -43,10 +43,19 @@ func GetWishlistProducts(userID uint) ([]models.Product, error) {
 		 WHERE wishlists.user_id = ?`, userID,
 	).Scan(&Products)
 	if query.Error != nil {
-		return []models.Product{}, errors.New(`something went wrong`)
+		return []models.UpdateProduct{}, errors.New(`something went wrong`)
 	}
 	if query.RowsAffected < 1 {
-		return []models.Product{}, errors.New(`no products in wishlist`)
+		return []models.UpdateProduct{}, errors.New(`no products in wishlist`)
 	}
 	return Products, nil
+}
+
+
+func RemoveProductFromWishlist(pid string,userID uint) error{
+	query:=initialisers.DB.Exec(`DELETE FROM wishlists WHERE user_id = ? AND product_id = ?`,userID,pid)
+	if query.Error != nil{
+		return errors.New(`something went wrong`)
+	}
+	return nil
 }
