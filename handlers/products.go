@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"main.go/models"
@@ -85,15 +86,19 @@ func ShowSingleProduct(c *gin.Context) {
 
 func FilterProducts(c *gin.Context){
 	category:=c.Query("category")
-	// size:=c.Query("size")
-	// price:=c.Query()
-	Products,err:=usecase.FilterProductCategoryWise(category)
+	size:=c.Query("size")
+	minPrice:=c.Query("minPrice")
+	maxPrice:=c.Query("maxPrice")
+
+	min,_:=strconv.ParseFloat(minPrice,64)
+	max,_:=strconv.ParseFloat(maxPrice,64)
+	Products,err:=usecase.FilterProducts(category,size,min,max)
 	if err != nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK,gin.H{"message":"Categoried products","products":Products})
+	c.JSON(http.StatusOK,gin.H{"message":"filtered products","products":Products})
 }
 
 
