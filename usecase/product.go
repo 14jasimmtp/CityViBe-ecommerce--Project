@@ -84,3 +84,11 @@ func SearchProduct(search string)([]models.Product,error){
 
 	return products,nil
 }
+
+func FilterProducts(category,size string,minPrice,maxPrice float64)([]models.UpdateProduct,error){
+	filteredProducts,err:=repository.FilterProducts(category,size,minPrice,maxPrice)
+	if err != nil {
+		return []models.UpdateProduct{},err
+	}
+	return filteredProducts,nil
+}

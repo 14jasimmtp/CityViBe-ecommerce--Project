@@ -33,4 +33,8 @@ func AdminRoutes(r *gin.Engine) {
 	r.GET("admin/order-single-details",middlewares.AdminAuthMiddleware,handlers.OrderDetailsforAdminWithID)
 	r.POST("admin/deliver-order",middlewares.AdminAuthMiddleware,handlers.DeliverOrderByAdmin)
 
+	//Coupon
+	// r.POST("admin/coupon",middlewares.AdminAuthMiddleware,handlers.MakeCoupon)
+	// r.PUT("admin/coupon",middlewares.AdminAuthMiddleware,handlers.DisableCoupon)
+
 }

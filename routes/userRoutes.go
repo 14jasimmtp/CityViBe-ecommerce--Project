@@ -10,14 +10,17 @@ func UserRoutes(r *gin.Engine) {
 	//login
 	r.POST("/signup", handlers.UserSignup)
 	r.POST("/login", handlers.UserLogin)
+
 	r.POST("/verify", handlers.VerifyLoginOtp)
 	r.POST("/logout", handlers.UserLogout)
 
 	//products
 	r.GET("/products", handlers.GetAllProducts)
 	r.GET("/products/:id", handlers.ShowSingleProduct)
-	r.GET("/products/c",handlers.FilterProducts)
 	r.GET("/products/search",handlers.SearchProducts)//search
+
+	//filtering
+	r.GET("/products/filter/",handlers.FilterProducts)
 
 	//wishlist
 	r.POST("/products/wishlist",middlewares.UserAuthMiddleware,handlers.AddProductToWishlist)
@@ -57,4 +60,7 @@ func UserRoutes(r *gin.Engine) {
 	r.POST("/wishlist", middlewares.UserAuthMiddleware, handlers.AddProductToWishlist)
 	r.DELETE("/wishlist", middlewares.UserAuthMiddleware, handlers.RemoveProductFromWishlist)
 
+	//payment
+	r.POST("/payment/razorpay",middlewares.UserAuthMiddleware,handlers.ExecuteRazorPayPayment)
+	// r.GET("/payment/update",middlewares.UserAuthMiddleware,handlers.PaymentUpdate)
 }

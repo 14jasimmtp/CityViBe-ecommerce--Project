@@ -128,3 +128,22 @@ func SearchProduct(search string) ([]models.Product, error) {
 
 	return products, nil
 }
+
+func FilterProducts(category, size string, minPrice, maxPrice float64) ([]models.UpdateProduct, error) {
+	var Products []models.UpdateProduct
+	query := initialisers.DB.Raw(
+		`SELECT products.id,products.name,products.description,categories.category,sizes.size,products.stock,products.price,products.color FROM products
+		 INNER JOIN categories ON products.category_id=categories.id
+		 INNER JOIN sizes ON products.size_id=sizes.id
+		 WHERE (categories.category = ? OR ? = '')
+		 AND (sizes.size = ? OR ? = '')
+		 AND ((products.price >= ? AND products.price <= ?) OR ? = 0.0)`,
+		category, category, size, size, minPrice, maxPrice, minPrice).Scan(&Products)
+	if query.Error != nil {
+		return []models.UpdateProduct{}, errors.New(`something went wrong`)
+	}
+	if query.RowsAffected < 1 {
+		return []models.UpdateProduct{}, errors.New(`no products found`)
+	}
+	return Products, nil
+}
