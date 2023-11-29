@@ -10,7 +10,8 @@ import (
 	"main.go/utils"
 )
 
-func CheckOut(Token string) (models.CheckOutInfo, error) {
+func CheckOut(Token,coupon string) (models.CheckOutInfo, error) {
+	var DiscountAmount float64
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return models.CheckOutInfo{}, err
@@ -30,7 +31,20 @@ func CheckOut(Token string) (models.CheckOutInfo, error) {
 	if err != nil {
 		return models.CheckOutInfo{}, err
 	}
-
+	if coupon !=""{
+		DiscountRate, err := repository.GetDiscountRate(coupon)
+		if err != nil {
+			return models.CheckOutInfo{}, err
+		}
+		DiscountAmount=TotalAmount-(TotalAmount*(DiscountRate/100))
+		
+		return models.CheckOutInfo{
+			Address:     AllUserAddress,
+			Cart:        AllCartProducts,
+			TotalAmount: TotalAmount,
+			DiscountAmount: DiscountAmount,
+		}, nil
+	}
 	return models.CheckOutInfo{
 		Address:     AllUserAddress,
 		Cart:        AllCartProducts,

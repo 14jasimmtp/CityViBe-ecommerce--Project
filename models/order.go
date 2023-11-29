@@ -4,6 +4,7 @@ type CheckOutInfo struct {
 	Address     []AddressRes `json:"address"`
 	Cart        []Cart       `json:"cart"`
 	TotalAmount float64      `json:"Total Amount"`
+	DiscountAmount float64 `json:"Discounted Amount"`
 }
 
 type OrderSuccessResponse struct {

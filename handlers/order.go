@@ -31,13 +31,17 @@ func OrderFromCart(c *gin.Context) {
 }
 
 func ViewCheckOut(c *gin.Context) {
+	var coupon models.CheckoutCoupon
+	if c.ShouldBindJSON(&coupon) != nil {
+		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter coupon correctly"})
+	}
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	OrderDetails, err := usecase.CheckOut(Token)
+	OrderDetails, err := usecase.CheckOut(Token,coupon.Coupon)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
