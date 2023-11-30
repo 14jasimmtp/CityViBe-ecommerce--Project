@@ -20,5 +20,4 @@ func main() {
 	routes.AdminRoutes(r)
 	routes.UserRoutes(r)
 	r.Run(":3000")
-	fashdflkajdfh
 }
