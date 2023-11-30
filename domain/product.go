@@ -22,3 +22,9 @@ type Size struct {
 	ID   uint   `json:"id" gorm:"unique; not null"`
 	Size string `json:"size" gorm:"unique; not null"`
 }
+
+type ProductImage struct {
+	ID        uint   `json:"id" gorm:"primarykey;unique; not null"`
+	ImageUrl  string `json:"image_url"`
+	ProductID uint   `json:"product_id"`
+}
