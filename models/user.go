@@ -63,14 +63,14 @@ type Address struct {
 }
 
 type AddressRes struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name" validate:"required"`
+	ID         int    `json:"id"`
+	Name       string `json:"name" validate:"required"`
 	House_name string `json:"house_name" validate:"required"`
-	Phone     string `json:"phone"`
-	Street    string `json:"street"`
-	City      string `json:"city"`
-	State     string `json:"state" validate:"required"`
-	Pin       string `json:"pin" validate:"required"`
+	Phone      string `json:"phone"`
+	Street     string `json:"street"`
+	City       string `json:"city"`
+	State      string `json:"state" validate:"required"`
+	Pin        string `json:"pin" validate:"required"`
 }
 
 type UserProfile struct {
@@ -78,6 +78,7 @@ type UserProfile struct {
 	Lastname  string `json:"lastname" binding:"required"`
 	Email     string `json:"email" binding:"required"`
 	Phone     string `json:"phone" binding:"required" validate:"min=10,max=10"`
+	Wallet    string `json:"wallet" binding:"required"`
 }
 
 type ChangePassword struct {

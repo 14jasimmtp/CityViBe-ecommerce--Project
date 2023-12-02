@@ -61,6 +61,5 @@ func UserRoutes(r *gin.Engine) {
 	r.DELETE("/wishlist", middlewares.UserAuthMiddleware, handlers.RemoveProductFromWishlist)
 
 	//payment
-	r.POST("/payment/razorpay",middlewares.UserAuthMiddleware,handlers.ExecuteRazorPayPayment)
-	// r.GET("/payment/update",middlewares.UserAuthMiddleware,handlers.PaymentUpdate)
+	r.GET("/payment/razorpay",handlers.ExecuteRazorPayPayment)	
 }

@@ -8,13 +8,13 @@ import (
 	"main.go/models"
 )
 
-func OrderFromCart(addressid uint, userid uint, price float64) (int, error) {
+func OrderFromCart(addressid uint,paymentid, userid uint, price float64) (int, error) {
 	var id int
 	query := `
-    INSERT INTO orders (created_at , user_id , address_id , final_price)
-    VALUES (NOW(),?, ?, ?)
+    INSERT INTO orders (created_at , user_id , address_id ,payment_method_id, final_price)
+    VALUES (NOW(),?, ?, ?,?)
     RETURNING id`
-	initialisers.DB.Raw(query, userid, addressid, price).Scan(&id)
+	initialisers.DB.Raw(query, userid, addressid,paymentid, price).Scan(&id)
 	return id, nil
 }
 
@@ -40,8 +40,13 @@ func AddOrderProducts(order_id int, cart []models.Cart) error {
 		}
 	}
 	return nil
+
 }
 
+func CheckPaymentMethodExist(paymentid uint)bool{
+	query:=initialisers.DB.Raw(`SELECT * FROM payment_methods WHERE id = ?`,paymentid)
+	return query.RowsAffected < 1
+}
 func GetOrder(orderID int) (domain.Order, error) {
 	var order domain.Order
 	err := initialisers.DB.Raw("SELECT * FROM orders WHERE id = ?", orderID).Scan(&order).Error

@@ -16,9 +16,10 @@ func init() {
 
 func main() {
 	fmt.Println("running at locatioon:http://localhost:3000")
+
 	r := gin.Default()
+	r.LoadHTMLGlob("/home/jasim/CityViBe-Project-Ecommerce/template/*")
 	routes.AdminRoutes(r)
 	routes.UserRoutes(r)
 	r.Run(":3000")
-	fashdflkajdfh
 }

@@ -118,3 +118,7 @@ func SearchProducts(c *gin.Context){
 	}
 	c.JSON(http.StatusOK,gin.H{"Products":products,"message":"Searched Products"})
 }
+
+func UploadProductImage (c *gin.Context){
+	
+}

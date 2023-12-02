@@ -20,7 +20,7 @@ func OrderFromCart(c *gin.Context) {
 		return
 	}
 
-	OrderDetails, err := usecase.OrderFromCart(Token, OrderInput.AddressID)
+	OrderDetails, err := usecase.OrderFromCart(Token, OrderInput.AddressID,OrderInput.PaymentID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -135,5 +135,5 @@ func CancelSingleProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Cancelled product from orders.If you have paid online money will be refunded within 2 days", "Order Details": orderDetails})
+	c.JSON(http.StatusOK, gin.H{"message": "Cancelled product from orders.If you have paid online money will be refunded to your wallet", "Order Details": orderDetails})
 }

@@ -52,7 +52,7 @@ func CheckOut(Token,coupon string) (models.CheckOutInfo, error) {
 	}, nil
 }
 
-func OrderFromCart(Token string, AddressId uint) (domain.Order, error) {
+func OrderFromCart(Token string, AddressId uint,PaymentID uint) (domain.Order, error) {
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return domain.Order{}, err
@@ -63,11 +63,16 @@ func OrderFromCart(Token string, AddressId uint) (domain.Order, error) {
 		return domain.Order{}, errors.New(`address doesn't exist`)
 	}
 
+	paymentExist:=repository.CheckPaymentMethodExist(PaymentID)
+	if !paymentExist {
+		return domain.Order{},errors.New(`payment method doesn't exist`)
+	}
+
 	cartExist := repository.CheckCartExist(userId)
 	if !cartExist {
 		return domain.Order{}, errors.New(`cart is empty`)
-
 	}
+
 
 	TotalAmount, err := repository.CartTotalAmount(userId)
 	if err != nil {
@@ -79,7 +84,7 @@ func OrderFromCart(Token string, AddressId uint) (domain.Order, error) {
 		return domain.Order{}, err
 	}
 
-	OrderID, err := repository.OrderFromCart(AddressId, userId, TotalAmount)
+	OrderID, err := repository.OrderFromCart(AddressId,PaymentID, userId, TotalAmount)
 	if err != nil {
 		return domain.Order{}, err
 	}
