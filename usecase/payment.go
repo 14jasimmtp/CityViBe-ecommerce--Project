@@ -7,7 +7,6 @@ import (
 	"github.com/razorpay/razorpay-go"
 	"main.go/models"
 	"main.go/repository"
-	"main.go/utils"
 )
 
 func MakePaymentRazorPay(orderID int) (models.Payment, string, error) {
@@ -56,15 +55,21 @@ func PaymentAlreadyPaid(orderID int) (bool, error) {
 	return AlreadyPayed, nil
 }
 
-func PaymentVerification(details models.PaymentVerify) (models.Invoice, error) {
-	result := utils.VerifyPayment(details.OrderID, details.PaymentID, details.Signature,os.Getenv(`KEY_SECRET_PAY`))
-	if !result {
-		return models.Invoice{}, errors.New(`payment not verified`)
-	}
-
-	orders, err := repository.UpdatePaymentStatus(details.OrderID)
+func SavePaymentDetails(orderID int, paymentID string) error {
+	status, err := repository.CheckPaymentStatus(orderID)
 	if err != nil {
-		return models.Invoice{}, err
+		return err
 	}
-	return orders, nil
+	if status == "not paid" {
+		err = repository.UpdatePaymentDetails(orderID, paymentID)
+		if err != nil {
+			return err
+		}
+		err := repository.UpdateShipmentAndPaymentByOrderID("processing", "paid", orderID)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return errors.New("already paid")
 }

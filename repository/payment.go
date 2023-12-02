@@ -26,7 +26,7 @@ func PaymentAlreadyPaid(orderID int) (bool, error) {
 		return false, errors.New(`something went wrong`)
 	}
 	if query.RowsAffected < 1 {
-		return false, errors.New(`no orders foun with this id `)
+		return false, errors.New(`no orders found with this id `)
 	}
 	if paymentStatus == `paid` {
 		return true, nil
@@ -54,14 +54,27 @@ func AddRazorPayDetails(orderID int, RazorID string) error {
 	return nil
 }
 
-func UpdatePaymentStatus(orderID string)(models.Invoice,error){
-	var Invoice models.Invoice
-	query:=initialisers.DB.Raw(`UPDATE orders SET payment_status = paid,order_status = processing WHERE id = ? RETURNING id,user_id,payment_method,final_price`,orderID).Scan(&Invoice)
-	if query.Error != nil{
-		return models.Invoice{},errors.New(`something went wrong`)
+func CheckPaymentStatus(orderID int) (string, error) {
+	var paymentStatus string
+	err := initialisers.DB.Raw(`SELECT payment_status FROM orders WHERE id = $1`, orderID).Scan(&paymentStatus).Error
+	if err != nil {
+		return "", err
 	}
-	if query.RowsAffected == 0 {
-		return models.Invoice{},errors.New(`order not found`)
-	}
-	return Invoice,nil
+	return paymentStatus, nil
 }
+func UpdatePaymentDetails(orderID int, paymentID string) error {
+	err := initialisers.DB.Exec("UPDATE razor_pays set payment_id = ? WHERE order_id= ?", paymentID, orderID).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateShipmentAndPaymentByOrderID(orderStatus string, paymentStatus string, orderID int) error {
+	err := initialisers.DB.Exec("UPDATE orders SET payment_status = ?,order_status = ?  WHERE id = ?", paymentStatus, orderStatus, orderID).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+

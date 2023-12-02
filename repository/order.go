@@ -8,13 +8,13 @@ import (
 	"main.go/models"
 )
 
-func OrderFromCart(addressid uint,paymentid, userid uint, price float64) (int, error) {
+func OrderFromCart(addressid uint, paymentid, userid uint, price float64) (int, error) {
 	var id int
 	query := `
     INSERT INTO orders (created_at , user_id , address_id ,payment_method_id, final_price)
     VALUES (NOW(),?, ?, ?,?)
     RETURNING id`
-	initialisers.DB.Raw(query, userid, addressid,paymentid, price).Scan(&id)
+	initialisers.DB.Raw(query, userid, addressid, paymentid, price).Scan(&id)
 	return id, nil
 }
 
@@ -43,8 +43,8 @@ func AddOrderProducts(order_id int, cart []models.Cart) error {
 
 }
 
-func CheckPaymentMethodExist(paymentid uint)bool{
-	query:=initialisers.DB.Raw(`SELECT * FROM payment_methods WHERE id = ?`,paymentid)
+func CheckPaymentMethodExist(paymentid uint) bool {
+	query := initialisers.DB.Raw(`SELECT * FROM payment_methods WHERE id = ?`, paymentid)
 	return query.RowsAffected < 1
 }
 func GetOrder(orderID int) (domain.Order, error) {
@@ -58,7 +58,7 @@ func GetOrder(orderID int) (domain.Order, error) {
 
 func GetOrderDetails(userID uint) ([]models.ViewOrderDetails, error) {
 	var orderDatails []models.OrderDetails
-	initialisers.DB.Raw("SELECT id, final_price, order_status,payment_method, payment_status FROM orders WHERE user_id = ? ", userID).Scan(&orderDatails)
+	initialisers.DB.Raw("SELECT orders.id, final_price, order_status,payment_methods.payment_mode AS payment_method, payment_status FROM orders INNER JOIN payment_methods ON orders.payment_method_id=payment_methods.id WHERE user_id = ? ", userID).Scan(&orderDatails)
 	var fullOrderDetails []models.ViewOrderDetails
 	for _, ok := range orderDatails {
 		var OrderProductDetails []models.OrderProductDetails

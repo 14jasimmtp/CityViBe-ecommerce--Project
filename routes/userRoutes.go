@@ -62,4 +62,5 @@ func UserRoutes(r *gin.Engine) {
 
 	//payment
 	r.GET("/payment/razorpay",handlers.ExecuteRazorPayPayment)	
+	r.POST("/payment/verify",handlers.VerifyPayment)
 }
