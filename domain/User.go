@@ -4,13 +4,14 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model `json:"-"`
-	ID         uint   `json:"id" gorm:"unique;not null"`
-	Firstname  string `json:"firstname"`
-	Lastname   string `json:"lastname"`
-	Email      string `json:"email" validate:"email"`
-	Phone      string `json:"phone"`
-	Password   string `json:"-" validate:"min=8,max=20"`
-	Blocked    bool   `json:"blocked" gorm:"default:false"`
+	ID         uint    `json:"id" gorm:"unique;not null"`
+	Firstname  string  `json:"firstname"`
+	Lastname   string  `json:"lastname"`
+	Email      string  `json:"email" validate:"email"`
+	Phone      string  `json:"phone"`
+	Password   string  `json:"-" validate:"min=8,max=20"`
+	Blocked    bool    `json:"blocked" gorm:"default:false"`
+	Wallet     float64 `json:"wallet" gorm:"default:0"`
 }
 
 type Address struct {

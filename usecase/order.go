@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
+	"strconv"
 
 	"main.go/domain"
 	"main.go/models"
@@ -10,7 +10,7 @@ import (
 	"main.go/utils"
 )
 
-func CheckOut(Token,coupon string) (models.CheckOutInfo, error) {
+func CheckOut(Token, coupon string) (models.CheckOutInfo, error) {
 	var DiscountAmount float64
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
@@ -31,17 +31,17 @@ func CheckOut(Token,coupon string) (models.CheckOutInfo, error) {
 	if err != nil {
 		return models.CheckOutInfo{}, err
 	}
-	if coupon !=""{
+	if coupon != "" {
 		DiscountRate, err := repository.GetDiscountRate(coupon)
 		if err != nil {
 			return models.CheckOutInfo{}, err
 		}
-		DiscountAmount=TotalAmount-(TotalAmount*(DiscountRate/100))
-		
+		DiscountAmount = TotalAmount - (TotalAmount * (DiscountRate / 100))
+
 		return models.CheckOutInfo{
-			Address:     AllUserAddress,
-			Cart:        AllCartProducts,
-			TotalAmount: TotalAmount,
+			Address:        AllUserAddress,
+			Cart:           AllCartProducts,
+			TotalAmount:    TotalAmount,
 			DiscountAmount: DiscountAmount,
 		}, nil
 	}
@@ -52,50 +52,49 @@ func CheckOut(Token,coupon string) (models.CheckOutInfo, error) {
 	}, nil
 }
 
-func OrderFromCart(Token string, AddressId uint,PaymentID uint) (domain.Order, error) {
+func OrderFromCart(Token string, AddressId uint, PaymentID uint) (models.OrderSuccessResponse, error) {
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
-		return domain.Order{}, err
+		return models.OrderSuccessResponse{}, err
 	}
 
 	addressExist := repository.CheckAddressExist(userId, AddressId)
 	if !addressExist {
-		return domain.Order{}, errors.New(`address doesn't exist`)
+		return models.OrderSuccessResponse{}, errors.New(`address doesn't exist`)
 	}
 
-	paymentExist:=repository.CheckPaymentMethodExist(PaymentID)
+	paymentExist := repository.CheckPaymentMethodExist(PaymentID)
 	if !paymentExist {
-		return domain.Order{},errors.New(`payment method doesn't exist`)
+		return models.OrderSuccessResponse{}, errors.New(`payment method doesn't exist`)
 	}
 
 	cartExist := repository.CheckCartExist(userId)
 	if !cartExist {
-		return domain.Order{}, errors.New(`cart is empty`)
+		return models.OrderSuccessResponse{}, errors.New(`cart is empty`)
 	}
-
 
 	TotalAmount, err := repository.CartTotalAmount(userId)
 	if err != nil {
-		return domain.Order{}, errors.New(`error while calculating total amount`)
+		return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
 	}
 
 	cartItems, err := repository.DisplayCart(userId)
 	if err != nil {
-		return domain.Order{}, err
+		return models.OrderSuccessResponse{}, err
 	}
 
-	OrderID, err := repository.OrderFromCart(AddressId,PaymentID, userId, TotalAmount)
+	OrderID, err := repository.OrderFromCart(AddressId, PaymentID, userId, TotalAmount)
 	if err != nil {
-		return domain.Order{}, err
+		return models.OrderSuccessResponse{}, err
 	}
 
-	if err := repository.AddOrderProducts(OrderID, cartItems); err != nil {
-		return domain.Order{}, err
+	if err := repository.AddOrderProducts(userId,OrderID, cartItems); err != nil {
+		return models.OrderSuccessResponse{}, err
 	}
 
 	body, err := repository.GetOrder(OrderID)
 	if err != nil {
-		return domain.Order{}, err
+		return models.OrderSuccessResponse{}, err
 	}
 
 	var orderItemDetails domain.OrderItem
@@ -104,10 +103,13 @@ func OrderFromCart(Token string, AddressId uint,PaymentID uint) (domain.Order, e
 		orderItemDetails.Quantity = c.Quantity
 		err := repository.UpdateCartAndStockAfterOrder(userId, int(orderItemDetails.ProductID), orderItemDetails.Quantity)
 		if err != nil {
-			return domain.Order{}, err
+			return models.OrderSuccessResponse{}, err
 		}
 	}
-	return body, nil
+	return models.OrderSuccessResponse{
+		OrderID:       OrderID,
+		PaymentStatus: body.PaymentStatus,
+	}, nil
 
 }
 
@@ -124,40 +126,47 @@ func ViewUserOrders(Token string) ([]models.ViewOrderDetails, error) {
 	return OrderDetails, nil
 }
 
-func CancelOrder(Token, orderId string) error {
+func CancelOrder(Token, orderId string, pid string) error {
 	UserID, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return err
 	}
-	err = repository.CheckOrder(orderId)
+	err = repository.CheckOrder(orderId, UserID)
 	if err != nil {
 		return errors.New(`no orders found with this id`)
 	}
 
-	orderDetails, err := repository.GetProductDetailsFromOrders(orderId)
+	OrderDetails, err := repository.CancelOrderDetails(UserID, orderId, pid)
 	if err != nil {
 		return err
 	}
 
-	OrderStatus, err := repository.GetOrderStatus(orderId)
-	if err != nil {
-		return err
-	}
-
-	if OrderStatus == "Delivered" {
+	if OrderDetails.OrderStatus == "Delivered" {
 		return errors.New(`the order is delivered .Can't Cancel`)
 	}
 
-	if OrderStatus == "Cancelled" {
+	if OrderDetails.OrderStatus == "Cancelled" {
 		return errors.New(`the order is already cancelled`)
 	}
 
-	err = repository.CancelOrder(orderId, UserID)
+	if OrderDetails.PaymentStatus == "paid" {
+		err := repository.ReturnAmountToWallet(UserID, orderId, pid)
+		if err != nil {
+			return err
+		}
+
+	}
+	err = repository.UpdateOrderFinalPrice(OrderDetails.OrderID, OrderDetails.TotalPrice)
+	if err != nil {
+		return err
+	}
+	proid, _ := strconv.Atoi(pid)
+	err = repository.UpdateStock(proid, OrderDetails.Quantity)
 	if err != nil {
 		return err
 	}
 
-	err = repository.UpdateStock(orderDetails)
+	err = repository.CancelOrder(orderId,pid, UserID)
 	if err != nil {
 		return err
 	}
@@ -166,27 +175,27 @@ func CancelOrder(Token, orderId string) error {
 
 }
 
-func CancelOrderByAdmin(order_id string) error {
-	err := repository.CheckOrder(order_id)
-	fmt.Println(err)
-	if err != nil {
-		return errors.New(`no orders found with this id`)
-	}
-	orderProduct, err := repository.GetProductDetailsFromOrders(order_id)
-	if err != nil {
-		return err
-	}
-	err = repository.CancelOrderByAdmin(order_id)
-	if err != nil {
-		return err
-	}
-	// update the quantity to products since the order is cancelled
-	err = repository.UpdateStock(orderProduct)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// func CancelOrderByAdmin(order_id string) error {
+// 	err := repository.CheckOrder(order_id)
+// 	fmt.Println(err)
+// 	if err != nil {
+// 		return errors.New(`no orders found with this id`)
+// 	}
+// 	orderProduct, err := repository.GetProductDetailsFromOrders(order_id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	err = repository.CancelOrderByAdmin(order_id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	// update the quantity to products since the order is cancelled
+// 	err = repository.UpdateStock(orderProduct)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
 
 func ShipOrders(orderId string) error {
 	OrderStatus, err := repository.GetOrderStatus(orderId)
@@ -279,9 +288,9 @@ func CancelSingleProduct(pid, Token, orderID string) ([]models.OrderProducts, er
 		return []models.OrderProducts{}, err
 	}
 
-	err = repository.UpdateAmount(orderID,userID)
-	if err !=nil{
-		return []models.OrderProducts{},err
+	err = repository.UpdateAmount(orderID, userID)
+	if err != nil {
+		return []models.OrderProducts{}, err
 	}
 
 	orderDetails, err := repository.GetProductDetailsFromOrders(orderID)
@@ -289,7 +298,10 @@ func CancelSingleProduct(pid, Token, orderID string) ([]models.OrderProducts, er
 		return []models.OrderProducts{}, err
 	}
 
-
 	return orderDetails, nil
+
+}
+
+func ReturnOrder() {
 
 }

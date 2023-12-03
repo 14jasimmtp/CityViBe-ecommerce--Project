@@ -71,9 +71,13 @@ func UpdatePaymentDetails(orderID int, paymentID string) error {
 }
 
 func UpdateShipmentAndPaymentByOrderID(orderStatus string, paymentStatus string, orderID int) error {
-	err := initialisers.DB.Exec("UPDATE orders SET payment_status = ?,order_status = ?  WHERE id = ?", paymentStatus, orderStatus, orderID).Error
+	err := initialisers.DB.Exec("UPDATE orders SET payment_status = ?  WHERE id = ?", paymentStatus, orderID).Error
 	if err != nil {
 		return err
+	}
+	err=initialisers.DB.Exec("UPDATE order_items SET order_status = ?  WHERE order_id = ?", orderStatus, orderID).Error
+	if err != nil{
+		return errors.New(`something went wrong`)
 	}
 	return nil
 }

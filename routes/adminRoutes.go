@@ -29,7 +29,7 @@ func AdminRoutes(r *gin.Engine) {
 	//order
 	r.GET("admin/order-details", middlewares.AdminAuthMiddleware, handlers.OrderDetailsForAdmin)
 	r.POST("admin/ship-order", middlewares.AdminAuthMiddleware, handlers.ShipOrderByAdmin)
-	r.POST("admin/cancel-order", middlewares.AdminAuthMiddleware, handlers.CancelOrderByAdmin)
+	// r.POST("admin/cancel-order", middlewares.AdminAuthMiddleware, handlers.CancelOrderByAdmin)
 	r.GET("admin/order-single-details",middlewares.AdminAuthMiddleware,handlers.OrderDetailsforAdminWithID)
 	r.POST("admin/deliver-order",middlewares.AdminAuthMiddleware,handlers.DeliverOrderByAdmin)
 
