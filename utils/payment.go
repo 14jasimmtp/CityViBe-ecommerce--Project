@@ -6,7 +6,7 @@ import (
 	"github.com/razorpay/razorpay-go/utils"
 )
 
-func VerifyPayment(orderID, paymentID, signature, razopaySecret string) bool {
+func VerifyPayment(orderID , paymentID, signature, razopaySecret string) bool {
 
 	params := map[string]interface{}{
 		"razorpay_order_id":   orderID,

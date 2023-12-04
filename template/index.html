@@ -26,6 +26,8 @@ var options = {
     "order_id": "{{.razor_id}}", 
     "handler": function (response){
         alert(response.razorpay_payment_id);
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature)
     },
     "prefill": {
         "name": "{{.username}}",

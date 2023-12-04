@@ -31,7 +31,7 @@ type ViewAdminOrderDetails struct {
 }
 
 type OrderDetails struct {
-	Id            string
+	Id            int
 	FinalPrice    float64
 	PaymentMethod string
 	PaymentStatus string

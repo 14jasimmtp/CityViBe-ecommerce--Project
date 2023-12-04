@@ -46,19 +46,24 @@ func ExecuteRazorPayPayment(c *gin.Context) {
 }
 func VerifyPayment(c *gin.Context) {
 	var Verify models.PaymentVerify
-	if c.ShouldBindJSON(&Verify) != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":"enter fields correctly"})
+	if c.ShouldBindJSON(&Verify) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "enter fields correctly"})
 		return
 	}
-	Error,err:=utils.Validation(Verify)
-	if err != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":Error})
+	Error, err := utils.Validation(Verify)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
 		return
 	}
-	err = usecase.SavePaymentDetails(Verify.OrderID, Verify.PaymentID)
+	order := c.Query("orderId")
+	order_id, err := strconv.Atoi(order)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "something went wrong"})
+	}
+	Order, err := usecase.VerifyPayment(Verify, order_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "updated payment details successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "updated payment details successfully", "Order Details": Order})
 }

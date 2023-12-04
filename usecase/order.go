@@ -216,7 +216,7 @@ func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.Ord
 	if err := repository.AddOrderProducts(userId, OrderID, cartItems); err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
-	err = repository.UpdateShipmentAndPaymentByOrderID("pending", "paid", OrderID)
+	_,err = repository.UpdateShipmentAndPaymentByOrderID("processing", "paid", OrderID)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
