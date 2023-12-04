@@ -84,10 +84,10 @@ func UnBlockUser(idStr string) error {
 
 }
 
-func GetAllOrderDetailsForAdmin() ([]models.CombinedOrderDetails, error) {
+func GetAllOrderDetailsForAdmin() ([]models.ViewAdminOrderDetails, error) {
 	orderDetail, err := repository.GetAllOrderDetailsBrief()
 	if err != nil {
-		return []models.CombinedOrderDetails{}, err
+		return []models.ViewAdminOrderDetails{}, err
 	}
 	return orderDetail, nil
 }

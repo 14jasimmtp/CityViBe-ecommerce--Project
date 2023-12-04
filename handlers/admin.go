@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"main.go/models"
 	"main.go/usecase"
+	"main.go/utils"
 )
 
 func AdminLogin(c *gin.Context) {
@@ -15,6 +16,12 @@ func AdminLogin(c *gin.Context) {
 	if c.ShouldBindJSON(&admin) != nil {
 		fmt.Println("binding error")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter details correctly"})
+		return
+	}
+
+	Error, err := utils.Validation(admin)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
 		return
 	}
 
@@ -63,25 +70,24 @@ func UnBlockUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "user successfully unblocked"})
 }
 
-
-func OrderDetailsForAdmin(c *gin.Context){
-	allOrderDetails,err:=usecase.GetAllOrderDetailsForAdmin()
+func OrderDetailsForAdmin(c *gin.Context) {
+	allOrderDetails, err := usecase.GetAllOrderDetailsForAdmin()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError,gin.H{"error":"couldn't retrieve order details"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "couldn't retrieve order details"})
 		return
 	}
 
-	c.JSON(http.StatusOK,gin.H{"message":"Order details retrieved successfully","All orders":allOrderDetails})
+	c.JSON(http.StatusOK, gin.H{"message": "Order details retrieved successfully", "All orders": allOrderDetails})
 }
 
-func OrderDetailsforAdminWithID(c *gin.Context){
-	orderID:=c.Query("orderID")
+func OrderDetailsforAdminWithID(c *gin.Context) {
+	orderID := c.Query("orderID")
 
-	OrderDetails,err:=usecase.GetOrderDetails(orderID)
-	if err != nil{
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+	OrderDetails, err := usecase.GetOrderDetails(orderID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK,gin.H{"Order Products":OrderDetails})
+	c.JSON(http.StatusOK, gin.H{"Order Products": OrderDetails})
 }

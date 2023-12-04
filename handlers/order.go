@@ -99,15 +99,17 @@ func CancelOrder(c *gin.Context) {
 
 }
 
-// func CancelOrderByAdmin(c *gin.Context) {
-// 	orderID := c.Query("id")
-// 	err := usecase.CancelOrderByAdmin(orderID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "couldn't cancel the order"})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"message": "Order cancelled successfully"})
-// }
+func CancelOrderByAdmin(c *gin.Context) {
+	orderID := c.Query("user_id")
+	productID:=c.Query("product_id")
+	userID:=c.Query("user_id")
+	err := usecase.CancelOrderByAdmin(userID,orderID,productID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "couldn't cancel the order"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Order cancelled successfully"})
+}
 
 func ShipOrderByAdmin(c *gin.Context) {
 	orderId := c.Query("OrderId")

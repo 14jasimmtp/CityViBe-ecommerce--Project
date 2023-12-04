@@ -17,19 +17,19 @@ func UserRoutes(r *gin.Engine) {
 	//products
 	r.GET("/products", handlers.GetAllProducts)
 	r.GET("/products/:id", handlers.ShowSingleProduct)
-	r.GET("/products/search",handlers.SearchProducts)//search
+	r.GET("/products/search", handlers.SearchProducts) //search
 
 	//filtering
-	r.GET("/products/filter/",handlers.FilterProducts)
+	r.GET("/products/filter/", handlers.FilterProducts)
 
 	//wishlist
-	r.POST("/products/wishlist",middlewares.UserAuthMiddleware,handlers.AddProductToWishlist)
-	r.GET("/products/wishlist",middlewares.UserAuthMiddleware,handlers.ViewUserWishlist)
-	r.DELETE("/products/wishlist",middlewares.UserAuthMiddleware,handlers.RemoveProductFromWishlist)
+	r.POST("/products/wishlist", middlewares.UserAuthMiddleware, handlers.AddProductToWishlist)
+	r.GET("/products/wishlist", middlewares.UserAuthMiddleware, handlers.ViewUserWishlist)
+	r.DELETE("/products/wishlist", middlewares.UserAuthMiddleware, handlers.RemoveProductFromWishlist)
 
 	//profile
-	r.GET("/profile",middlewares.UserAuthMiddleware,handlers.UserProfile)
-	r.PUT("/profile",middlewares.UserAuthMiddleware,handlers.UpdateUserProfile)
+	r.GET("/profile", middlewares.UserAuthMiddleware, handlers.UserProfile)
+	r.PUT("/profile", middlewares.UserAuthMiddleware, handlers.UpdateUserProfile)
 
 	//password change
 	r.POST("/password/forgot", handlers.ForgotPassword)
@@ -53,7 +53,7 @@ func UserRoutes(r *gin.Engine) {
 	r.POST("/orders", middlewares.UserAuthMiddleware, handlers.OrderFromCart)
 	r.GET("/checkout", middlewares.UserAuthMiddleware, handlers.ViewCheckOut)
 	r.PUT("/orders/return", middlewares.UserAuthMiddleware, handlers.ReturnOrder)
-	r.PUT("/orders/cancel",middlewares.UserAuthMiddleware,handlers.CancelOrder)
+	r.PUT("/orders/cancel", middlewares.UserAuthMiddleware, handlers.CancelOrder)
 
 	//wishlist
 	r.GET("/wishlist", middlewares.UserAuthMiddleware, handlers.ViewUserWishlist)
@@ -61,6 +61,9 @@ func UserRoutes(r *gin.Engine) {
 	r.DELETE("/wishlist", middlewares.UserAuthMiddleware, handlers.RemoveProductFromWishlist)
 
 	//payment
-	r.GET("/payment/razorpay",handlers.ExecuteRazorPayPayment)	
-	r.POST("/payment/verify",handlers.VerifyPayment)
+	r.GET("/payment/razorpay", handlers.ExecuteRazorPayPayment)
+	r.POST("/payment/verify", handlers.VerifyPayment)
+
+	//coupons
+	r.GET("/coupons", middlewares.UserAuthMiddleware, handlers.ViewCouponsUser)
 }

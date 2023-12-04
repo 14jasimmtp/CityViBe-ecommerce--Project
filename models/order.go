@@ -8,16 +8,16 @@ type CheckOutInfoDiscount struct {
 }
 
 type CheckOutInfo struct {
-	Address        []AddressRes `json:"address"`
-	Cart           []Cart       `json:"cart"`
-	TotalAmount    float64      `json:"Total Amount"`
+	Address     []AddressRes `json:"address"`
+	Cart        []Cart       `json:"cart"`
+	TotalAmount float64      `json:"Total Amount"`
 }
 
 type OrderSuccessResponse struct {
-	OrderID       int    `json:"order_id"`
-	PaymentMethod string `json:"payment_method"`
-	TotalAmount float64 `json:"total_amount"`
-	PaymentStatus string `json:"Payment_status"`
+	OrderID       int     `json:"order_id"`
+	PaymentMethod string  `json:"payment_method"`
+	TotalAmount   float64 `json:"total_amount"`
+	PaymentStatus string  `json:"Payment_status"`
 }
 
 type ViewOrderDetails struct {
@@ -25,7 +25,20 @@ type ViewOrderDetails struct {
 	OrderProductDetails []OrderProductDetails
 }
 
+type ViewAdminOrderDetails struct {
+	OrderDetails AdminOrderDetails
+	OrderProductDetails []OrderProductDetails
+}
+
 type OrderDetails struct {
+	Id            string
+	FinalPrice    float64
+	PaymentMethod string
+	PaymentStatus string
+}
+
+type AdminOrderDetails struct {
+	UserID       int
 	Id            string
 	FinalPrice    float64
 	PaymentMethod string
@@ -61,16 +74,16 @@ type CombinedOrderDetails struct {
 }
 
 type CheckOut struct {
-	AddressID uint `json:"address_id" binding:"required"`
-	PaymentID uint `json:"payment_id"`
-	Coupon string `json:"coupon"`
+	AddressID uint   `json:"address_id" binding:"required"`
+	PaymentID uint   `json:"payment_id"`
+	Coupon    string `json:"coupon"`
 }
 
 type CancelDetails struct {
-	OrderStatus string `json:"order_status"`
-	Quantity int `json:"quantity"`
-	PaymentStatus string `json:"payment_status"`
-	TotalPrice float64 `json:"total_price"`
-	OrderID int `json:"order_id"`
-	ProductID int `json:"product_id"`
+	OrderStatus   string  `json:"order_status"`
+	Quantity      int     `json:"quantity"`
+	PaymentStatus string  `json:"payment_status"`
+	TotalPrice    float64 `json:"total_price"`
+	OrderID       int     `json:"order_id"`
+	ProductID     int     `json:"product_id"`
 }

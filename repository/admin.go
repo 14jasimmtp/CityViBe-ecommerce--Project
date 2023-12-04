@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 
 	initialisers "main.go/Initialisers"
@@ -43,14 +44,20 @@ func UnBlockUserByID(user models.UserDetailsResponse) error {
 	return nil
 }
 
-func GetAllOrderDetailsBrief() ([]models.CombinedOrderDetails, error) {
+func GetAllOrderDetailsBrief() ([]models.ViewAdminOrderDetails, error) {
 
-	var orderDatails []models.CombinedOrderDetails
-	err := initialisers.DB.Raw("SELECT orders.id,orders.total_price as final_price,orders.payment_status,users.firstname,users.email,users.phone,addresses.house_name,addresses.street,addresses.city,addresses.state,addresses.pin FROM orders INNER JOIN users ON orders.user_id = users.id INNER JOIN addresses ON orders.address_id = addresses.id ").Scan(&orderDatails).Error
-	if err != nil {
-		return []models.CombinedOrderDetails{}, nil
+	var orderDatails []models.AdminOrderDetails
+	query := initialisers.DB.Raw("SELECT orders.user_id,orders.id, total_price as final_price, payment_methods.payment_mode AS payment_method, payment_status FROM orders INNER JOIN payment_methods ON orders.payment_method_id=payment_methods.id  ORDER BY orders.id DESC").Scan(&orderDatails)
+	if query.Error != nil {
+		return []models.ViewAdminOrderDetails{}, errors.New(`something went wrong`)
 	}
-	return orderDatails, nil
+	var fullOrderDetails []models.ViewAdminOrderDetails
+	for _, ok := range orderDatails {
+		var OrderProductDetails []models.OrderProductDetails
+		initialisers.DB.Raw("SELECT order_items.product_id,products.name AS product_name,order_items.order_status,order_items.quantity,order_items.total_price FROM order_items INNER JOIN products ON order_items.product_id = products.id WHERE order_items.order_id = ? ORDER BY order_id DESC", ok.Id).Scan(&OrderProductDetails)
+		fullOrderDetails = append(fullOrderDetails, models.ViewAdminOrderDetails{OrderDetails: ok, OrderProductDetails: OrderProductDetails})
+	}
+	return fullOrderDetails, nil
 
 }
 

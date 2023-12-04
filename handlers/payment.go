@@ -5,7 +5,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"main.go/models"
 	"main.go/usecase"
+	"main.go/utils"
 )
 
 func ExecuteRazorPayPayment(c *gin.Context) {
@@ -43,13 +45,17 @@ func ExecuteRazorPayPayment(c *gin.Context) {
 	c.HTML(http.StatusNotFound, "notfound.html", nil)
 }
 func VerifyPayment(c *gin.Context) {
-	orderID, err := strconv.Atoi(c.Query("order_id"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error converting id"})
+	var Verify models.PaymentVerify
+	if c.ShouldBindJSON(&Verify) != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":"enter fields correctly"})
 		return
 	}
-	paymentID := c.Query("payment_id")
-	err = usecase.SavePaymentDetails(orderID, paymentID)
+	Error,err:=utils.Validation(Verify)
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":Error})
+		return
+	}
+	err = usecase.SavePaymentDetails(Verify.OrderID, Verify.PaymentID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

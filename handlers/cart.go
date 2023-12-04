@@ -109,18 +109,3 @@ func DecreaseQuantityUpdate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "quantity decreased by 1 successfully"})
 }
-
-func EraseCartAfterOrder(c *gin.Context){
-	Token,err:=c.Cookie("Authorisation")
-	if err != nil{
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
-		return
-	}
-	cart,err:=usecase.EraseCart(Token)
-	if err != nil{
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK,gin.H{"message":"cart emptied successfully","cart":cart})
-}

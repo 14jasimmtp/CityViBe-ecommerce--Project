@@ -25,8 +25,8 @@ type UserToken struct {
 }
 
 type UserLoginDetails struct {
-	Phone    string `json:"phone" binding:"required" validate:"min=10,max=10"`
-	Password string `json:"password" binding:"required" validate:"min=6,max=20"`
+	Phone    string `json:"phone" validate:"required,len=10,number"`
+	Password string `json:"password"  validate:"required,min=6,max=20"`
 }
 
 type UserLoginResponse struct {
@@ -86,4 +86,8 @@ type ChangePassword struct {
 	Oldpassword     string `json:"Current password" binding:"required"`
 	Newpassword     string `json:"New password" binding:"required"`
 	ConfirmPassword string `json:"Confirm new password" binding:"required"`
+}
+
+type Errors struct {
+	Error string
 }

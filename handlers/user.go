@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"main.go/models"
 	"main.go/usecase"
+	"main.go/utils"
 )
 
 func UserSignup(c *gin.Context) {
@@ -18,10 +18,9 @@ func UserSignup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details in correct format"})
 		return
 	}
-	err := validator.New().Struct(User)
+	data, err := utils.Validation(User)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
-		return
+		c.JSON(http.StatusBadRequest, gin.H{"error": data})
 	}
 
 	err = usecase.SignUp(User)
@@ -42,10 +41,9 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details in correct format"})
 		return
 	}
-
-	err := validator.New().Struct(User)
+	Error, err := utils.Validation(User)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "details not satisfied"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
 		return
 	}
 
@@ -91,7 +89,6 @@ func ResetForgottenPassword(c *gin.Context) {
 		return
 	}
 
-	
 	err := usecase.ResetForgottenPassword(Newpassword)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -201,7 +198,6 @@ func UpdateUserProfile(c *gin.Context) {
 	if c.ShouldBindJSON(&UserDetails) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
 	}
-
 
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {

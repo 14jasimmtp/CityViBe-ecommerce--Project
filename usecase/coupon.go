@@ -7,6 +7,7 @@ import (
 	"main.go/domain"
 	"main.go/models"
 	"main.go/repository"
+	"main.go/utils"
 )
 
 func CreateCoupon(coupon models.Coupon) (domain.Coupon, error) {
@@ -67,4 +68,18 @@ func UpdateCoupon(coupon models.Coupon, coupon_id string) (domain.Coupon, error)
 		return domain.Coupon{}, err
 	}
 	return Coupon, nil
+}
+
+func ViewCouponsUser(Token string)([]models.Couponlist,error){
+	UserID,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil{
+		return []models.Couponlist{},errors.New(`error in token`)
+	}
+
+	Coupons,err:=repository.ViewUserCoupons(UserID)
+	if err != nil {
+		return []models.Couponlist{},err
+	}
+
+	return Coupons,nil
 }

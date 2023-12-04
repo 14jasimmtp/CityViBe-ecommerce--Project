@@ -300,27 +300,53 @@ func CancelOrder(Token, orderId string, pid string) error {
 
 }
 
-// func CancelOrderByAdmin(order_id string) error {
-// 	err := repository.CheckOrder(order_id,)
-// 	fmt.Println(err)
-// 	if err != nil {
-// 		return errors.New(`no orders found with this id`)
-// 	}
-// 	orderProduct, err := repository.GetProductDetailsFromOrders(order_id)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	err = repository.CancelOrderByAdmin(order_id)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	// update the quantity to products since the order is cancelled
-// 	err = repository.UpdateStock(orderProduct)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+func CancelOrderByAdmin(userID,order_id,pid string) error {
+	user_id,err:=strconv.Atoi(userID)
+	if err != nil {
+		return err
+	}
+	err = repository.CheckOrder(order_id,uint(user_id))
+	fmt.Println(err)
+	if err != nil {
+		return errors.New(`no orders found with this id`)
+	}
+	OrderDetails, err := repository.CancelOrderDetails(uint(user_id), order_id, pid)
+	if err != nil {
+		return err
+	}
+
+	if OrderDetails.OrderStatus == "Delivered" {
+		return errors.New(`the order is delivered .Can't Cancel`)
+	}
+
+	if OrderDetails.OrderStatus == "Cancelled" {
+		return errors.New(`the order is already cancelled`)
+	}
+
+	if OrderDetails.PaymentStatus == "paid" {
+		err := repository.ReturnAmountToWallet(uint(user_id), order_id, pid)
+		if err != nil {
+			return err
+		}
+
+	}
+	err = repository.UpdateOrderFinalPrice(OrderDetails.OrderID, OrderDetails.TotalPrice)
+	if err != nil {
+		return err
+	}
+	proid, _ := strconv.Atoi(pid)
+	err = repository.UpdateStock(proid, OrderDetails.Quantity)
+	if err != nil {
+		return err
+	}
+
+	err = repository.CancelOrder(order_id, pid, uint(user_id))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func ShipOrders(userID, orderId, pid string) error {
 	OrderStatus, err := repository.GetOrderStatus(orderId, pid)

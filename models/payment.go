@@ -9,8 +9,7 @@ type Payment struct {
 
 type PaymentVerify struct {
 	PaymentID string `json:"payment_id" validate:"required"`
-	OrderID   string `json:"order_id" validate:"required"`
-	Signature string `json:"signature" validate:"required"`
+	OrderID   int    `json:"order_id" validate:"required"`
 }
 
 type Invoice struct {
@@ -18,5 +17,4 @@ type Invoice struct {
 	UserID        int     `json:"user_id"`
 	PaymentMethod string  `json:"payment_method"`
 	TotalAmount   float64 `json:"total_amount"`
-	
 }
