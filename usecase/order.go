@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"main.go/domain"
@@ -10,8 +11,8 @@ import (
 	"main.go/utils"
 )
 
-func CheckOut(Token, coupon string) (models.CheckOutInfo, error) {
-	var DiscountAmount float64
+func CheckOut(Token, coupon string) (interface{}, error) {
+	var FinalPrice float64
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return models.CheckOutInfo{}, err
@@ -32,17 +33,36 @@ func CheckOut(Token, coupon string) (models.CheckOutInfo, error) {
 		return models.CheckOutInfo{}, err
 	}
 	if coupon != "" {
+		err := repository.CheckCouponUsage(userId, coupon)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
 		DiscountRate, err := repository.GetDiscountRate(coupon)
 		if err != nil {
-			return models.CheckOutInfo{}, err
+			return models.OrderSuccessResponse{}, err
 		}
-		DiscountAmount = TotalAmount - (TotalAmount * (DiscountRate / 100))
+		FinalPrice, err = repository.UpdateCartAmount(userId, uint(DiscountRate))
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+		err = repository.UpdateCouponUsage(userId, coupon)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+		err = repository.UpdateCouponCount(coupon)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
 
-		return models.CheckOutInfo{
+		fmt.Println(FinalPrice)
+		if FinalPrice == 0 {
+			FinalPrice = TotalAmount
+		}
+		return models.CheckOutInfoDiscount{
 			Address:        AllUserAddress,
 			Cart:           AllCartProducts,
 			TotalAmount:    TotalAmount,
-			DiscountAmount: DiscountAmount,
+			DiscountAmount: FinalPrice,
 		}, nil
 	}
 	return models.CheckOutInfo{
@@ -52,20 +72,27 @@ func CheckOut(Token, coupon string) (models.CheckOutInfo, error) {
 	}, nil
 }
 
-func OrderFromCart(Token string, AddressId uint, PaymentID uint) (models.OrderSuccessResponse, error) {
+func ExecutePurchase(Token string, OrderInput models.CheckOut) (models.OrderSuccessResponse, error) {
+	var FinalPrice float64
+	var method string
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
 
-	addressExist := repository.CheckAddressExist(userId, AddressId)
+	addressExist := repository.CheckAddressExist(userId, OrderInput.AddressID)
 	if !addressExist {
 		return models.OrderSuccessResponse{}, errors.New(`address doesn't exist`)
 	}
 
-	paymentExist := repository.CheckPaymentMethodExist(PaymentID)
+	paymentExist := repository.CheckPaymentMethodExist(OrderInput.PaymentID)
 	if !paymentExist {
 		return models.OrderSuccessResponse{}, errors.New(`payment method doesn't exist`)
+	}
+	if OrderInput.PaymentID == 1 {
+		method = "COD"
+	} else {
+		method = "Razorpay"
 	}
 
 	cartExist := repository.CheckCartExist(userId)
@@ -83,16 +110,113 @@ func OrderFromCart(Token string, AddressId uint, PaymentID uint) (models.OrderSu
 		return models.OrderSuccessResponse{}, err
 	}
 
-	OrderID, err := repository.OrderFromCart(AddressId, PaymentID, userId, TotalAmount)
+	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, FinalPrice)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
 
-	if err := repository.AddOrderProducts(userId,OrderID, cartItems); err != nil {
+	if err := repository.AddOrderProducts(userId, OrderID, cartItems); err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
 
-	body, err := repository.GetOrder(OrderID)
+	var orderItemDetails domain.OrderItem
+	for _, c := range cartItems {
+		orderItemDetails.ProductID = c.ProductID
+		orderItemDetails.Quantity = c.Quantity
+		err := repository.UpdateCartAndStockAfterOrder(userId, int(orderItemDetails.ProductID), orderItemDetails.Quantity)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+	}
+	return models.OrderSuccessResponse{
+		OrderID:       OrderID,
+		PaymentMethod: method,
+		TotalAmount:   TotalAmount,
+		PaymentStatus: "not paid",
+	}, nil
+}
+
+func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.OrderSuccessResponse, error) {
+	var FinalPrice float64
+	userId, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return models.OrderSuccessResponse{}, err
+	}
+
+	user, err := repository.GetUserById(int(userId))
+	if err != nil {
+		return models.OrderSuccessResponse{}, err
+	}
+
+	addressExist := repository.CheckAddressExist(userId, OrderInput.AddressID)
+	if !addressExist {
+		return models.OrderSuccessResponse{}, errors.New(`address doesn't exist`)
+	}
+
+	paymentExist := repository.CheckPaymentMethodExist(OrderInput.PaymentID)
+	if !paymentExist {
+		return models.OrderSuccessResponse{}, errors.New(`payment method doesn't exist`)
+	}
+
+	cartExist := repository.CheckCartExist(userId)
+	if !cartExist {
+		return models.OrderSuccessResponse{}, errors.New(`cart is empty`)
+	}
+
+	TotalAmount, err := repository.CartTotalAmount(userId)
+	if err != nil {
+		return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
+	}
+
+	if OrderInput.Coupon != "" {
+		err := repository.CheckCouponUsage(userId, OrderInput.Coupon)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+		DiscountRate, err := repository.GetDiscountRate(OrderInput.Coupon)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+		FinalPrice, err = repository.UpdateCartAmount(userId, uint(DiscountRate))
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+		err = repository.UpdateCouponUsage(userId, OrderInput.Coupon)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+		err = repository.UpdateCouponCount(OrderInput.Coupon)
+		if err != nil {
+			return models.OrderSuccessResponse{}, err
+		}
+	}
+	if FinalPrice == 0 {
+		FinalPrice = TotalAmount
+	}
+	if user.Wallet < FinalPrice {
+		return models.OrderSuccessResponse{}, errors.New(`insufficient Balance in Wallet.Add amount to wallet to purchase`)
+	}
+	cartItems, err := repository.DisplayCart(userId)
+	if err != nil {
+		return models.OrderSuccessResponse{}, err
+	}
+
+	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, FinalPrice)
+	if err != nil {
+		return models.OrderSuccessResponse{}, err
+	}
+
+	user.Wallet -= FinalPrice
+
+	err = repository.UpdateWallet(user.Wallet, userId)
+	if err != nil {
+		return models.OrderSuccessResponse{}, err
+	}
+
+	if err := repository.AddOrderProducts(userId, OrderID, cartItems); err != nil {
+		return models.OrderSuccessResponse{}, err
+	}
+	err = repository.UpdateShipmentAndPaymentByOrderID("pending", "paid", OrderID)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
@@ -108,9 +232,10 @@ func OrderFromCart(Token string, AddressId uint, PaymentID uint) (models.OrderSu
 	}
 	return models.OrderSuccessResponse{
 		OrderID:       OrderID,
-		PaymentStatus: body.PaymentStatus,
+		PaymentMethod: "Wallet",
+		TotalAmount:   FinalPrice,
+		PaymentStatus: "paid",
 	}, nil
-
 }
 
 func ViewUserOrders(Token string) ([]models.ViewOrderDetails, error) {
@@ -166,7 +291,7 @@ func CancelOrder(Token, orderId string, pid string) error {
 		return err
 	}
 
-	err = repository.CancelOrder(orderId,pid, UserID)
+	err = repository.CancelOrder(orderId, pid, UserID)
 	if err != nil {
 		return err
 	}
@@ -176,7 +301,7 @@ func CancelOrder(Token, orderId string, pid string) error {
 }
 
 // func CancelOrderByAdmin(order_id string) error {
-// 	err := repository.CheckOrder(order_id)
+// 	err := repository.CheckOrder(order_id,)
 // 	fmt.Println(err)
 // 	if err != nil {
 // 		return errors.New(`no orders found with this id`)
@@ -197,8 +322,8 @@ func CancelOrder(Token, orderId string, pid string) error {
 // 	return nil
 // }
 
-func ShipOrders(orderId string) error {
-	OrderStatus, err := repository.GetOrderStatus(orderId)
+func ShipOrders(userID, orderId, pid string) error {
+	OrderStatus, err := repository.GetOrderStatus(orderId, pid)
 	if err != nil {
 		return err
 	}
@@ -214,8 +339,8 @@ func ShipOrders(orderId string) error {
 		return errors.New("the order is already Shipped")
 	}
 
-	if OrderStatus == "pending" {
-		err := repository.ShipOrder(orderId)
+	if OrderStatus == "pending" || OrderStatus == "processing" {
+		err := repository.ShipOrder(userID, orderId)
 		if err != nil {
 			return err
 		}
@@ -225,9 +350,9 @@ func ShipOrders(orderId string) error {
 	return nil
 }
 
-func DeliverOrder(orderId string) error {
+func DeliverOrder(useriD, orderId, pid string) error {
 
-	OrderStatus, err := repository.GetOrderStatus(orderId)
+	OrderStatus, err := repository.GetOrderStatus(orderId, pid)
 	if err != nil {
 		return err
 	}
@@ -243,65 +368,48 @@ func DeliverOrder(orderId string) error {
 		return errors.New("the order is not shipped yet")
 	}
 
+	if OrderStatus == "returned" {
+		return errors.New(`the order is returned already by the customer`)
+	}
+
 	if OrderStatus == "Shipped" {
-		err := repository.DeliverOrder(orderId)
+		err := repository.DeliverOrder(useriD, orderId)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
-	// if the shipment status is not processing or cancelled. Then it is defenetely cancelled
 	return nil
 }
 
-func CancelSingleProduct(pid, Token, orderID string) ([]models.OrderProducts, error) {
-	userID, err := utils.ExtractUserIdFromToken(Token)
+func ReturnOrder(Token, orderID, pid string) error {
+	UserID, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
-		return []models.OrderProducts{}, err
+		return err
 	}
 
-	err = repository.CheckSingleOrder(pid, orderID, userID)
+	Order, err := repository.GetOrderStatus(orderID, pid)
 	if err != nil {
-		return []models.OrderProducts{}, errors.New(`no orders found with this id`)
+		return err
 	}
 
-	OrderStatus, err := repository.GetOrderStatus(orderID)
+	if Order == "pending" || Order == "processing" || Order == "Cancelled" || Order == "Shipped" {
+		return errors.New(`order is not delivered .Can't return`)
+	}
+
+	if Order == "returned" {
+		return errors.New(`order is already returned`)
+	}
+
+	err = repository.ReturnAmountToWallet(UserID, orderID, pid)
 	if err != nil {
-		return []models.OrderProducts{}, err
+		return err
 	}
 
-	if OrderStatus == "Delivered" {
-		return []models.OrderProducts{}, errors.New(`the order is delivered .Can't Cancel`)
-	}
-
-	if OrderStatus == "Cancelled" {
-		return []models.OrderProducts{}, errors.New(`the order is already cancelled`)
-	}
-
-	err = repository.CancelSingleOrder(pid, orderID, userID)
+	err = repository.ReturnOrder(UserID, orderID, pid)
 	if err != nil {
-		return []models.OrderProducts{}, err
+		return err
 	}
 
-	err = repository.UpdateSingleStock(pid)
-	if err != nil {
-		return []models.OrderProducts{}, err
-	}
-
-	err = repository.UpdateAmount(orderID, userID)
-	if err != nil {
-		return []models.OrderProducts{}, err
-	}
-
-	orderDetails, err := repository.GetProductDetailsFromOrders(orderID)
-	if err != nil {
-		return []models.OrderProducts{}, err
-	}
-
-	return orderDetails, nil
-
-}
-
-func ReturnOrder() {
-
+	return nil
 }

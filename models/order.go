@@ -1,14 +1,22 @@
 package models
 
-type CheckOutInfo struct {
+type CheckOutInfoDiscount struct {
 	Address        []AddressRes `json:"address"`
 	Cart           []Cart       `json:"cart"`
 	TotalAmount    float64      `json:"Total Amount"`
 	DiscountAmount float64      `json:"Discounted Amount"`
 }
 
+type CheckOutInfo struct {
+	Address        []AddressRes `json:"address"`
+	Cart           []Cart       `json:"cart"`
+	TotalAmount    float64      `json:"Total Amount"`
+}
+
 type OrderSuccessResponse struct {
 	OrderID       int    `json:"order_id"`
+	PaymentMethod string `json:"payment_method"`
+	TotalAmount float64 `json:"total_amount"`
 	PaymentStatus string `json:"Payment_status"`
 }
 
@@ -55,6 +63,7 @@ type CombinedOrderDetails struct {
 type CheckOut struct {
 	AddressID uint `json:"address_id" binding:"required"`
 	PaymentID uint `json:"payment_id"`
+	Coupon string `json:"coupon"`
 }
 
 type CancelDetails struct {

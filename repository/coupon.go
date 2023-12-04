@@ -43,7 +43,7 @@ func CheckCouponExistWithID(coupon int) (bool, error) {
 
 func CreateCoupon(coupon models.Coupon) (domain.Coupon, error) {
 	var Coupons domain.Coupon
-	query := initialisers.DB.Raw(`INSERT INTO coupons (coupon,discount_percentage) VALUES (?,?) RETURNING id,coupon,discount_percentage`, coupon.Coupon, coupon.DiscoutPercentage).Scan(&Coupons)
+	query := initialisers.DB.Raw(`INSERT INTO coupons (coupon,discount_percentage,usage_limit) VALUES (?,?,?) RETURNING id,coupon,discount_percentage,usage_limit`, coupon.Coupon, coupon.DiscoutPercentage,coupon.UsageLimit).Scan(&Coupons)
 	if query.Error != nil {
 		return domain.Coupon{}, errors.New(`something went wrong`)
 	}
@@ -51,7 +51,7 @@ func CreateCoupon(coupon models.Coupon) (domain.Coupon, error) {
 }
 
 func DisableCoupon(coupon uint) error {
-	query := initialisers.DB.Exec(`UPDATE coupons SET valid = false WHERE id = ?`, coupon)
+	query := initialisers.DB.Exec(`UPDATE coupons SET active = false WHERE id = ?`, coupon)
 	if query.RowsAffected < 1 {
 		return errors.New(`no coupons found with this id`)
 	}
@@ -62,7 +62,7 @@ func DisableCoupon(coupon uint) error {
 }
 
 func EnableCoupon(coupon uint) error {
-	query := initialisers.DB.Exec(`UPDATE coupons SET valid = true WHERE id = ?`, coupon)
+	query := initialisers.DB.Exec(`UPDATE coupons SET active = true WHERE id = ?`, coupon)
 	if query.RowsAffected < 1 {
 		return errors.New(`no coupons found with this id`)
 	}
@@ -103,4 +103,32 @@ func GetDiscountRate(coupon string) (float64, error) {
 		return 0.0, errors.New(`no coupons found`)
 	}
 	return discountRate, nil
+}
+
+func UpdateCouponUsage(userID uint,coupon string)error{
+	query:=initialisers.DB.Exec(`insert into used_coupons (user_id,coupon) values(?,?)`,userID,coupon)
+	if query.Error != nil {
+		return errors.New(`something went wrong`)
+	}
+	return nil
+}
+
+func UpdateCouponCount(coupon string)error{
+	query:=initialisers.DB.Exec(`UPDATE coupons SET usage_limit = usage_limit - 1`)
+	if query.Error != nil {
+		return errors.New(`something went wrong`)
+	}
+	return nil
+}
+
+func CheckCouponUsage(userId uint,coupon string)error{
+	var count int
+	query:=initialisers.DB.Raw(`SELECT count(*) from used_coupons where user_id = ? AND coupon = ?`,userId,coupon).Scan(&count)
+	if query.Error != nil {
+		return errors.New(`something went wrong`)
+	}
+	if count>=1{
+		return errors.New(`coupon already used`)
+	}
+	return nil
 }

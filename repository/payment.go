@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	initialisers "main.go/Initialisers"
 	"main.go/models"
@@ -9,11 +10,12 @@ import (
 
 func GetPaymentDetails(orderID int) (models.Payment, error) {
 	var Paymentdt models.Payment
-	query := initialisers.DB.Raw(`SELECT users.firstname,orders.final_price,users.phone FROM orders INNER JOIN users ON orders.user_id=users.id WHERE orders.id = ? `, orderID).Scan(&Paymentdt)
+	query := initialisers.DB.Raw(`SELECT users.firstname,orders.total_price as final_price,users.phone FROM orders INNER JOIN users ON orders.user_id=users.id WHERE orders.id = ? `, orderID).Scan(&Paymentdt)
 	if query.Error != nil {
 		return models.Payment{}, errors.New(`something went wrong`)
 	}
 	if query.RowsAffected < 1 {
+		fmt.Println("hi")
 		return models.Payment{}, errors.New(`no orders foun with this id `)
 	}
 	return Paymentdt, nil
@@ -75,10 +77,9 @@ func UpdateShipmentAndPaymentByOrderID(orderStatus string, paymentStatus string,
 	if err != nil {
 		return err
 	}
-	err=initialisers.DB.Exec("UPDATE order_items SET order_status = ?  WHERE order_id = ?", orderStatus, orderID).Error
-	if err != nil{
+	err = initialisers.DB.Exec("UPDATE order_items SET order_status = ?  WHERE order_id = ?", orderStatus, orderID).Error
+	if err != nil {
 		return errors.New(`something went wrong`)
 	}
 	return nil
 }
-

@@ -10,12 +10,13 @@ type UserSignUpDetails struct {
 }
 
 type UserDetailsResponse struct {
-	ID        uint   `json:"ID"`
-	Email     string `json:"email"`
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Phone     string `json:"phone"`
-	Blocked   bool   `json:"blocked"`
+	ID        uint    `json:"ID"`
+	Email     string  `json:"email"`
+	Firstname string  `json:"firstname"`
+	Lastname  string  `json:"lastname"`
+	Phone     string  `json:"phone"`
+	Blocked   bool    `json:"blocked"`
+	Wallet    float64 `json:"wallet"`
 }
 
 type UserToken struct {

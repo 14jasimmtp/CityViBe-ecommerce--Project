@@ -148,3 +148,11 @@ func CheckAddressExist(userid uint, address uint) bool {
 	}
 	return count > 0
 }
+
+func UpdateWallet(wallet float64,userID uint)error{
+	query:=initialisers.DB.Exec(`UPDATE users SET wallet = ? WHERE id = ?`,wallet,userID)
+	if query.Error != nil{
+		 return errors.New(`something went wrong`)
+	}
+	return nil
+}

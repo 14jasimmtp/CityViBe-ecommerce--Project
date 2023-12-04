@@ -19,21 +19,33 @@ func OrderFromCart(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if OrderInput.PaymentID == 1 || OrderInput.PaymentID == 2 {
+		OrderDetails, err := usecase.ExecutePurchase(Token, OrderInput)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		} else {
+			c.JSON(http.StatusOK, gin.H{"message": "ordered products successfully", "order Details": OrderDetails})
+		}
 
-	OrderDetails, err := usecase.OrderFromCart(Token, OrderInput.AddressID,OrderInput.PaymentID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	} else if OrderInput.PaymentID == 3 {
+		OrderDetails, err := usecase.ExecutePurchaseWallet(Token, OrderInput)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		} else {
+			c.JSON(http.StatusOK, gin.H{"message": "ordered products successfully", "order Details": OrderDetails})
+		}
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "enter a valid payment method"})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "ordered products successfully", "order Details": OrderDetails})
-
 }
 
 func ViewCheckOut(c *gin.Context) {
 	var coupon models.CheckoutCoupon
 	if c.ShouldBindJSON(&coupon) != nil {
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter coupon correctly"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter coupon correctly"})
 	}
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -41,7 +53,7 @@ func ViewCheckOut(c *gin.Context) {
 		return
 	}
 
-	OrderDetails, err := usecase.CheckOut(Token,coupon.Coupon)
+	OrderDetails, err := usecase.CheckOut(Token, coupon.Coupon)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -75,9 +87,9 @@ func CancelOrder(c *gin.Context) {
 	}
 
 	orderId := c.Query("order_id")
-	product_id:=c.Query("product_id")
+	product_id := c.Query("product_id")
 
-	err = usecase.CancelOrder(Token, orderId,product_id)
+	err = usecase.CancelOrder(Token, orderId, product_id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -98,8 +110,10 @@ func CancelOrder(c *gin.Context) {
 // }
 
 func ShipOrderByAdmin(c *gin.Context) {
-	orderId := c.Query("id")
-	err := usecase.ShipOrders(orderId)
+	orderId := c.Query("OrderId")
+	pid := c.Query("productId")
+	userID:=c.Query("userID")
+	err := usecase.ShipOrders(userID,orderId, pid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -110,8 +124,10 @@ func ShipOrderByAdmin(c *gin.Context) {
 
 func DeliverOrderByAdmin(c *gin.Context) {
 	id := c.Query("orderId")
+	pid := c.Query("productId")
+	userID:=c.Query("userID")
 
-	err := usecase.DeliverOrder(id)
+	err := usecase.DeliverOrder(userID,id, pid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -120,21 +136,21 @@ func DeliverOrderByAdmin(c *gin.Context) {
 
 }
 
-func CancelSingleProduct(c *gin.Context) {
-	id := c.Query("pid")
-	orderID := c.Query("oid")
-
+func ReturnOrder(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	orderDetails, err := usecase.CancelSingleProduct(id, Token, orderID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Cancelled product from orders.If you have paid online money will be refunded to your wallet", "Order Details": orderDetails})
+	orderId := c.Query("order_id")
+	productId := c.Query("product_id")
+
+	err = usecase.ReturnOrder(Token, orderId, productId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "order returned successfully.Amount will be credited to wallet."})
 }

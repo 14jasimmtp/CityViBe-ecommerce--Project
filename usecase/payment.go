@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/razorpay/razorpay-go"
@@ -18,13 +19,14 @@ func MakePaymentRazorPay(orderID int) (models.Payment, string, error) {
 	client := razorpay.NewClient(os.Getenv("KEY_ID_PAY"), os.Getenv("KEY_SECRET_PAY"))
 
 	data := map[string]interface{}{
-		"amount":   PaymentDetails.Final_price * 100,
+		"amount":   int(PaymentDetails.Final_price * 100),
 		"currency": "INR",
 		"receipt":  "some_receipt_id",
 	}
 	body, err := client.Order.Create(data, nil)
 	if err != nil {
-
+		fmt.Println("hello")
+		fmt.Println(err)
 		return models.Payment{}, "", err
 	}
 
@@ -32,6 +34,7 @@ func MakePaymentRazorPay(orderID int) (models.Payment, string, error) {
 
 	err = repository.AddRazorPayDetails(orderID, razorPayOrderID)
 	if err != nil {
+		fmt.Println("hig")
 		return models.Payment{}, "", err
 	}
 
