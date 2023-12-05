@@ -18,7 +18,7 @@ func MakeCoupon(c *gin.Context) {
 	}
 	data, err := utils.Validation(Coupon)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{ "error": data})
+		c.JSON(http.StatusBadRequest, gin.H{"error": data})
 		return
 	}
 
@@ -81,6 +81,11 @@ func UpdateCoupon(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
 		return
 	}
+	Error, err := utils.Validation(UpdateCoupon)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
 	coupon_id := c.Query("couponID")
 
 	Coupon, err := usecase.UpdateCoupon(UpdateCoupon, coupon_id)
@@ -91,17 +96,17 @@ func UpdateCoupon(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "coupon updated successfully", "coupon": Coupon})
 }
 
-func ViewCouponsUser(c *gin.Context){
-	Token,err:=c.Cookie("Authorisation")
+func ViewCouponsUser(c *gin.Context) {
+	Token, err := c.Cookie("Authorisation")
 	if err != nil {
-		c.JSON(http.StatusUnauthorized,gin.H{"error":"error in token .relogin again."})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "error in token .relogin again."})
 		return
 	}
-	coupons,err:=usecase.ViewCouponsUser(Token)
+	coupons, err := usecase.ViewCouponsUser(Token)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK,gin.H{"message":"Coupons","Coupons":coupons})
+	c.JSON(http.StatusOK, gin.H{"message": "Coupons", "Coupons": coupons})
 }

@@ -45,20 +45,20 @@ type ClientToken struct {
 }
 
 type Phone struct {
-	Phone string `json:"phone" binding:"required" validate:"max=10,min=10"`
+	Phone string `json:"phone" validate:"required,max=10,min=10"`
 }
 type ForgotPassword struct {
-	Phone       string `json:"phone" binding:"required" validate:"max=10,min=10"`
-	OTP         string `json:"otp" binding:"required"`
-	NewPassword string `json:"new password" binding:"required" validate:"min=6,max=20"`
+	Phone       string `json:"phone"  validate:"required,max=10,min=10"`
+	OTP         string `json:"otp" validate:"required"`
+	NewPassword string `json:"new password"  validate:"required,min=6,max=20"`
 }
 
 type Address struct {
 	Name      string `json:"name" validate:"required"`
 	Housename string `json:"house_name" validate:"required"`
-	Phone     string `json:"phone"`
-	Street    string `json:"street"`
-	City      string `json:"city"`
+	Phone     string `json:"phone" validate:"required"`
+	Street    string `json:"street" validate:"required"`
+	City      string `json:"city" validate:"required"`
 	State     string `json:"state" validate:"required"`
 	Pin       string `json:"pin" validate:"required"`
 }
@@ -75,17 +75,17 @@ type AddressRes struct {
 }
 
 type UserProfile struct {
-	Firstname string `json:"firstname" binding:"required"`
-	Lastname  string `json:"lastname" binding:"required"`
-	Email     string `json:"email" binding:"required"`
-	Phone     string `json:"phone" binding:"required" validate:"min=10,max=10"`
-	Wallet    string `json:"wallet" binding:"required"`
+	Firstname string `json:"firstname" validate:"required"`
+	Lastname  string `json:"lastname" validate:"required"`
+	Email     string `json:"email" validate:"required"`
+	Phone     string `json:"phone" validate:"required,min=10,max=10"`
+	Wallet    string `json:"wallet"`
 }
 
 type ChangePassword struct {
-	Oldpassword     string `json:"Current password" binding:"required"`
-	Newpassword     string `json:"New password" binding:"required"`
-	ConfirmPassword string `json:"Confirm new password" binding:"required"`
+	Oldpassword     string `json:"Current password" validate:"required"`
+	Newpassword     string `json:"New password" validate:"required"`
+	ConfirmPassword string `json:"Confirm new password" validate:"required"`
 }
 
 type Errors struct {

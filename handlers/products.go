@@ -39,6 +39,13 @@ func EditProductDetails(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter details correctly"})
 		return
 	}
+
+	Error, err := utils.Validation(product)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
+
 	UpdatedProduct, err := usecase.EditProductDetails(id, product)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

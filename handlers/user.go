@@ -71,7 +71,13 @@ func ForgotPassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter constraints correctly"})
 	}
 
-	err := usecase.ForgotPassword(forgotPassword.Phone)
+	Error, err := utils.Validation(forgotPassword)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
+
+	err = usecase.ForgotPassword(forgotPassword.Phone)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -89,7 +95,13 @@ func ResetForgottenPassword(c *gin.Context) {
 		return
 	}
 
-	err := usecase.ResetForgottenPassword(Newpassword)
+	Error, err := utils.Validation(Newpassword)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
+
+	err = usecase.ResetForgottenPassword(Newpassword)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 	}
@@ -121,6 +133,12 @@ func AddNewAddressDetails(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
 	}
 
+	Error, err := utils.Validation(Address)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
+
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -139,6 +157,12 @@ func EditUserAddress(c *gin.Context) {
 
 	if c.ShouldBindJSON(&UpdateAddress) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter constraints correctly"})
+	}
+
+	Error, err := utils.Validation(UpdateAddress)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
 	}
 
 	Aid := c.Query("id")
@@ -197,6 +221,13 @@ func UpdateUserProfile(c *gin.Context) {
 
 	if c.ShouldBindJSON(&UserDetails) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Details correctly"})
+		return
+	}
+
+	Error, err := utils.Validation(UserDetails)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
 	}
 
 	Token, err := c.Cookie("Authorisation")
