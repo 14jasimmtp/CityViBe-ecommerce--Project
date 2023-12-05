@@ -51,7 +51,7 @@ func DeleteProduct(id int) error {
 
 func GetAllProducts() ([]models.Product, error) {
 	var products []models.Product
-	query := initialisers.DB.Raw(`SELECT name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE deleted = false `).Scan(&products)
+	query := initialisers.DB.Raw(`SELECT products.id,name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE deleted = false `).Scan(&products)
 	if query.Error != nil {
 		return []models.Product{}, query.Error
 	}

@@ -46,9 +46,9 @@ func DeleteProduct(id string) error {
 	return nil
 }
 
-func ShowProductsByCategory() ([]models.Product, error) {
+func ShowProductsByCategory() ([]domain.Product, error) {
 
-	return []models.Product{}, nil
+	return []domain.Product{}, nil
 }
 
 func SeeAllProducts() ([]domain.Product, error) {
@@ -68,27 +68,27 @@ func GetSingleProduct(id string) (models.Product, error) {
 	return product, nil
 }
 
-func FilterProductCategoryWise(category string) ([]models.Product,error){
-	products,err:=repository.FilterProductCategoryWise(category)
-	if err != nil{
-		return []models.Product{},err
-	}
-	return products,nil
-}
-
-func SearchProduct(search string)([]models.Product,error){
-	products,err:=repository.SearchProduct(search)
-	if err != nil{
-		return []models.Product{},err
-	}
-
-	return products,nil
-}
-
-func FilterProducts(category,size string,minPrice,maxPrice float64)([]models.UpdateProduct,error){
-	filteredProducts,err:=repository.FilterProducts(category,size,minPrice,maxPrice)
+func FilterProductCategoryWise(category string) ([]models.Product, error) {
+	products, err := repository.FilterProductCategoryWise(category)
 	if err != nil {
-		return []models.UpdateProduct{},err
+		return []models.Product{}, err
 	}
-	return filteredProducts,nil
+	return products, nil
+}
+
+func SearchProduct(search string) ([]models.Product, error) {
+	products, err := repository.SearchProduct(search)
+	if err != nil {
+		return []models.Product{}, err
+	}
+
+	return products, nil
+}
+
+func FilterProducts(category, size string, minPrice, maxPrice float64) ([]models.UpdateProduct, error) {
+	filteredProducts, err := repository.FilterProducts(category, size, minPrice, maxPrice)
+	if err != nil {
+		return []models.UpdateProduct{}, err
+	}
+	return filteredProducts, nil
 }
