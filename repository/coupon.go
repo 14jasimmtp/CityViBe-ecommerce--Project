@@ -43,7 +43,7 @@ func CheckCouponExistWithID(coupon int) (bool, error) {
 
 func CreateCoupon(coupon models.Coupon) (domain.Coupon, error) {
 	var Coupons domain.Coupon
-	query := initialisers.DB.Raw(`INSERT INTO coupons (coupon,discount_percentage,usage_limit) VALUES (?,?,?) RETURNING id,coupon,discount_percentage,usage_limit`, coupon.Coupon, coupon.DiscoutPercentage, coupon.UsageLimit).Scan(&Coupons)
+	query := initialisers.DB.Raw(`INSERT INTO coupons (coupon,discount_percentage,usage_limit) VALUES (?,?,?) RETURNING id,coupon,discount_percentage,usage_limit,active`, coupon.Coupon, coupon.DiscoutPercentage, coupon.UsageLimit).Scan(&Coupons)
 	if query.Error != nil {
 		return domain.Coupon{}, errors.New(`something went wrong`)
 	}
