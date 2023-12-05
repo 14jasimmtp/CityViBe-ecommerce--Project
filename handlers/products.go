@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"main.go/models"
 	"main.go/usecase"
+	"main.go/utils"
 )
 
 func AddProduct(c *gin.Context) {
@@ -16,6 +17,13 @@ func AddProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Product details correctly"})
 		return
 	}
+
+	Error, err := utils.Validation(product)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
+
 	NewProduct, err := usecase.AddProduct(product)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
@@ -26,7 +34,7 @@ func AddProduct(c *gin.Context) {
 
 func EditProductDetails(c *gin.Context) {
 	var product models.AddProduct
-	id := c.Query("id")
+	id := c.Query("product_id")
 	if c.ShouldBindJSON(&product) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter details correctly"})
 		return
@@ -84,41 +92,40 @@ func ShowSingleProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "product details", "product": product})
 }
 
-func FilterProducts(c *gin.Context){
-	category:=c.Query("category")
-	size:=c.Query("size")
-	minPrice:=c.Query("minPrice")
-	maxPrice:=c.Query("maxPrice")
+func FilterProducts(c *gin.Context) {
+	category := c.Query("category")
+	size := c.Query("size")
+	minPrice := c.Query("minPrice")
+	maxPrice := c.Query("maxPrice")
 
-	min,_:=strconv.ParseFloat(minPrice,64)
-	max,_:=strconv.ParseFloat(maxPrice,64)
-	Products,err:=usecase.FilterProducts(category,size,min,max)
-	if err != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+	min, _ := strconv.ParseFloat(minPrice, 64)
+	max, _ := strconv.ParseFloat(maxPrice, 64)
+	Products, err := usecase.FilterProducts(category, size, min, max)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK,gin.H{"message":"filtered products","products":Products})
+	c.JSON(http.StatusOK, gin.H{"message": "filtered products", "products": Products})
 }
 
-
-func SearchProducts(c *gin.Context){
-	var Search struct{
+func SearchProducts(c *gin.Context) {
+	var Search struct {
 		Search string `json:"search"`
 	}
 
-	if c.ShouldBindJSON(&Search) != nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Enter Constraints correctly"})
+	if c.ShouldBindJSON(&Search) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Constraints correctly"})
 		return
 	}
-	products,err:=usecase.SearchProduct(Search.Search)
-	if err != nil{
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
-		return 
+	products, err := usecase.SearchProduct(Search.Search)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	c.JSON(http.StatusOK,gin.H{"Products":products,"message":"Searched Products"})
+	c.JSON(http.StatusOK, gin.H{"Products": products, "message": "Searched Products"})
 }
 
-func UploadProductImage (c *gin.Context){
-	
+func UploadProductImage(c *gin.Context) {
+
 }

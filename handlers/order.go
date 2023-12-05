@@ -16,9 +16,9 @@ func OrderFromCart(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Enter constraints correctly"})
 		return
 	}
-	Error,err:=utils.Validation(OrderInput)
+	Error, err := utils.Validation(OrderInput)
 	if err != nil {
-		c.JSON(http.StatusBadRequest,gin.H{"error":Error})
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
 		return
 	}
 	Token, err := c.Cookie("Authorisation")
@@ -107,22 +107,38 @@ func CancelOrder(c *gin.Context) {
 }
 
 func CancelOrderByAdmin(c *gin.Context) {
-	orderID := c.Query("user_id")
-	productID:=c.Query("product_id")
-	userID:=c.Query("user_id")
-	err := usecase.CancelOrderByAdmin(userID,orderID,productID)
+	var cancel models.AdminOrder
+	if c.ShouldBindJSON(&cancel) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Constraints correctly"})
+		return
+	}
+
+	Error, err := utils.Validation(cancel)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "couldn't cancel the order"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
+	err = usecase.CancelOrderByAdmin(cancel.UserID, cancel.OrderID, cancel.ProductID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Order cancelled successfully"})
 }
 
 func ShipOrderByAdmin(c *gin.Context) {
-	orderId := c.Query("OrderId")
-	pid := c.Query("productId")
-	userID:=c.Query("userID")
-	err := usecase.ShipOrders(userID,orderId, pid)
+	var Ship models.AdminOrder
+	if c.ShouldBindJSON(&Ship) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "enter constraints correctly"})
+		return
+	}
+
+	Error, err := utils.Validation(Ship)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+	}
+
+	err = usecase.ShipOrders(Ship.UserID, Ship.OrderID, Ship.ProductID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -132,11 +148,20 @@ func ShipOrderByAdmin(c *gin.Context) {
 }
 
 func DeliverOrderByAdmin(c *gin.Context) {
-	id := c.Query("orderId")
-	pid := c.Query("productId")
-	userID:=c.Query("userID")
+	var Deliver models.AdminOrder
 
-	err := usecase.DeliverOrder(userID,id, pid)
+	if c.ShouldBindJSON(&Deliver) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "enter constraints correctly"})
+		return
+	}
+
+	Error, err := utils.Validation(Deliver)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": Error})
+		return
+	}
+
+	err = usecase.DeliverOrder(Deliver.UserID, Deliver.OrderID, Deliver.ProductID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

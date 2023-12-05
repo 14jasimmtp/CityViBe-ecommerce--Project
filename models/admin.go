@@ -8,3 +8,9 @@ type Admin struct {
 	Password    string `json:"password" validate:"required,min=6,max=20"`
 	TokenString string `json:"token"`
 }
+
+type AdminOrder struct {
+	UserID    int `json:"user_id" validate:"required,number"`
+	OrderID   int `json:"order_id" validate:"required,number"`
+	ProductID int `json:"product_id" validate:"required,number"`
+}

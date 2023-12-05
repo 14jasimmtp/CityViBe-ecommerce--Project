@@ -216,7 +216,7 @@ func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.Ord
 	if err := repository.AddOrderProducts(userId, OrderID, cartItems); err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
-	_,err = repository.UpdateShipmentAndPaymentByOrderID("processing", "paid", OrderID)
+	_, err = repository.UpdateShipmentAndPaymentByOrderID("processing", "paid", OrderID)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
@@ -300,17 +300,15 @@ func CancelOrder(Token, orderId string, pid string) error {
 
 }
 
-func CancelOrderByAdmin(userID,order_id,pid string) error {
-	user_id,err:=strconv.Atoi(userID)
-	if err != nil {
-		return err
-	}
-	err = repository.CheckOrder(order_id,uint(user_id))
+func CancelOrderByAdmin(userID, order_id, pid int) error {
+	orderID := strconv.Itoa(order_id)
+	Pid := strconv.Itoa(pid)
+	err := repository.CheckOrder(orderID, uint(userID))
 	fmt.Println(err)
 	if err != nil {
 		return errors.New(`no orders found with this id`)
 	}
-	OrderDetails, err := repository.CancelOrderDetails(uint(user_id), order_id, pid)
+	OrderDetails, err := repository.CancelOrderDetails(uint(userID), orderID, Pid)
 	if err != nil {
 		return err
 	}
@@ -324,7 +322,7 @@ func CancelOrderByAdmin(userID,order_id,pid string) error {
 	}
 
 	if OrderDetails.PaymentStatus == "paid" {
-		err := repository.ReturnAmountToWallet(uint(user_id), order_id, pid)
+		err := repository.ReturnAmountToWallet(uint(userID), orderID, Pid)
 		if err != nil {
 			return err
 		}
@@ -334,13 +332,13 @@ func CancelOrderByAdmin(userID,order_id,pid string) error {
 	if err != nil {
 		return err
 	}
-	proid, _ := strconv.Atoi(pid)
-	err = repository.UpdateStock(proid, OrderDetails.Quantity)
+
+	err = repository.UpdateStock(pid, OrderDetails.Quantity)
 	if err != nil {
 		return err
 	}
 
-	err = repository.CancelOrder(order_id, pid, uint(user_id))
+	err = repository.CancelOrder(orderID, Pid, uint(userID))
 	if err != nil {
 		return err
 	}
@@ -348,8 +346,11 @@ func CancelOrderByAdmin(userID,order_id,pid string) error {
 	return nil
 }
 
-func ShipOrders(userID, orderId, pid string) error {
-	OrderStatus, err := repository.GetOrderStatus(orderId, pid)
+func ShipOrders(userID, orderId, pid int) error {
+	orderID := strconv.Itoa(orderId)
+	Pid := strconv.Itoa(pid)
+	OrderStatus, err := repository.GetOrderStatus(orderID, Pid)
+	fmt.Println(OrderStatus)
 	if err != nil {
 		return err
 	}
@@ -376,9 +377,10 @@ func ShipOrders(userID, orderId, pid string) error {
 	return nil
 }
 
-func DeliverOrder(useriD, orderId, pid string) error {
-
-	OrderStatus, err := repository.GetOrderStatus(orderId, pid)
+func DeliverOrder(useriD, orderId, pid int) error {
+	orderID:=strconv.Itoa(orderId)
+	Pid:=strconv.Itoa(pid)
+	OrderStatus, err := repository.GetOrderStatus(orderID, Pid)
 	if err != nil {
 		return err
 	}
@@ -399,7 +401,7 @@ func DeliverOrder(useriD, orderId, pid string) error {
 	}
 
 	if OrderStatus == "Shipped" {
-		err := repository.DeliverOrder(useriD, orderId)
+		err := repository.DeliverOrder(useriD, orderID)
 		if err != nil {
 			return err
 		}

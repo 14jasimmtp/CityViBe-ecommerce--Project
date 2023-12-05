@@ -13,7 +13,7 @@ type Product struct {
 
 type UpdateProduct struct {
 	ID          int    `json:"id"`
-	Name        string `json:"name" `
+	Name        string `json:"name"`
 	Description string `json:"description"`
 	Category    string `json:"category"`
 	Size        string `json:"size"`
@@ -24,13 +24,13 @@ type UpdateProduct struct {
 
 type AddProduct struct {
 	ID          int    `json:"-"`
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description"`
-	CategoryID  int    `json:"category" binding:"required"`
-	Size        int    `json:"size" binding:"required"`
-	Stock       int    `json:"stock" binding:"required"`
-	Price       int    `json:"price" binding:"required"`
-	Color       string `json:"color" binding:"required"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	CategoryID  int    `json:"category" validate:"required,numeric"`
+	Size        int    `json:"size" validate:"required,numeric"`
+	Stock       int    `json:"stock" validate:"required,numeric"`
+	Price       int    `json:"price" validate:"required,numeric"`
+	Color       string `json:"color" validate:"required"`
 }
 
 type Category struct {
@@ -38,6 +38,6 @@ type Category struct {
 }
 
 type SetNewName struct {
-	Current string `json:"current" binding:"required"`
-	New     string `json:"new" binding:"required"`
+	Current string `json:"current" validate:"required"`
+	New     string `json:"new" validate:"required"`
 }

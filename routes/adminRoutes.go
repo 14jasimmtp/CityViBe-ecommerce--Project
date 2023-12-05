@@ -18,7 +18,7 @@ func AdminRoutes(r *gin.Engine) {
 	r.GET("/admin/products", middlewares.AdminAuthMiddleware, handlers.AllProducts)
 	r.POST("/admin/products", middlewares.AdminAuthMiddleware, handlers.AddProduct)
 	r.PUT("/admin/products", middlewares.AdminAuthMiddleware, handlers.EditProductDetails)
-	r.DELETE("admin/products/:id/remove", middlewares.AdminAuthMiddleware, handlers.DeleteProduct)
+	r.DELETE("admin/products/remove/:id", middlewares.AdminAuthMiddleware, handlers.DeleteProduct)
 
 	//category
 	r.GET("admin/category", middlewares.AdminAuthMiddleware, handlers.GetCategory)
@@ -27,11 +27,11 @@ func AdminRoutes(r *gin.Engine) {
 	r.DELETE("admin/category", middlewares.AdminAuthMiddleware, handlers.DeleteCategory)
 
 	//order
-	r.GET("admin/order-details", middlewares.AdminAuthMiddleware, handlers.OrderDetailsForAdmin)
-	r.POST("admin/ship-order", middlewares.AdminAuthMiddleware, handlers.ShipOrderByAdmin)
-	r.POST("admin/cancel-order", middlewares.AdminAuthMiddleware, handlers.CancelOrderByAdmin)
-	r.GET("admin/order-single-details",middlewares.AdminAuthMiddleware,handlers.OrderDetailsforAdminWithID)
-	r.POST("admin/deliver-order",middlewares.AdminAuthMiddleware,handlers.DeliverOrderByAdmin)
+	r.GET("admin/orders", middlewares.AdminAuthMiddleware, handlers.OrderDetailsForAdmin)
+	r.POST("admin/orders/ship", middlewares.AdminAuthMiddleware, handlers.ShipOrderByAdmin)
+	r.POST("admin/orders/cancel", middlewares.AdminAuthMiddleware, handlers.CancelOrderByAdmin)
+	r.GET("admin/orders/details",middlewares.AdminAuthMiddleware,handlers.OrderDetailsforAdminWithID)
+	r.POST("admin/orders/deliver",middlewares.AdminAuthMiddleware,handlers.DeliverOrderByAdmin)
 
 	//coupons
 	r.POST("admin/coupon",middlewares.AdminAuthMiddleware,handlers.MakeCoupon)

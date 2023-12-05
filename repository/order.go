@@ -93,12 +93,14 @@ func GetProductDetailsFromOrders(orderid string) ([]models.OrderProducts, error)
 }
 
 func GetOrderStatus(orderId, pid string) (string, error) {
-	var status string
-	err := initialisers.DB.Raw("SELECT order_status FROM order_items WHERE order_id = ? AND product_id = ?", orderId, pid).Scan(&status).Error
+	var status struct {
+		OrderStatus string `json:"order_status"`
+	}
+	err := initialisers.DB.Raw("SELECT order_status FROM order_items WHERE order_id = ? AND product_id = ? ", orderId, pid).Scan(&status.OrderStatus).Error
 	if err != nil {
 		return "", errors.New(`something went wrong`)
 	}
-	return status, nil
+	return status.OrderStatus, nil
 }
 
 func CancelOrder(orderid, pid string, userID uint) error {
@@ -173,7 +175,7 @@ func CancelOrderByAdmin(orderID string) error {
 	return nil
 }
 
-func ShipOrder(userID, orderId string) error {
+func ShipOrder(userID, orderId int) error {
 	err := initialisers.DB.Exec("UPDATE order_items SET order_status = 'Shipped'  WHERE order_id = ? AND user_id = ?", orderId, userID).Error
 	if err != nil {
 		return errors.New(`something went wrong`)
@@ -181,7 +183,7 @@ func ShipOrder(userID, orderId string) error {
 	return nil
 }
 
-func DeliverOrder(userID, orderId string) error {
+func DeliverOrder(userID int, orderId string) error {
 	status := "Delivered"
 	err := initialisers.DB.Exec("UPDATE order_items SET order_status = ? WHERE order_id = ? AND user_id = ?", status, orderId, userID).Error
 	if err != nil {
@@ -260,7 +262,7 @@ func UpdateCartAmount(userID, discount uint) (float64, error) {
 }
 
 func ReturnOrder(userID uint, orderID, pid string) error {
-	query := initialisers.DB.Exec(`UPDATE order_items SET order_status = 'returned' `)
+	query := initialisers.DB.Exec(`UPDATE order_items SET order_status = 'returned' WHERE user_id = ? AND product_id = ? AND order_id = ?`, userID, pid, orderID)
 	if query.Error != nil {
 		return errors.New(`something went wrong`)
 	}
