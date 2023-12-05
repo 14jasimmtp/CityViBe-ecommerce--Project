@@ -26,7 +26,7 @@ type ViewOrderDetails struct {
 }
 
 type ViewAdminOrderDetails struct {
-	OrderDetails AdminOrderDetails
+	OrderDetails        AdminOrderDetails
 	OrderProductDetails []OrderProductDetails
 }
 
@@ -38,7 +38,7 @@ type OrderDetails struct {
 }
 
 type AdminOrderDetails struct {
-	UserID       int
+	UserID        int
 	Id            string
 	FinalPrice    float64
 	PaymentMethod string
@@ -74,8 +74,8 @@ type CombinedOrderDetails struct {
 }
 
 type CheckOut struct {
-	AddressID uint   `json:"address_id" binding:"required"`
-	PaymentID uint   `json:"payment_id"`
+	AddressID uint   `json:"address_id" validate:"required"`
+	PaymentID uint   `json:"payment_id" validate:"required"`
 	Coupon    string `json:"coupon"`
 }
 

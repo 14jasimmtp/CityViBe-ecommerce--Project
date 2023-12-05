@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 
 	initialisers "main.go/Initialisers"
@@ -49,7 +50,7 @@ func CheckProductExistInCart(userId uint, pid string) (bool, error) {
 	var count int
 	query := initialisers.DB.Raw(`SELECT COUNT(*) FROM carts WHERE user_id = ? AND product_id = ?`, userId, pid).Scan(&count)
 	if query.Error != nil {
-		return false, query.Error
+		return false, errors.New(`something went wrong`)
 	}
 	fmt.Println(count)
 
@@ -152,4 +153,13 @@ func EmptyCart(userID uint) error {
 
 	return nil
 
+}
+
+func ProductQuantityCart(userID uint, pid string) (int, error) {
+	var quantity int
+	query := initialisers.DB.Raw(`SELECT quantity FROM carts WHERE user_id = ? AND product_id = ?`, userID, pid).Scan(&quantity).Error
+	if query != nil {
+		return 0, errors.New(`something went wrong`)
+	}
+	return quantity, nil
 }

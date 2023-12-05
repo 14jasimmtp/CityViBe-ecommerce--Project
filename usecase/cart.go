@@ -141,6 +141,15 @@ func UpdateQuantityIncrease(Token, pid string) error {
 	if err != nil {
 		return err
 	}
+
+	check, err := repository.CheckProductExistInCart(userID, pid)
+	if err != nil {
+		return err
+	}
+	if !check {
+		return errors.New(`no products found in cart with this id`)
+	}
+
 	err = repository.UpdateQuantityAdd(userID, pid)
 	if err != nil {
 		return err
@@ -165,6 +174,24 @@ func UpdateQuantityDecrease(Token, pid string) error {
 	userID, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return err
+	}
+
+	check, err := repository.CheckProductExistInCart(userID, pid)
+	if err != nil {
+		return err
+	}
+
+	if !check {
+		return errors.New(`no products found in cart with this id`)
+	}
+
+	quantity, err := repository.ProductQuantityCart(userID, pid)
+	if err != nil {
+		return err
+	}
+
+	if quantity == 1 {
+		return errors.New(`quantity is 1 .can't reduce anymore`)
 	}
 
 	err = repository.UpdateQuantityless(userID, pid)

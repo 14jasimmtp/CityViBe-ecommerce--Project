@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"main.go/models"
 	"main.go/usecase"
+	"main.go/utils"
 )
 
 func OrderFromCart(c *gin.Context) {
@@ -13,6 +14,12 @@ func OrderFromCart(c *gin.Context) {
 
 	if c.ShouldBindJSON(&OrderInput) != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Enter constraints correctly"})
+		return
+	}
+	Error,err:=utils.Validation(OrderInput)
+	if err != nil {
+		c.JSON(http.StatusBadRequest,gin.H{"error":Error})
+		return
 	}
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {

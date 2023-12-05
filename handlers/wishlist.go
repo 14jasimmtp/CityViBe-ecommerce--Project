@@ -23,7 +23,7 @@ func ViewUserWishlist(c *gin.Context) {
 }
 
 func AddProductToWishlist(c *gin.Context) {
-	ProductID := c.Query("productID")
+	ProductID := c.Query("product_id")
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error in Access Token"})
@@ -38,7 +38,7 @@ func AddProductToWishlist(c *gin.Context) {
 }
 
 func RemoveProductFromWishlist(c *gin.Context) {
-	ProductID := c.Query("productID")
+	ProductID := c.Query("product_id")
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error in Access Token"})

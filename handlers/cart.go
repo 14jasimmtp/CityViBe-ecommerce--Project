@@ -8,7 +8,7 @@ import (
 )
 
 func AddToCart(c *gin.Context) {
-	pid := c.Query("id")
+	pid := c.Query("product_id")
 
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -43,7 +43,7 @@ func ViewCart(c *gin.Context) {
 }
 
 func RemoveProductsFromCart(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Query("product_id")
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -61,7 +61,7 @@ func RemoveProductsFromCart(c *gin.Context) {
 }
 
 func IncreaseQuantityUpdate(c *gin.Context) {
-	pid := c.Query("product")
+	pid := c.Query("product_id")
 
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -87,7 +87,7 @@ func IncreaseQuantityUpdate(c *gin.Context) {
 
 
 func DecreaseQuantityUpdate(c *gin.Context) {
-	pid := c.Query("product")
+	pid := c.Query("product_id")
 
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
