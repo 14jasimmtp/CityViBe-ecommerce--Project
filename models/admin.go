@@ -14,3 +14,8 @@ type AdminOrder struct {
 	OrderID   int `json:"order_id" validate:"required,number"`
 	ProductID int `json:"product_id" validate:"required,number"`
 }
+
+type SalesReport struct {
+	TotalSales int
+	
+}

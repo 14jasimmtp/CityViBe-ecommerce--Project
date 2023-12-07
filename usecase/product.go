@@ -1,14 +1,29 @@
 package usecase
 
 import (
+	"fmt"
+	"mime/multipart"
 	"strconv"
 
 	"main.go/domain"
 	"main.go/models"
 	"main.go/repository"
+	"main.go/utils"
 )
 
-func AddProduct(product models.AddProduct) (models.UpdateProduct, error) {
+func AddProduct(product models.AddProduct, image *multipart.FileHeader) (models.UpdateProduct, error) {
+	sess := utils.CreateSession()
+	// fmt.Println("sess", sess)
+
+	ImageURL, err := utils.UploadImageToS3(image, sess)
+	if err != nil {
+		fmt.Println("err:", err)
+		return models.UpdateProduct{}, err
+	}
+	fmt.Println("err:", err)
+	product.ImageURL = ImageURL
+	fmt.Println("image,", ImageURL)
+	
 	ProductResponse, err := repository.AddProduct(product)
 	if err != nil {
 		return models.UpdateProduct{}, err

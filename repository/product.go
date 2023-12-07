@@ -13,7 +13,7 @@ import (
 func AddProduct(product models.AddProduct) (models.UpdateProduct, error) {
 	var dproduct models.UpdateProduct
 	var p domain.Product
-	result := initialisers.DB.Raw("INSERT INTO products(name,description,category_id,size_id,stock,price,color) values(?,?,?,?,?,?,?)", product.Name, product.Description, product.CategoryID, product.Size, product.Stock, product.Price, product.Color).Scan(&p)
+	result := initialisers.DB.Raw("INSERT INTO products(name,description,category_id,size_id,stock,price,color,image_url) values(?,?,?,?,?,?,?,?)", product.Name, product.Description, product.CategoryID, product.Size, product.Stock, product.Price, product.Color, product.ImageURL).Scan(&p)
 	fmt.Println(p)
 	if result.Error != nil {
 		return models.UpdateProduct{}, result.Error
@@ -114,10 +114,10 @@ func SearchProduct(search string) ([]models.Product, error) {
 	var products []models.Product
 
 	query := initialisers.DB.Raw(
-		`SELECT name,description,Categories.category,Sizes.size,stock,price,color
+		`SELECT id,name,description,Categories.category,Sizes.size,stock,price,color
 	 	 FROM products INNER JOIN categories ON categories.id=products.category_id
 		 INNER JOIN sizes ON sizes.id = products.size_id
-		 WHERE name ILIKE $1 OR description ILIKE $1 OR sizes.size ILIKE $1 OR categories.category ILIKE $1`, search+"%",
+		 WHERE name ILIKE $1 OR description ILIKE $1 OR sizes.size ILIKE $1 OR categories.category ILIKE $1`, "%"+search+"%",
 	).Scan(&products)
 	if query.Error != nil {
 		return []models.Product{}, errors.New(`something went wrong`)

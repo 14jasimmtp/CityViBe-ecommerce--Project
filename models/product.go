@@ -24,13 +24,14 @@ type UpdateProduct struct {
 
 type AddProduct struct {
 	ID          int    `json:"-"`
-	Name        string `json:"name" validate:"required"`
-	Description string `json:"description" validate:"required"`
-	CategoryID  int    `json:"category" validate:"required,numeric"`
-	Size        int    `json:"size" validate:"required,numeric"`
-	Stock       int    `json:"stock" validate:"required,numeric"`
-	Price       int    `json:"price" validate:"required,numeric"`
-	Color       string `json:"color" validate:"required"`
+	Name        string `json:"name" validate:"required" form:"name"`
+	Description string `json:"description" validate:"required" form:"description"`
+	CategoryID  int    `json:"category" validate:"required,numeric" form:"category_id"`
+	Size        int    `json:"size" validate:"required,numeric" form:"size_id"`
+	Stock       int    `json:"stock" validate:"required,numeric" form:"stock"`
+	Price       int    `json:"price" validate:"required,numeric" form:"price"`
+	Color       string `json:"color" validate:"required" form:"color"`
+	ImageURL    string `json:"imageurl"`
 }
 
 type Category struct {

@@ -421,7 +421,7 @@ func ReturnOrder(Token, orderID, pid string) error {
 		return err
 	}
 
-	if Order == "pending" || Order == "processing" || Order == "Cancelled" || Order == "Shipped" {
+	if Order != "returned"{
 		return errors.New(`order is not delivered .Can't return`)
 	}
 

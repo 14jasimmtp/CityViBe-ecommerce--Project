@@ -1,43 +1,47 @@
 package utils
 
-// func CreateSession() *session.Session {
-// 	sess := session.Must(session.NewSession(
-// 		&aws.Config{
-// 			Region: aws.String(cfg.Region),
-// 			Credentials: credentials.NewStaticCredentials(
-// 				cfg.AccessKeyID,
-// 				cfg.AccessKeySecret,
-// 				"",
-// 			),
-// 		},
-// 	))
-// 	return sess
-// }
+import (
+	"fmt"
+	"mime/multipart"
+	"os"
 
-// func CreateS3Session(sess *session.Session) *s3.S3 {
-// 	s3Session := s3.New(sess)
-// 	return s3Session
-// }
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+)
 
-// func UploadImageToS3(file *multipart.FileHeader, sess *session.Session) (string, error) {
+func CreateSession() *session.Session {
+	sess := session.Must(session.NewSession(
+		&aws.Config{
+			Region: aws.String(os.Getenv("AwsRegion")),
+			Credentials: credentials.NewStaticCredentials(
+				os.Getenv("AwsAccessKey"),
+				os.Getenv("AwsSecretKey"),
+				"",
+			),
+		},
+	))
+	return sess
+}
 
-// 	image, err := file.Open()
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return "", err
-// 	}
-// 	defer image.Close()
-
-// 	uploader := s3manager.NewUploader(sess)
-// 	upload, err := uploader.Upload(&s3manager.UploadInput{
-// 		Bucket: aws.String("mobile-mart-image"),
-// 		Key:    aws.String(file.Filename),
-// 		Body:   image,
-// 		ACL:    aws.String("public-read"),
-// 	})
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return "", err
-// 	}
-// 	return upload.Location, nil
-// }
+func UploadImageToS3(file *multipart.FileHeader, sess *session.Session) (string, error) {
+	image, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	// fmt.Println("**", sess)
+	defer image.Close()
+	uploader := s3manager.NewUploader(sess)
+	upload, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String("vibecity1/product_images/"),
+		Key:    aws.String(file.Filename),
+		Body:   image,
+		ACL:    aws.String("private"),
+	})
+	if err != nil {
+		fmt.Println("eror")
+		return "", err
+	}
+	return upload.Location, nil
+}

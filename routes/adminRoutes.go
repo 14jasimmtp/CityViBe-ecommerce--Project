@@ -39,4 +39,9 @@ func AdminRoutes(r *gin.Engine) {
 	r.PUT("admin/coupon/enable",middlewares.AdminAuthMiddleware,handlers.EnableCoupon)
 	r.GET("admin/coupon",middlewares.AdminAuthMiddleware,handlers.ViewCouponsAdmin)
 	r.PUT("admin/coupon/update",middlewares.AdminAuthMiddleware,handlers.UpdateCoupon)
+
+	//salesreport
+	r.POST("admin/salesreport",middlewares.AdminAuthMiddleware,handlers.Salesreport)
+	// r.GET("admin/Dashboard",middlewares.AdminAuthMiddleware,handlers.AdminDashboard)
+
 }

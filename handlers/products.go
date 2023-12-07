@@ -13,10 +13,12 @@ import (
 func AddProduct(c *gin.Context) {
 	var product models.AddProduct
 
-	if c.ShouldBindJSON(&product) != nil {
+	if c.ShouldBind(&product) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter Product details correctly"})
 		return
 	}
+
+	image, _ := c.FormFile("image")
 
 	Error, err := utils.Validation(product)
 	if err != nil {
@@ -24,7 +26,7 @@ func AddProduct(c *gin.Context) {
 		return
 	}
 
-	NewProduct, err := usecase.AddProduct(product)
+	NewProduct, err := usecase.AddProduct(product,image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return

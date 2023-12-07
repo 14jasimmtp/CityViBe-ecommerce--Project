@@ -91,3 +91,12 @@ func OrderDetailsforAdminWithID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"Order Products": OrderDetails})
 }
+
+
+func Salesreport(c *gin.Context){
+	
+}
+
+func AdminDashBoard(c *gin.Context){
+	
+}

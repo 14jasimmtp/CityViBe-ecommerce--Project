@@ -66,4 +66,8 @@ func UserRoutes(r *gin.Engine) {
 
 	//coupons
 	r.GET("/coupons", middlewares.UserAuthMiddleware, handlers.ViewCouponsUser)
+
+	//Invoice
+	// r.GET("/Invoice",middlewares.UserAuthMiddleware,handlers.InvoiceDownload)
+
 }
