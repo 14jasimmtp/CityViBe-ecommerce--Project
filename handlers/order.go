@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"main.go/models"
@@ -187,4 +189,91 @@ func ReturnOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "order returned successfully.Amount will be credited to wallet."})
+}
+
+func SalesReportByDate(c *gin.Context) {
+	startDateStr := c.PostForm("start")
+	endDateStr := c.PostForm("end")
+	startDate, err := time.Parse("2-1-2006", startDateStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	endDate, err := time.Parse("2-1-2006", endDateStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	report, err := usecase.ExecuteSalesReportByDate(startDate, endDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"report": report})
+}
+
+func SalesReportByPeriod(c *gin.Context) {
+	period := c.PostForm("period")
+
+	report, err := usecase.ExecuteSalesReportByPeriod(period)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, gin.H{"report": report})
+}
+
+func SalesReportByPayment(c *gin.Context) {
+	startDateStr := c.PostForm("start")
+	endDateStr := c.PostForm("end")
+	paymentmethod := c.PostForm("paymentmethod")
+	startDate, err := time.Parse("2-1-2006", startDateStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	endDate, err := time.Parse("2-1-2006", endDateStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	report, err := usecase.ExecuteSalesReportByPaymentMethod(startDate, endDate, paymentmethod)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, gin.H{"report": report})
+}
+
+func PrintInvoice(c *gin.Context) {
+	Token,err:=c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	strorderId := c.Query("orderid")
+	orderid, err := strconv.Atoi(strorderId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	pdf, err := usecase.PrintInvoice(orderid,Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.Header("Content-Disposition", "attachment;filename=Invoice.pdf")
+	c.Header("Content_Type", "application/pdf")
+
+	err = pdf.Output(c.Writer)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pdfFilePath := "Invoice/invoice.pdf"
+
+	err = pdf.OutputFileAndClose(pdfFilePath)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.File(pdfFilePath)
+
 }

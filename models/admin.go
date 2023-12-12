@@ -15,7 +15,10 @@ type AdminOrder struct {
 	ProductID int `json:"product_id" validate:"required,number"`
 }
 
-type SalesReport struct {
-	TotalSales int
-	
+type TimePeriod struct {
+	Year      string
+	Month     string
+	Week      string
+	Startdate string
+	EndDate   string
 }

@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/jung-kurt/gofpdf"
 	"main.go/domain"
 	"main.go/models"
 	"main.go/repository"
@@ -378,8 +380,8 @@ func ShipOrders(userID, orderId, pid int) error {
 }
 
 func DeliverOrder(useriD, orderId, pid int) error {
-	orderID:=strconv.Itoa(orderId)
-	Pid:=strconv.Itoa(pid)
+	orderID := strconv.Itoa(orderId)
+	Pid := strconv.Itoa(pid)
 	OrderStatus, err := repository.GetOrderStatus(orderID, Pid)
 	if err != nil {
 		return err
@@ -421,7 +423,7 @@ func ReturnOrder(Token, orderID, pid string) error {
 		return err
 	}
 
-	if Order != "returned"{
+	if Order != "returned" {
 		return errors.New(`order is not delivered .Can't return`)
 	}
 
@@ -440,4 +442,86 @@ func ReturnOrder(Token, orderID, pid string) error {
 	}
 
 	return nil
+}
+
+func ExecuteSalesReportByPeriod(period string) (*models.SalesReport, error) {
+	startdate, enddate := utils.CalcualtePeriodDate(period)
+
+	orders, err := repository.GetByDate(startdate, enddate)
+	if err != nil {
+		return nil, errors.New("report fetching failed")
+	}
+	return orders, nil
+}
+
+func ExecuteSalesReportByDate(startdate, enddate time.Time) (*models.SalesReport, error) {
+	orders, err := repository.GetByDate(startdate, enddate)
+	if err != nil {
+		return nil, errors.New("report fetching failed")
+	}
+	return orders, nil
+}
+
+func ExecuteSalesReportByPaymentMethod(startdate, enddate time.Time, paymentmethod string) (*models.SalesReport, error) {
+	orders, err := repository.GetByPaymentMethod(startdate, enddate, paymentmethod)
+	if err != nil {
+		return nil, errors.New("report fetching failed")
+	}
+	return orders, nil
+}
+
+func PrintInvoice(orderID int, Token string) (*gofpdf.Fpdf, error) {
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return nil, err
+	}
+
+	orde, err := repository.GetOrderInvoice(orderID, int(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	usr, err := repository.GetUserById(int(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	usadres, err := repository.GetAddressFromOrders(orde.AddressID, int(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	items, err := repository.GetProductDetailsFromOrders(orderID)
+	if err != nil {
+		return nil, err
+	}
+
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	pdf.SetFont("Arial", "B", 16)
+	pdf.Cell(40, 10, "Invoice")
+	pdf.Ln(10)
+
+	pdf.Cell(0, 10, "Customer Name: "+usr.Firstname)
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "House Name: "+usadres.Housename)
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "State: "+usadres.State)
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Phone: "+usadres.Phone)
+	pdf.Ln(10)
+
+	for _, item := range items {
+		pdf.Cell(0, 10, "Item: "+item.Name)
+		pdf.Ln(10)
+		pdf.Cell(0, 10, "Price: &#8377;"+strconv.FormatFloat(item.Price, 'f', 2, 64))
+		pdf.Ln(10)
+		pdf.Cell(0, 10, "Quantity: "+strconv.Itoa(item.Stock))
+		pdf.Ln(10)
+	}
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Total Amount: &#8377;"+strconv.FormatFloat(float64(orde.FinalPrice), 'f', 2, 64))
+
+	return pdf, nil
 }

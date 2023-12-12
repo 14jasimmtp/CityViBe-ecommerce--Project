@@ -92,11 +92,11 @@ func GetAllOrderDetailsForAdmin() ([]models.ViewAdminOrderDetails, error) {
 	return orderDetail, nil
 }
 
-func GetOrderDetails(orderID string)([]models.OrderProductDetails,error){
-	orderDetails,err:=repository.GetSingleOrderDetails(orderID)
-	if err != nil{
-		return []models.OrderProductDetails{},err
+func GetOrderDetails(orderID string) ([]models.OrderProductDetails, error) {
+	orderDetails, err := repository.GetSingleOrderDetails(orderID)
+	if err != nil {
+		return []models.OrderProductDetails{}, err
 	}
 
-	return orderDetails,nil
+	return orderDetails, nil
 }

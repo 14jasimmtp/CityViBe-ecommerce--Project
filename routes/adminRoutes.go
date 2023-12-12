@@ -30,18 +30,19 @@ func AdminRoutes(r *gin.Engine) {
 	r.GET("admin/orders", middlewares.AdminAuthMiddleware, handlers.OrderDetailsForAdmin)
 	r.POST("admin/orders/ship", middlewares.AdminAuthMiddleware, handlers.ShipOrderByAdmin)
 	r.POST("admin/orders/cancel", middlewares.AdminAuthMiddleware, handlers.CancelOrderByAdmin)
-	r.GET("admin/orders/details",middlewares.AdminAuthMiddleware,handlers.OrderDetailsforAdminWithID)
-	r.POST("admin/orders/deliver",middlewares.AdminAuthMiddleware,handlers.DeliverOrderByAdmin)
+	r.GET("admin/orders/details", middlewares.AdminAuthMiddleware, handlers.OrderDetailsforAdminWithID)
+	r.POST("admin/orders/deliver", middlewares.AdminAuthMiddleware, handlers.DeliverOrderByAdmin)
 
 	//coupons
-	r.POST("admin/coupon",middlewares.AdminAuthMiddleware,handlers.MakeCoupon)
-	r.PUT("admin/coupon/disable",middlewares.AdminAuthMiddleware,handlers.DisableCoupon)
-	r.PUT("admin/coupon/enable",middlewares.AdminAuthMiddleware,handlers.EnableCoupon)
-	r.GET("admin/coupon",middlewares.AdminAuthMiddleware,handlers.ViewCouponsAdmin)
-	r.PUT("admin/coupon/update",middlewares.AdminAuthMiddleware,handlers.UpdateCoupon)
+	r.POST("admin/coupon", middlewares.AdminAuthMiddleware, handlers.MakeCoupon)
+	r.PUT("admin/coupon/disable", middlewares.AdminAuthMiddleware, handlers.DisableCoupon)
+	r.PUT("admin/coupon/enable", middlewares.AdminAuthMiddleware, handlers.EnableCoupon)
+	r.GET("admin/coupon", middlewares.AdminAuthMiddleware, handlers.ViewCouponsAdmin)
+	r.PUT("admin/coupon/update", middlewares.AdminAuthMiddleware, handlers.UpdateCoupon)
 
 	//salesreport
-	r.POST("admin/salesreport",middlewares.AdminAuthMiddleware,handlers.Salesreport)
-	// r.GET("admin/Dashboard",middlewares.AdminAuthMiddleware,handlers.AdminDashboard)
+	r.GET("/admin/salesreportbyperiod", middlewares.AdminAuthMiddleware, handlers.SalesReportByPeriod)
+	r.GET("/admin/salesreportbydate", middlewares.AdminAuthMiddleware, handlers.SalesReportByDate)
+	r.GET("/admin/salesreportbypayment", middlewares.AdminAuthMiddleware, handlers.SalesReportByPayment)
 
 }

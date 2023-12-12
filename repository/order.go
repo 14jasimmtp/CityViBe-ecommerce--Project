@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"time"
 
 	initialisers "main.go/Initialisers"
 	"main.go/domain"
@@ -84,10 +85,10 @@ func CheckOrder(orderid string, userID uint) error {
 	return nil
 }
 
-func GetProductDetailsFromOrders(orderid string) ([]models.OrderProducts, error) {
-	var OrderProductDetails []models.OrderProducts
-	if err := initialisers.DB.Raw("SELECT product_id,quantity, FROM order_items WHERE id = ?", orderid).Scan(&OrderProductDetails).Error; err != nil {
-		return []models.OrderProducts{}, err
+func GetProductDetailsFromOrders(orderid int) ([]models.Product, error) {
+	var OrderProductDetails []models.Product
+	if err := initialisers.DB.Raw("SELECT product_id,products.name,products.description,order_items.quantity as stock,order_items.total_price as price FROM order_items INNER JOIN products ON order_items.product_id = products.id WHERE order_items.order_id = ?", orderid).Scan(&OrderProductDetails).Error; err != nil {
+		return []models.Product{}, err
 	}
 	return OrderProductDetails, nil
 }
@@ -270,4 +271,69 @@ func ReturnOrder(userID uint, orderID, pid string) error {
 		return errors.New(`no order with this id found to return`)
 	}
 	return nil
+}
+
+func GetOrderInvoice(orderID, UserID int) (domain.Order, error) {
+	var order domain.Order
+	query := initialisers.DB.Raw(`SELECT * FROM orders WHERE id = ? AND user_id = ?`, orderID, UserID).Scan(&order)
+	if query.Error != nil {
+		return domain.Order{}, errors.New(`something went wrong`)
+	}
+
+	if query.RowsAffected == 0 {
+		return domain.Order{}, errors.New(`no orders found`)
+	}
+	return order, nil
+}
+
+func GetByDate(startdate, enddate time.Time) (*models.SalesReport, error) {
+	var order []domain.Order
+	var report models.SalesReport
+	enddate = enddate.Add(+24 * time.Hour)
+
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =?", startdate, enddate, "confirmed").Select("SUM(total) as total_sales").Scan(&report).Error; err != nil {
+		return nil, err
+	}
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =?", startdate, enddate, "confirmed").Count(&report.TotalOrders).Error; err != nil {
+		return nil, err
+	}
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =?", startdate, enddate, "confirmed").Select("AVG(total) as average_order").Scan(&report).Error; err != nil {
+		return nil, err
+	}
+
+	return &report, nil
+
+}
+func GetByPaymentMethod(startdate, enddate time.Time, paymentmethod string) (*models.SalesReport, error) {
+	var order []domain.Order
+	enddate = enddate.Add(+24 * time.Hour)
+	var report models.SalesReport
+
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =? AND payment_method=?", startdate, enddate, "confirmed", paymentmethod).Select("SUM(total) as total_sales").Scan(&report).Error; err != nil {
+		return nil, err
+	}
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =? AND payment_method=?", startdate, enddate, "confirmed", paymentmethod).Count(&report.TotalOrders).Error; err != nil {
+		return nil, err
+	}
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =? AND payment_method=?", startdate, enddate, "confirmed", paymentmethod).Select("AVG(total) as average_order").Scan(&report).Error; err != nil {
+		return nil, err
+	}
+
+	return &report, nil
+
+}
+
+func GetAddressFromOrders(address_id, userID int) (models.Address, error) {
+	var Address models.Address
+	query := initialisers.DB.Raw(`SELECT name,house_name as housename,phone,state FROM addresses WHERE user_id = ? AND id = ? `, userID, address_id).Scan(&Address)
+	if query.Error != nil {
+		return models.Address{}, errors.New(`something went wrong`)
+	}
+
+	if query.RowsAffected == 0 {
+		return models.Address{}, errors.New(`no orders found`)
+	}
+
+	return Address, nil
+
 }

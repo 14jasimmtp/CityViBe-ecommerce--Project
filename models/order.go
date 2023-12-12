@@ -87,3 +87,9 @@ type CancelDetails struct {
 	OrderID       int     `json:"order_id"`
 	ProductID     int     `json:"product_id"`
 }
+
+type SalesReport struct {
+	TotalSales   float64
+	TotalOrders  int64
+	AverageOrder float64
+}
