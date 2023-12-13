@@ -3,9 +3,11 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	initialisers "main.go/Initialisers"
 	"main.go/models"
+	"main.go/utils"
 )
 
 func AdminLogin(adminDetails models.Admin) (models.Admin, error) {
@@ -68,4 +70,64 @@ func GetSingleOrderDetails(orderID string) ([]models.OrderProductDetails, error)
 		return []models.OrderProductDetails{}, query.Error
 	}
 	return Order, nil
+}
+
+func DashBoardUserDetails() (models.DashBoardUser, error) {
+	var userDetails models.DashBoardUser
+	err := initialisers.DB.Raw("SELECT COUNT(*) FROM users").Scan(&userDetails.TotalUsers).Error
+	if err != nil {
+		return models.DashBoardUser{}, nil
+	}
+	err = initialisers.DB.Raw("SELECT COUNT(*) FROM users WHERE blocked=true").Scan(&userDetails.BlockedUser).Error
+	if err != nil {
+		return models.DashBoardUser{}, nil
+	}
+	return userDetails, nil
+}
+
+func DashBoardProductDetails() (models.DashBoardProduct, error) {
+	var productDetails models.DashBoardProduct
+	err := initialisers.DB.Raw("SELECT COUNT(*) FROM products").Scan(&productDetails.TotalProducts).Error
+	if err != nil {
+		return models.DashBoardProduct{}, nil
+	}
+	err = initialisers.DB.Raw("SELECT COUNT(*) FROM products WHERE stock<=0").Scan(&productDetails.OutofStockProduct).Error
+	if err != nil {
+		return models.DashBoardProduct{}, nil
+	}
+	return productDetails, nil
+}
+
+func TotalRevenue() (models.DashboardRevenue, error) {
+	var revenueDetails models.DashboardRevenue
+	startTime := time.Now().AddDate(0, 0, -1)
+	endTime := time.Now()
+	err := initialisers.DB.Raw("SELECT COALESCE(SUM(final_price),0) FROM orders WHERE payment_status = 'paid' AND approval = true AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.TodayRevenue).Error
+	if err != nil {
+		return models.DashboardRevenue{}, nil
+	}
+	startTime, endTime = utils.CalcualtePeriodDate("monthly")
+	err = initialisers.DB.Raw("SELECT COALESCE (SUM(final_price),0) FROM orders WHERE payment_status = 'paid' AND approval = true AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.MonthRevenue).Error
+	if err != nil {
+		return models.DashboardRevenue{}, nil
+	}
+	startTime, endTime = utils.CalcualtePeriodDate("yearly")
+	err = initialisers.DB.Raw("SELECT COALESCE (SUM(final_price),0) FROM orders WHERE payment_status = 'paid' AND approval = true AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.YearRevenue).Error
+	if err != nil {
+		return models.DashboardRevenue{}, nil
+	}
+	return revenueDetails, nil
+}
+
+func AmountDetails() (models.DashboardAmount, error) {
+	var amountDetails models.DashboardAmount
+	err := initialisers.DB.Raw("SELECT COALESCE (SUM(total_price),0) FROM orders WHERE payment_status = 'paid' ").Scan(&amountDetails.CreditedAmount).Error
+	if err != nil {
+		return models.DashboardAmount{}, nil
+	}
+	err = initialisers.DB.Raw("SELECT COALESCE(SUM(total_price),0) FROM orders WHERE payment_status = 'not paid' ").Scan(&amountDetails.PendingAmount).Error
+	if err != nil {
+		return models.DashboardAmount{}, nil
+	}
+	return amountDetails, nil
 }

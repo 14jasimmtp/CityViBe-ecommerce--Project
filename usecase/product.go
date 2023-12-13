@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"mime/multipart"
 	"strconv"
@@ -23,7 +24,7 @@ func AddProduct(product models.AddProduct, image *multipart.FileHeader) (models.
 	fmt.Println("err:", err)
 	product.ImageURL = ImageURL
 	fmt.Println("image,", ImageURL)
-	
+
 	ProductResponse, err := repository.AddProduct(product)
 	if err != nil {
 		return models.UpdateProduct{}, err
@@ -106,4 +107,13 @@ func FilterProducts(category, size string, minPrice, maxPrice float64) ([]models
 		return []models.UpdateProduct{}, err
 	}
 	return filteredProducts, nil
+}
+
+func ExecuteAddOffer(offer *models.Offer) error {
+	err := repository.CreateOffer(offer)
+	if err != nil {
+		return errors.New("error creating offer")
+	} else {
+		return nil
+	}
 }

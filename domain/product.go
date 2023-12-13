@@ -10,6 +10,7 @@ type Product struct {
 	Size        Size     `json:"-" gorm:"foriegnkey:SizeID;"`
 	Stock       int      `json:"stock" form:"stock"`
 	Price       float64  `json:"price" form:"price"`
+	OfferPrize  float64  `json:"offerprice"`
 	Color       string   `json:"color" form:"color"`
 	Deleted     bool     `json:"delete" gorm:"default:false"`
 	ImageURL    string   `json:"imageurl"`

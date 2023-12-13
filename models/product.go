@@ -1,5 +1,11 @@
 package models
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type Product struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name" `
@@ -8,6 +14,7 @@ type Product struct {
 	Size        string  `json:"size"`
 	Stock       int     `json:"stock"`
 	Price       float64 `json:"price"`
+	OfferPrize  float64 `json:"offerprice"`
 	Color       string  `json:"color"`
 }
 
@@ -41,4 +48,19 @@ type Category struct {
 type SetNewName struct {
 	Current string `json:"current" validate:"required"`
 	New     string `json:"new" validate:"required"`
+}
+
+type Offer struct {
+	gorm.Model `json:"-"`
+	Id         int       `json:"-" gorm:"primarykey"`
+	Name       string    `json:"name"`
+	Type       string    `json:"type"`
+	Amount     int       `json:"amount"`
+	MinPrice   int       `json:"minprice"`
+	ValidFrom  time.Time `json:"-"`
+	ValidUntil time.Time `json:"valid_until"`
+	UsageLimit int       `json:"usage_limit"`
+	UsedCount  int       `json:"-"`
+	Category   int       `json:"category"`
+	ProductId  int       `json:"product_id"`
 }

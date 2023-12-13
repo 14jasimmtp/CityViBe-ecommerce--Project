@@ -291,13 +291,13 @@ func GetByDate(startdate, enddate time.Time) (*models.SalesReport, error) {
 	var report models.SalesReport
 	enddate = enddate.Add(+24 * time.Hour)
 
-	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =?", startdate, enddate, "confirmed").Select("SUM(total) as total_sales").Scan(&report).Error; err != nil {
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? ", startdate, enddate).Select("SUM(total_price) as total_sales").Scan(&report).Error; err != nil {
 		return nil, err
 	}
-	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =?", startdate, enddate, "confirmed").Count(&report.TotalOrders).Error; err != nil {
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? ", startdate, enddate).Count(&report.TotalOrders).Error; err != nil {
 		return nil, err
 	}
-	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =?", startdate, enddate, "confirmed").Select("AVG(total) as average_order").Scan(&report).Error; err != nil {
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? ", startdate, enddate).Select("AVG(total_price) as average_order").Scan(&report).Error; err != nil {
 		return nil, err
 	}
 
@@ -336,4 +336,31 @@ func GetAddressFromOrders(address_id, userID int) (models.Address, error) {
 
 	return Address, nil
 
+}
+
+func DashBoardOrder() (models.DashboardOrder, error) {
+	var orderDetail models.DashboardOrder
+	err := initialisers.DB.Raw("SELECT COUNT(*) FROM orders INNER JOIN order_items ON orders.id=order_items.order_id WHERE orders.payment_status= 'paid' ").Scan(&orderDetail.CompletedOrder).Error
+	if err != nil {
+		return models.DashboardOrder{}, err
+	}
+	err = initialisers.DB.Raw("SELECT COUNT(*) FROM orders INNER JOIN order_items ON orders.id=order_items.order_id WHERE order_status='pending' OR order_status = 'processing'").Scan(&orderDetail.PendingOrder).Error
+	if err != nil {
+		return models.DashboardOrder{}, err
+	}
+	err = initialisers.DB.Raw("select count(*) from orders INNER JOIN order_items ON orders.id=order_items.order_id where order_status = 'Cancelled' OR order_status = 'returned'").Scan(&orderDetail.CancelledOrder).Error
+	if err != nil {
+		return models.DashboardOrder{}, nil
+	}
+
+	err = initialisers.DB.Raw("select count(*) from orders INNER JOIN order_items ON orders.id=order_items.order_id").Scan(&orderDetail.TotalOrder).Error
+	if err != nil {
+		return models.DashboardOrder{}, nil
+	}
+
+	err = initialisers.DB.Raw("select COALESCE(SUM(quantity),0) from order_items").Scan(&orderDetail.TotalOrderItem).Error
+	if err != nil {
+		return models.DashboardOrder{}, nil
+	}
+	return orderDetail, nil
 }

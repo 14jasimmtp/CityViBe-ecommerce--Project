@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
+	"gorm.io/gorm"
 	initialisers "main.go/Initialisers"
 	"main.go/domain"
 	"main.go/models"
@@ -146,4 +148,48 @@ func FilterProducts(category, size string, minPrice, maxPrice float64) ([]models
 		return []models.UpdateProduct{}, errors.New(`no products found`)
 	}
 	return Products, nil
+}
+
+func CreateOffer(offer *models.Offer) error {
+	if err := initialisers.DB.Create(offer).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetAllOffers() ([]models.Offer, error) {
+	var offer []models.Offer
+	currenttime := time.Now()
+	err := initialisers.DB.Where("valid_until > ?", currenttime).Find(&offer).Error
+	if err != nil {
+		return nil, errors.New("record not found")
+	}
+	return offer, nil
+
+}
+
+func GetProductsByCategoryoffer(id int) ([]models.Product, error) {
+	var product []models.Product
+
+	err := initialisers.DB.Where("category_id= ? AND deleted = ?", id, false).Find(&product).Error
+	if err != nil {
+		return nil, errors.New("record not found")
+	}
+	return product, nil
+}
+
+func GetProductById(id int) (*models.Product, error) {
+	var product models.Product
+	result := initialisers.DB.First(&product, id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, result.Error
+		}
+		return nil, result.Error
+	}
+	return &product, nil
+}
+
+func UpdateProduct(product *models.Product) error {
+	return initialisers.DB.Save(product).Error
 }

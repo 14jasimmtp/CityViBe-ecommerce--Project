@@ -242,7 +242,7 @@ func SalesReportByPayment(c *gin.Context) {
 }
 
 func PrintInvoice(c *gin.Context) {
-	Token,err:=c.Cookie("Authorisation")
+	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -253,7 +253,7 @@ func PrintInvoice(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	pdf, err := usecase.PrintInvoice(orderid,Token)
+	pdf, err := usecase.PrintInvoice(orderid, Token)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -276,4 +276,19 @@ func PrintInvoice(c *gin.Context) {
 	}
 	c.File(pdfFilePath)
 
+}
+
+func ApplyCoupon(c *gin.Context) {
+	Token,err:=c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized,gin.H{"error":"login to apply coupon"})
+		return
+	}
+	coupon := c.PostForm("coupon")
+	err = usecase.ApplyCoupon(coupon,Token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "coupon applied successfully"})
 }

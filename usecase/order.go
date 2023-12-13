@@ -515,13 +515,43 @@ func PrintInvoice(orderID int, Token string) (*gofpdf.Fpdf, error) {
 	for _, item := range items {
 		pdf.Cell(0, 10, "Item: "+item.Name)
 		pdf.Ln(10)
-		pdf.Cell(0, 10, "Price: &#8377;"+strconv.FormatFloat(item.Price, 'f', 2, 64))
+		pdf.Cell(0, 10, "Price: "+strconv.FormatFloat(item.Price, 'f', 2, 64))
 		pdf.Ln(10)
 		pdf.Cell(0, 10, "Quantity: "+strconv.Itoa(item.Stock))
 		pdf.Ln(10)
 	}
 	pdf.Ln(10)
-	pdf.Cell(0, 10, "Total Amount: &#8377;"+strconv.FormatFloat(float64(orde.FinalPrice), 'f', 2, 64))
+	pdf.Cell(0, 10, "Total Amount: "+strconv.FormatFloat(float64(orde.FinalPrice), 'f', 2, 64))
 
 	return pdf, nil
+}
+
+func ApplyCoupon(coupon, Token string) error {
+	userID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return err
+	}
+
+	err = repository.CheckCouponUsage(userID, coupon)
+	if err != nil {
+		return err
+	}
+	DiscountRate, err := repository.GetDiscountRate(coupon)
+	if err != nil {
+		return err
+	}
+	_, err = repository.UpdateCartAmount(userID, uint(DiscountRate))
+	if err != nil {
+		return err
+	}
+	err = repository.UpdateCouponUsage(userID, coupon)
+	if err != nil {
+		return err
+	}
+	err = repository.UpdateCouponCount(coupon)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
