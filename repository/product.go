@@ -140,7 +140,7 @@ func SearchProduct(search string) ([]models.Product, error) {
 func FilterProducts(category, size string, minPrice, maxPrice float64) ([]models.UpdateProduct, error) {
 	var Products []models.UpdateProduct
 	query := initialisers.DB.Raw(
-		`SELECT products.id,products.name,products.description,categories.category,sizes.size,products.stock,products.price,products.color FROM products
+		`SELECT products.id,products.name,products.description,categories.category,sizes.size,products.stock,products.price,products.color,products.offer_prize as offer_price FROM products
 		 INNER JOIN categories ON products.category_id=categories.id
 		 INNER JOIN sizes ON products.size_id=sizes.id
 		 WHERE (categories.category = ? OR ? = '')
@@ -177,7 +177,13 @@ func GetAllOffers() ([]models.Offer, error) {
 func GetProductsByCategoryoffer(id int) ([]models.Product, error) {
 	var product []models.Product
 
-	err := initialisers.DB.Where("category_id= ? AND deleted = ?", id, false).Find(&product).Error
+	err := initialisers.DB.Raw(
+		`SELECT products.id,products.name,products.description,categories.category,sizes.size,products.stock,price,offer_prize as offer_price,color
+		from products
+		inner join categories on categories.id=products.category_id
+		inner join sizes on sizes.id=products.size_id 
+		Where category_id= ? AND deleted = ?`,
+		id, false).Find(&product).Error
 	if err != nil {
 		return nil, errors.New("record not found")
 	}
@@ -186,7 +192,13 @@ func GetProductsByCategoryoffer(id int) ([]models.Product, error) {
 
 func GetProductById(id int) (*models.Product, error) {
 	var product models.Product
-	result := initialisers.DB.First(&product, id)
+	result := initialisers.DB.Raw(
+		`SELECT products.id,products.name,products.description,categories.category,sizes.size,products.stock,price,offer_prize as offer_price,color
+		from products
+		inner join categories on categories.id=products.category_id
+		inner join sizes on sizes.id=products.size_id 
+		Where products.id = ? AND deleted = ?`,
+		id, false).Find(&product)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, result.Error

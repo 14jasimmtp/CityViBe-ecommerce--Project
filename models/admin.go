@@ -32,11 +32,11 @@ type DashBoardProduct struct {
 	OutofStockProduct int `json:"Outofstock"`
 }
 type DashboardOrder struct {
-	CompletedOrder int
-	PendingOrder   int
-	CancelledOrder int
-	TotalOrder     int
-	TotalOrderItem int
+	DeliveredOrderProducts int
+	PendingOrderProducts   int
+	CancelledOrderProducts int
+	TotalOrderItems        int
+	TotalOrderQuantity     int
 }
 type DashboardRevenue struct {
 	TodayRevenue float64

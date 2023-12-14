@@ -75,11 +75,11 @@ type AddressRes struct {
 }
 
 type UserProfile struct {
-	Firstname string `json:"firstname" validate:"required"`
-	Lastname  string `json:"lastname" validate:"required"`
-	Email     string `json:"email" validate:"required"`
-	Phone     string `json:"phone" validate:"required,min=10,max=10"`
-	Wallet    string `json:"wallet"`
+	Firstname string  `json:"firstname" validate:"required"`
+	Lastname  string  `json:"lastname" validate:"required"`
+	Email     string  `json:"email" validate:"required"`
+	Phone     string  `json:"phone" validate:"required,min=10,max=10"`
+	Wallet    float64 `json:"wallet"`
 }
 
 type ChangePassword struct {

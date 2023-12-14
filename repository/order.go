@@ -2,6 +2,8 @@ package repository
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 	"time"
 
 	initialisers "main.go/Initialisers"
@@ -154,7 +156,7 @@ func CheckSingleOrder(pid, orderId string, userId uint) error {
 		return errors.New(`something went wrong`)
 	}
 	if count < 1 {
-		return errors.New(`no orders found`)
+		return errors.New(`no product found with this id`)
 	}
 	return nil
 }
@@ -211,20 +213,51 @@ func UpdateAmount(oid string, userID uint) error {
 	return nil
 }
 
+// func ReturnAmountToWallet(userID uint, orderID, pid string) error {
+// 	var amount float64
+// 	query := initialisers.DB.Raw(`SELECT total_price FROM order_items WHERE product_id = ? AND order_id = ? AND user_id = ?`, pid, orderID, userID).Scan(&amount)
+// 	if query.Error != nil {
+// 		return errors.New(`something went wrong`)
+// 	}
+
+// 	query = initialisers.DB.Exec(`UPDATE users SET wallet = wallet + $1 WHERE id = $2`, amount, userID)
+// 	if query.Error != nil {
+// 		return errors.New(`something went wrong`)
+// 	}
+// 	if query.RowsAffected == 0 {
+// 		return errors.New(`no orders found with this id`)
+// 	}
+// 	return nil
+// }
+
 func ReturnAmountToWallet(userID uint, orderID, pid string) error {
+	tx := initialisers.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 	var amount float64
-	query := initialisers.DB.Raw(`SELECT total_price FROM order_items WHERE product_id = ? AND order_id = ? AND user_id = ?`, pid, orderID, userID).Scan(&amount)
+	query := tx.Raw(`SELECT total_price FROM order_items WHERE product_id = ? AND order_id = ? AND user_id = ?`, pid, orderID, userID).Scan(&amount)
 	if query.Error != nil {
+		tx.Rollback()
+		return errors.New(`something went wrong`)
+	}
+	query = tx.Exec(`UPDATE users SET wallet = wallet + $1 WHERE id = $2`, amount, userID)
+	if query.Error != nil {
+
+		tx.Rollback()
 		return errors.New(`something went wrong`)
 	}
 
-	query = initialisers.DB.Exec(`UPDATE users SET wallet = wallet + $1 WHERE id = $2`, amount, userID)
-	if query.Error != nil {
-		return errors.New(`something went wrong`)
-	}
 	if query.RowsAffected == 0 {
+
+		tx.Rollback()
 		return errors.New(`no orders found with this id`)
 	}
+
+	tx.Commit()
+
 	return nil
 }
 
@@ -287,6 +320,7 @@ func GetOrderInvoice(orderID, UserID int) (domain.Order, error) {
 }
 
 func GetByDate(startdate, enddate time.Time) (*models.SalesReport, error) {
+	var err error
 	var order []domain.Order
 	var report models.SalesReport
 	enddate = enddate.Add(+24 * time.Hour)
@@ -301,26 +335,44 @@ func GetByDate(startdate, enddate time.Time) (*models.SalesReport, error) {
 		return nil, err
 	}
 
+	formattedValue := fmt.Sprintf("%.2f", report.AverageOrder)
+	fmt.Println(formattedValue)
+
+	report.AverageOrder, err = strconv.ParseFloat(formattedValue, 64)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil, err
+	}
+
 	return &report, nil
 
 }
 func GetByPaymentMethod(startdate, enddate time.Time, paymentmethod string) (*models.SalesReport, error) {
+	var err error
 	var order []domain.Order
 	enddate = enddate.Add(+24 * time.Hour)
 	var report models.SalesReport
 
-	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =? AND payment_method=?", startdate, enddate, "confirmed", paymentmethod).Select("SUM(total) as total_sales").Scan(&report).Error; err != nil {
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND payment_method_id=?", startdate, enddate, paymentmethod).Select("SUM(total_price) as total_sales").Scan(&report).Error; err != nil {
 		return nil, err
 	}
-	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =? AND payment_method=?", startdate, enddate, "confirmed", paymentmethod).Count(&report.TotalOrders).Error; err != nil {
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND payment_method_id=?", startdate, enddate, paymentmethod).Count(&report.TotalOrders).Error; err != nil {
 		return nil, err
 	}
-	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND status =? AND payment_method=?", startdate, enddate, "confirmed", paymentmethod).Select("AVG(total) as average_order").Scan(&report).Error; err != nil {
+	if err := initialisers.DB.Model(&order).Where("created_at BETWEEN ? AND ? AND payment_method_id=?", startdate, enddate, paymentmethod).Select("AVG(total_price) as average_order").Scan(&report).Error; err != nil {
+		return nil, err
+	}
+
+	formattedValue := fmt.Sprintf("%.2f", report.AverageOrder)
+	fmt.Println(formattedValue)
+
+	report.AverageOrder, err = strconv.ParseFloat(formattedValue, 64)
+	if err != nil {
+		fmt.Println("Error:", err)
 		return nil, err
 	}
 
 	return &report, nil
-
 }
 
 func GetAddressFromOrders(address_id, userID int) (models.Address, error) {
@@ -340,25 +392,25 @@ func GetAddressFromOrders(address_id, userID int) (models.Address, error) {
 
 func DashBoardOrder() (models.DashboardOrder, error) {
 	var orderDetail models.DashboardOrder
-	err := initialisers.DB.Raw("SELECT COUNT(*) FROM orders INNER JOIN order_items ON orders.id=order_items.order_id WHERE orders.payment_status= 'paid' ").Scan(&orderDetail.CompletedOrder).Error
+	err := initialisers.DB.Raw("SELECT COUNT(*) FROM order_items WHERE order_status= 'Delivered'").Scan(&orderDetail.DeliveredOrderProducts).Error
 	if err != nil {
 		return models.DashboardOrder{}, err
 	}
-	err = initialisers.DB.Raw("SELECT COUNT(*) FROM orders INNER JOIN order_items ON orders.id=order_items.order_id WHERE order_status='pending' OR order_status = 'processing'").Scan(&orderDetail.PendingOrder).Error
+	err = initialisers.DB.Raw("SELECT COUNT(*) FROM order_items WHERE order_status='pending' OR order_status = 'processing'").Scan(&orderDetail.PendingOrderProducts).Error
 	if err != nil {
 		return models.DashboardOrder{}, err
 	}
-	err = initialisers.DB.Raw("select count(*) from orders INNER JOIN order_items ON orders.id=order_items.order_id where order_status = 'Cancelled' OR order_status = 'returned'").Scan(&orderDetail.CancelledOrder).Error
+	err = initialisers.DB.Raw("select count(*) from order_items where order_status = 'Cancelled' OR order_status = 'returned'").Scan(&orderDetail.CancelledOrderProducts).Error
 	if err != nil {
 		return models.DashboardOrder{}, nil
 	}
 
-	err = initialisers.DB.Raw("select count(*) from orders INNER JOIN order_items ON orders.id=order_items.order_id").Scan(&orderDetail.TotalOrder).Error
+	err = initialisers.DB.Raw("select count(*) from order_items").Scan(&orderDetail.TotalOrderItems).Error
 	if err != nil {
 		return models.DashboardOrder{}, nil
 	}
 
-	err = initialisers.DB.Raw("select COALESCE(SUM(quantity),0) from order_items").Scan(&orderDetail.TotalOrderItem).Error
+	err = initialisers.DB.Raw("select COALESCE(SUM(quantity),0) from order_items").Scan(&orderDetail.TotalOrderQuantity).Error
 	if err != nil {
 		return models.DashboardOrder{}, nil
 	}

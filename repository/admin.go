@@ -102,17 +102,17 @@ func TotalRevenue() (models.DashboardRevenue, error) {
 	var revenueDetails models.DashboardRevenue
 	startTime := time.Now().AddDate(0, 0, -1)
 	endTime := time.Now()
-	err := initialisers.DB.Raw("SELECT COALESCE(SUM(final_price),0) FROM orders WHERE payment_status = 'paid' AND approval = true AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.TodayRevenue).Error
+	err := initialisers.DB.Raw("SELECT COALESCE(SUM(total_price),0) FROM orders WHERE payment_status = 'paid' AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.TodayRevenue).Error
 	if err != nil {
 		return models.DashboardRevenue{}, nil
 	}
 	startTime, endTime = utils.CalcualtePeriodDate("monthly")
-	err = initialisers.DB.Raw("SELECT COALESCE (SUM(final_price),0) FROM orders WHERE payment_status = 'paid' AND approval = true AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.MonthRevenue).Error
+	err = initialisers.DB.Raw("SELECT COALESCE (SUM(total_price),0) FROM orders WHERE payment_status = 'paid' AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.MonthRevenue).Error
 	if err != nil {
 		return models.DashboardRevenue{}, nil
 	}
 	startTime, endTime = utils.CalcualtePeriodDate("yearly")
-	err = initialisers.DB.Raw("SELECT COALESCE (SUM(final_price),0) FROM orders WHERE payment_status = 'paid' AND approval = true AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.YearRevenue).Error
+	err = initialisers.DB.Raw("SELECT COALESCE (SUM(total_price),0) FROM orders WHERE payment_status = 'paid' AND created_at >=? AND created_at <=?", startTime, endTime).Scan(&revenueDetails.YearRevenue).Error
 	if err != nil {
 		return models.DashboardRevenue{}, nil
 	}

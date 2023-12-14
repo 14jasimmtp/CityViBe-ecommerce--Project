@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"gorm.io/gorm"
 	initialisers "main.go/Initialisers"
@@ -118,6 +119,7 @@ func RemoveAddress(Userid uint, aid string) error {
 }
 
 func UserProfile(userid uint) (models.UserProfile, error) {
+	var err error
 	var User models.UserProfile
 	query := initialisers.DB.Raw(`SELECT * FROM users WHERE id = ?`, userid).Scan(&User)
 	if query.Error != nil {
@@ -127,7 +129,12 @@ func UserProfile(userid uint) (models.UserProfile, error) {
 	if query.RowsAffected < 1 {
 		return models.UserProfile{}, errors.New(`no user profile found`)
 	}
-
+	formattedValue := fmt.Sprintf("%.2f", User.Wallet)
+	User.Wallet, err = strconv.ParseFloat(formattedValue, 64)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return models.UserProfile{}, err
+	}
 	return User, nil
 }
 
@@ -149,10 +156,10 @@ func CheckAddressExist(userid uint, address uint) bool {
 	return count > 0
 }
 
-func UpdateWallet(wallet float64,userID uint)error{
-	query:=initialisers.DB.Exec(`UPDATE users SET wallet = ? WHERE id = ?`,wallet,userID)
-	if query.Error != nil{
-		 return errors.New(`something went wrong`)
+func UpdateWallet(wallet float64, userID uint) error {
+	query := initialisers.DB.Exec(`UPDATE users SET wallet = ? WHERE id = ?`, wallet, userID)
+	if query.Error != nil {
+		return errors.New(`something went wrong`)
 	}
 	return nil
 }

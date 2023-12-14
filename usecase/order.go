@@ -293,6 +293,10 @@ func CancelOrderByAdmin(userID, order_id, pid int) error {
 	if err != nil {
 		return errors.New(`no orders found with this id`)
 	}
+	err = repository.CheckSingleOrder(Pid, orderID, uint(userID))
+	if err != nil {
+		return err
+	}
 	OrderDetails, err := repository.CancelOrderDetails(uint(userID), orderID, Pid)
 	if err != nil {
 		return err
@@ -334,6 +338,15 @@ func CancelOrderByAdmin(userID, order_id, pid int) error {
 func ShipOrders(userID, orderId, pid int) error {
 	orderID := strconv.Itoa(orderId)
 	Pid := strconv.Itoa(pid)
+	err := repository.CheckOrder(orderID, uint(userID))
+	fmt.Println(err)
+	if err != nil {
+		return errors.New(`no orders found with this id`)
+	}
+	err = repository.CheckSingleOrder(Pid, orderID, uint(userID))
+	if err != nil {
+		return err
+	}
 	OrderStatus, err := repository.GetOrderStatus(orderID, Pid)
 	fmt.Println(OrderStatus)
 	if err != nil {
@@ -365,6 +378,15 @@ func ShipOrders(userID, orderId, pid int) error {
 func DeliverOrder(useriD, orderId, pid int) error {
 	orderID := strconv.Itoa(orderId)
 	Pid := strconv.Itoa(pid)
+	err := repository.CheckOrder(orderID, uint(useriD))
+	fmt.Println(err)
+	if err != nil {
+		return errors.New(`no orders found with this id`)
+	}
+	err = repository.CheckSingleOrder(Pid, orderID, uint(useriD))
+	if err != nil {
+		return err
+	}
 	OrderStatus, err := repository.GetOrderStatus(orderID, Pid)
 	if err != nil {
 		return err
@@ -397,6 +419,17 @@ func DeliverOrder(useriD, orderId, pid int) error {
 
 func ReturnOrder(Token, orderID, pid string) error {
 	UserID, err := utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return err
+	}
+
+	err = repository.CheckOrder(orderID, uint(UserID))
+	fmt.Println(err)
+	if err != nil {
+		return errors.New(`no orders found with this id`)
+	}
+
+	err = repository.CheckSingleOrder(pid, orderID, uint(UserID))
 	if err != nil {
 		return err
 	}
@@ -505,7 +538,8 @@ func PrintInvoice(orderID int, Token string) (*gofpdf.Fpdf, error) {
 	}
 	pdf.Ln(10)
 	pdf.Cell(0, 10, "Total Amount: "+strconv.FormatFloat(float64(orde.FinalPrice), 'f', 2, 64))
-
+	pdf.Ln(20)
+	pdf.Cell(40, 10, "CityVibe: Thanks for shopping!")
 	return pdf, nil
 }
 

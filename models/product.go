@@ -19,14 +19,15 @@ type Product struct {
 }
 
 type UpdateProduct struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Category    string `json:"category"`
-	Size        string `json:"size"`
-	Stock       int    `json:"stock"`
-	Price       int    `json:"price"`
-	Color       string `json:"color"`
+	ID          int     `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Category    string  `json:"category"`
+	Size        string  `json:"size"`
+	Stock       int     `json:"stock"`
+	Price       float64 `json:"price"`
+	OfferPrice  float64 `json:"offer_price"`
+	Color       string  `json:"color"`
 }
 
 type AddProduct struct {
