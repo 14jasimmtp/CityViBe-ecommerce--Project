@@ -53,7 +53,7 @@ func DeleteProduct(id int) error {
 
 func GetAllProducts() ([]models.Product, error) {
 	var products []models.Product
-	query := initialisers.DB.Raw(`SELECT products.id,name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE deleted = false `).Scan(&products)
+	query := initialisers.DB.Raw(`SELECT products.id,name,description,categories.category,sizes.size,stock,color,price,offer_prize FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE deleted = false ORDER BY id ASC`).Scan(&products)
 	if query.Error != nil {
 		return []models.Product{}, query.Error
 	}
@@ -104,12 +104,18 @@ func CheckStock(pid int) error {
 }
 
 func GetProductAmountFromID(pid string) (float64, error) {
-	var productPrice float64
+	var price struct {
+		Price      float64
+		OfferPrize float64
+	}
 
-	if err := initialisers.DB.Raw("select price from products where id = ?", pid).Scan(&productPrice).Error; err != nil {
+	if err := initialisers.DB.Raw("select price,offer_prize from products where id = ?", pid).Scan(&price).Error; err != nil {
 		return 0.0, err
 	}
-	return productPrice, nil
+	if price.OfferPrize != 0 {
+		return price.OfferPrize, nil
+	}
+	return price.Price, nil
 }
 
 func SearchProduct(search string) ([]models.Product, error) {
@@ -191,5 +197,12 @@ func GetProductById(id int) (*models.Product, error) {
 }
 
 func UpdateProduct(product *models.Product) error {
-	return initialisers.DB.Save(product).Error
+	query := initialisers.DB.Exec(`UPDATE products SET offer_prize = ? WHERE id = ? `, product.OfferPrize, product.ID)
+	if query.Error != nil {
+		return errors.New(`something went wrong`)
+	}
+	if query.RowsAffected == 0 {
+		return errors.New(`no products found with this id`)
+	}
+	return nil
 }

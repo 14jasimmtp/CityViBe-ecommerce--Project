@@ -78,7 +78,7 @@ func UpdateShipmentAndPaymentByOrderID(orderStatus string, paymentStatus string,
 	if err != nil {
 		return models.OrderDetails{}, err
 	}
-	err = initialisers.DB.Raw("UPDATE order_items SET order_status = ?  WHERE order_id = ? ", orderStatus, orderID).Error
+	err = initialisers.DB.Exec("UPDATE order_items SET order_status = ?  WHERE order_id = ? ", orderStatus, orderID).Error
 	if err != nil {
 		return models.OrderDetails{}, errors.New(`something went wrong`)
 	}

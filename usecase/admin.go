@@ -122,7 +122,7 @@ func ExecuteAddProductOffer(productid, offer int) (*models.Product, error) {
 		return nil, err
 	}
 	if offer < 0 || offer > 100 {
-		return nil, errors.New("Invalid offer percentage")
+		return nil, errors.New("invalid offer percentage")
 	}
 
 	amount := float64(offer) / 100.0 * float64(product.Price)
@@ -141,7 +141,7 @@ func ExecuteCategoryOffer(catid, offer int) ([]models.Product, error) {
 		return nil, err
 	}
 	if offer < 0 || offer > 100 {
-		return nil, errors.New("Invalid offer percentage")
+		return nil, errors.New("invalid offer percentage")
 	}
 	for i := range productlist {
 		product := &(productlist)[i]

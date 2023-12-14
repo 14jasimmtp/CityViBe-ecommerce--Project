@@ -1,5 +1,11 @@
 package domain
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type Product struct {
 	ID          uint     `json:"id" gorm:"unique;not null"`
 	Name        string   `json:"name" form:"name"`
@@ -29,4 +35,19 @@ type ProductImage struct {
 	ID        uint   `json:"id" gorm:"primarykey;unique; not null"`
 	ImageUrl  string `json:"image_url"`
 	ProductID uint   `json:"product_id"`
+}
+
+type Offer struct {
+	gorm.Model `json:"-"`
+	Id         int       `json:"-" gorm:"primarykey"`
+	Name       string    `json:"name"`
+	Type       string    `json:"type"`
+	Amount     int       `json:"amount"`
+	MinPrice   int       `json:"minprice"`
+	ValidFrom  time.Time `json:"-"`
+	ValidUntil time.Time `json:"valid_until"`
+	UsageLimit int       `json:"usage_limit"`
+	UsedCount  int       `json:"-"`
+	Category   int       `json:"category"`
+	ProductId  int       `json:"product_id"`
 }

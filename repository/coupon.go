@@ -142,5 +142,6 @@ func ViewUserCoupons(userID uint) ([]models.Couponlist, error) {
 	if query.RowsAffected == 0 {
 		return []models.Couponlist{}, errors.New(`no coupons found`)
 	}
+	
 	return coupons, nil
 }

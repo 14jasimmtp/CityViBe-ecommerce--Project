@@ -30,7 +30,7 @@ func DisplayCart(userid uint) ([]models.Cart, error) {
 
 	var Cart []models.Cart
 
-	if err := initialisers.DB.Raw("SELECT carts.user_id,users.firstname as user_name,carts.product_id,products.name as product_name,categories.category as category,carts.quantity,carts.price FROM carts inner join users on carts.user_id = users.id inner join products on carts.product_id = products.id inner join categories on categories.id = products.category_id where user_id = ?", userid).First(&Cart).Error; err != nil {
+	if err := initialisers.DB.Raw("SELECT carts.user_id,users.firstname as user_name,carts.product_id,products.name as product_name,categories.category as category,carts.quantity,carts.price,carts.final_price FROM carts inner join users on carts.user_id = users.id inner join products on carts.product_id = products.id inner join categories on categories.id = products.category_id where user_id = ?", userid).First(&Cart).Error; err != nil {
 		return []models.Cart{}, err
 	}
 
@@ -78,6 +78,16 @@ func UpdateQuantity(userid uint, pid, quantity string) ([]models.Cart, error) {
 func CartTotalAmount(userid uint) (float64, error) {
 	var Amount float64
 	err := initialisers.DB.Raw(`SELECT SUM(price) FROM carts WHERE user_id = ?`, userid).Scan(&Amount).Error
+
+	if err != nil {
+		return 0.0, nil
+	}
+	return Amount, nil
+}
+
+func CartFinalPrice(userid uint) (float64, error) {
+	var Amount float64
+	err := initialisers.DB.Raw(`SELECT SUM(final_price) FROM carts WHERE user_id = ?`, userid).Scan(&Amount).Error
 
 	if err != nil {
 		return 0.0, nil

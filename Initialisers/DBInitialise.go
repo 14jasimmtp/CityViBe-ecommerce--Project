@@ -41,4 +41,5 @@ func DBInitialise() {
 	DB.AutoMigrate(&domain.PaymentMethod{})
 	DB.AutoMigrate(&domain.RazorPay{})
 	DB.AutoMigrate(&domain.UsedCoupon{})
+	DB.AutoMigrate(&domain.Offer{})
 }

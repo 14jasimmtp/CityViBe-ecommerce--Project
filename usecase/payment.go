@@ -59,33 +59,23 @@ func PaymentAlreadyPaid(orderID int) (bool, error) {
 	return AlreadyPayed, nil
 }
 
-// func SavePaymentDetails(orderID int, paymentID string) error {
-// 	status, err := repository.CheckPaymentStatus(orderID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if status == "not paid" {
-// 		err = repository.UpdatePaymentDetails(orderID, paymentID)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		err := repository.UpdateShipmentAndPaymentByOrderID("processing", "paid", orderID)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		return nil
-// 	}
-// 	return errors.New("already paid")
-// }
 
-func VerifyPayment(details models.PaymentVerify,order_id int)(models.OrderDetails,error) {
+
+func VerifyPayment(details models.PaymentVerify, order_id int) (models.OrderDetails, error) {
+	paid, err := repository.CheckVerifiedPayment(order_id)
+	if err != nil {
+		return models.OrderDetails{}, err
+	}
+	if paid {
+		return models.OrderDetails{}, errors.New(`already payment verified`)
+	}
+
 	result := utils.VerifyPayment(details.OrderID, details.PaymentID, details.Signature, os.Getenv("KEY_SECRET_PAY"))
 	if !result {
 		return models.OrderDetails{}, errors.New("payment is unsuccessful")
 	}
-	
 
-	orders, err :=repository.UpdateShipmentAndPaymentByOrderID("processing","paid",order_id)
+	orders, err := repository.UpdateShipmentAndPaymentByOrderID("processing", "paid", order_id)
 	if err != nil {
 		return models.OrderDetails{}, err
 	}

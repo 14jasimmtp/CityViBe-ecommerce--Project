@@ -27,4 +27,5 @@ type OrderItem struct {
 	OrderStatus string  `json:"order_status" gorm:"default:'pending'"`
 	Quantity    float64 `json:"quantity"`
 	TotalPrice  float64 `json:"total_price"`
+	FinalPrice  float64 `json:"final_price"`
 }

@@ -49,7 +49,7 @@ func AddToCart(pid, Token string) (models.CartResponse, error) {
 	if err != nil {
 		return models.CartResponse{}, err
 	}
-
+	
 	productPrize, err := repository.GetProductAmountFromID(pid)
 	if err != nil {
 		return models.CartResponse{}, err

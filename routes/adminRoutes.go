@@ -41,10 +41,16 @@ func AdminRoutes(r *gin.Engine) {
 	r.PUT("admin/coupon/update", middlewares.AdminAuthMiddleware, handlers.UpdateCoupon)
 
 	//salesreport
-	r.GET("/admin/salesreportbyperiod", middlewares.AdminAuthMiddleware, handlers.SalesReportByPeriod)
-	r.GET("/admin/salesreportbydate", middlewares.AdminAuthMiddleware, handlers.SalesReportByDate)
-	r.GET("/admin/salesreportbypayment", middlewares.AdminAuthMiddleware, handlers.SalesReportByPayment)
+	r.GET("admin/salesreportbyperiod", middlewares.AdminAuthMiddleware, handlers.SalesReportByPeriod)
+	r.GET("admin/salesreportbydate", middlewares.AdminAuthMiddleware, handlers.SalesReportByDate)
+	r.GET("admin/salesreportbypayment", middlewares.AdminAuthMiddleware, handlers.SalesReportByPayment)
 
 	//dashboard
-	r.GET("/admin/dashboard",middlewares.AdminAuthMiddleware,handlers.DashBoard)
+	r.GET("/admin/dashboard", middlewares.AdminAuthMiddleware, handlers.DashBoard)
+
+	//offer
+	r.POST("admin/offer", middlewares.AdminAuthMiddleware, handlers.AddOffer)
+	r.GET("admin/offer", middlewares.AdminAuthMiddleware, handlers.AllOffer)
+	r.POST("admin/product/offer", middlewares.AdminAuthMiddleware, handlers.AddProductOffer)
+	r.POST("admin/category/offer", middlewares.AdminAuthMiddleware, handlers.AddCategoryOffer)
 }

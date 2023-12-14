@@ -6,6 +6,7 @@ type Cart struct {
 	Category    string  `json:"category"`
 	Quantity    float64 `json:"quantity"`
 	Price       float64 `json:"price"`
+	FinalPrice  float64 `json:"-"`
 }
 
 type CartResponse struct {

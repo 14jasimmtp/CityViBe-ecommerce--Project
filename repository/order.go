@@ -30,7 +30,7 @@ func AddAmountToOrder(Amount float64, orderID uint) error {
 func AddOrderProducts(userID uint, orderid int, cart []models.Cart) error {
 	query := `
     INSERT INTO order_items (order_id,product_id,user_id,quantity,total_price)
-    VALUES (?, ?, ?, ?,?) `
+    VALUES (?, ?, ?, ?, ?) `
 	for _, v := range cart {
 		var productID int
 		if err := initialisers.DB.Raw("SELECT id FROM products WHERE name = $1", v.ProductName).Scan(&productID).Error; err != nil {
@@ -248,14 +248,14 @@ func UpdateOrderFinalPrice(orderID int, amount float64) error {
 func UpdateCartAmount(userID, discount uint) (float64, error) {
 	var finalprice float64
 	perc := 1 - (float64(discount) / 100)
-	query := initialisers.DB.Exec(`UPDATE carts SET price = price * ? WHERE user_id = ?`, perc, userID)
+	query := initialisers.DB.Exec(`UPDATE carts SET final_price = price * ? WHERE user_id = ?`, perc, userID)
 	if query.Error != nil {
 		return 0.0, errors.New(`something went wrong`)
 	}
 	if query.RowsAffected == 0 {
 		return 0.0, errors.New(`something went wrong`)
 	}
-	query = initialisers.DB.Raw(`SELECT SUM(price) FROM carts WHERE user_id = ?`, userID).Scan(&finalprice)
+	query = initialisers.DB.Raw(`SELECT SUM(final_price) FROM carts WHERE user_id = ?`, userID).Scan(&finalprice)
 	if query.Error != nil {
 		return 0.0, errors.New(`something went wrong`)
 	}
@@ -363,4 +363,20 @@ func DashBoardOrder() (models.DashboardOrder, error) {
 		return models.DashboardOrder{}, nil
 	}
 	return orderDetail, nil
+}
+
+func CheckVerifiedPayment(orderID int) (bool, error) {
+	var payment string
+	query := initialisers.DB.Raw(`SELECT payment_status FROM orders WHERE id = ?`, orderID).Scan(&payment)
+	if query.Error != nil {
+		return false, errors.New(`something went wrong`)
+	}
+	if query.RowsAffected == 0 {
+		return false, errors.New(`no orders found`)
+	}
+	if payment == "paid" {
+		return true, nil
+	}
+
+	return false, nil
 }

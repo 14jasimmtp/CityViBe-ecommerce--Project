@@ -52,17 +52,13 @@ func OrderFromCart(c *gin.Context) {
 }
 
 func ViewCheckOut(c *gin.Context) {
-	var coupon models.CheckoutCoupon
-	if c.ShouldBindJSON(&coupon) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Enter coupon correctly"})
-	}
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	OrderDetails, err := usecase.CheckOut(Token, coupon.Coupon)
+	OrderDetails, err := usecase.CheckOut(Token)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -279,13 +275,13 @@ func PrintInvoice(c *gin.Context) {
 }
 
 func ApplyCoupon(c *gin.Context) {
-	Token,err:=c.Cookie("Authorisation")
+	Token, err := c.Cookie("Authorisation")
 	if err != nil {
-		c.JSON(http.StatusUnauthorized,gin.H{"error":"login to apply coupon"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "login to apply coupon"})
 		return
 	}
 	coupon := c.PostForm("coupon")
-	err = usecase.ApplyCoupon(coupon,Token)
+	err = usecase.ApplyCoupon(coupon, Token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

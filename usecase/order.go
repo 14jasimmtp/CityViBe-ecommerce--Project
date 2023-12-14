@@ -13,8 +13,7 @@ import (
 	"main.go/utils"
 )
 
-func CheckOut(Token, coupon string) (interface{}, error) {
-	var FinalPrice float64
+func CheckOut(Token string) (interface{}, error) {
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return models.CheckOutInfo{}, err
@@ -34,48 +33,33 @@ func CheckOut(Token, coupon string) (interface{}, error) {
 	if err != nil {
 		return models.CheckOutInfo{}, err
 	}
-	if coupon != "" {
-		err := repository.CheckCouponUsage(userId, coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		DiscountRate, err := repository.GetDiscountRate(coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		FinalPrice, err = repository.UpdateCartAmount(userId, uint(DiscountRate))
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		err = repository.UpdateCouponUsage(userId, coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		err = repository.UpdateCouponCount(coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
 
-		fmt.Println(FinalPrice)
-		if FinalPrice == 0 {
-			FinalPrice = TotalAmount
+	if AllCartProducts[1].FinalPrice == 0 {
+		return models.CheckOutInfo{
+			Address:     AllUserAddress,
+			Cart:        AllCartProducts,
+			TotalAmount: TotalAmount,
+		}, nil
+	} else {
+
+		finalPrice, err := repository.CartFinalPrice(userId)
+		if err != nil {
+			return models.CheckOutInfo{}, err
+		}
+		for i := 0; i < len(AllCartProducts); i++ {
+			AllCartProducts[i].Price = AllCartProducts[i].FinalPrice
 		}
 		return models.CheckOutInfoDiscount{
 			Address:        AllUserAddress,
 			Cart:           AllCartProducts,
 			TotalAmount:    TotalAmount,
-			DiscountAmount: FinalPrice,
+			DiscountAmount: finalPrice,
 		}, nil
 	}
-	return models.CheckOutInfo{
-		Address:     AllUserAddress,
-		Cart:        AllCartProducts,
-		TotalAmount: TotalAmount,
-	}, nil
 }
 
 func ExecutePurchase(Token string, OrderInput models.CheckOut) (models.OrderSuccessResponse, error) {
-	var FinalPrice float64
+	var TotalAmount float64
 	var method string
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
@@ -102,17 +86,28 @@ func ExecutePurchase(Token string, OrderInput models.CheckOut) (models.OrderSucc
 		return models.OrderSuccessResponse{}, errors.New(`cart is empty`)
 	}
 
-	TotalAmount, err := repository.CartTotalAmount(userId)
-	if err != nil {
-		return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
-	}
-
 	cartItems, err := repository.DisplayCart(userId)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
+	if cartItems[1].FinalPrice != 0 {
 
-	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, FinalPrice)
+		for i := 0; i < len(cartItems); i++ {
+			cartItems[i].Price = cartItems[i].FinalPrice
+		}
+
+		TotalAmount, err = repository.CartFinalPrice(userId)
+		if err != nil {
+			return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
+		}
+	} else {
+		TotalAmount, err = repository.CartTotalAmount(userId)
+		if err != nil {
+			return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
+		}
+	}
+
+	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, TotalAmount)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
@@ -139,7 +134,7 @@ func ExecutePurchase(Token string, OrderInput models.CheckOut) (models.OrderSucc
 }
 
 func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.OrderSuccessResponse, error) {
-	var FinalPrice float64
+	var TotalAmount float64
 	userId, err := utils.ExtractUserIdFromToken(Token)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
@@ -165,52 +160,33 @@ func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.Ord
 		return models.OrderSuccessResponse{}, errors.New(`cart is empty`)
 	}
 
-	TotalAmount, err := repository.CartTotalAmount(userId)
-	if err != nil {
-		return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
-	}
-
-	if OrderInput.Coupon != "" {
-		err := repository.CheckCouponUsage(userId, OrderInput.Coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		DiscountRate, err := repository.GetDiscountRate(OrderInput.Coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		FinalPrice, err = repository.UpdateCartAmount(userId, uint(DiscountRate))
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		err = repository.UpdateCouponUsage(userId, OrderInput.Coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-		err = repository.UpdateCouponCount(OrderInput.Coupon)
-		if err != nil {
-			return models.OrderSuccessResponse{}, err
-		}
-	}
-	if FinalPrice == 0 {
-		FinalPrice = TotalAmount
-	}
-	if user.Wallet < FinalPrice {
-		return models.OrderSuccessResponse{}, errors.New(`insufficient Balance in Wallet.Add amount to wallet to purchase`)
-	}
 	cartItems, err := repository.DisplayCart(userId)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
 
-	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, FinalPrice)
-	if err != nil {
-		return models.OrderSuccessResponse{}, err
+	if cartItems[1].FinalPrice != 0 {
+
+		for i := 0; i < len(cartItems); i++ {
+			cartItems[i].Price = cartItems[i].FinalPrice
+		}
+
+		TotalAmount, err = repository.CartFinalPrice(userId)
+		if err != nil {
+			return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
+		}
+	} else {
+		TotalAmount, err = repository.CartTotalAmount(userId)
+		if err != nil {
+			return models.OrderSuccessResponse{}, errors.New(`error while calculating total amount`)
+		}
 	}
 
-	user.Wallet -= FinalPrice
+	if user.Wallet < TotalAmount {
+		return models.OrderSuccessResponse{}, errors.New(`insufficient Balance in Wallet.Add amount to wallet to purchase`)
+	}
 
-	err = repository.UpdateWallet(user.Wallet, userId)
+	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, TotalAmount)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
@@ -219,6 +195,13 @@ func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.Ord
 		return models.OrderSuccessResponse{}, err
 	}
 	_, err = repository.UpdateShipmentAndPaymentByOrderID("processing", "paid", OrderID)
+	if err != nil {
+		return models.OrderSuccessResponse{}, err
+	}
+
+	user.Wallet -= TotalAmount
+
+	err = repository.UpdateWallet(user.Wallet, userId)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
@@ -235,7 +218,7 @@ func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.Ord
 	return models.OrderSuccessResponse{
 		OrderID:       OrderID,
 		PaymentMethod: "Wallet",
-		TotalAmount:   FinalPrice,
+		TotalAmount:   TotalAmount,
 		PaymentStatus: "paid",
 	}, nil
 }
