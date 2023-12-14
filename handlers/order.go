@@ -205,7 +205,25 @@ func SalesReportByDate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"report": report})
+
+	c.Header("Content-Disposition", "attachment;filename=Invoice.pdf")
+	c.Header("Content_Type", "application/pdf")
+
+	err = report.Output(c.Writer)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pdfFilePath := "Invoice/salesreport.pdf"
+
+	err = report.OutputFileAndClose(pdfFilePath)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.File(pdfFilePath)
+	// c.JSON(http.StatusOK, gin.H{"report": report})
 }
 
 func SalesReportByPeriod(c *gin.Context) {
@@ -215,7 +233,24 @@ func SalesReportByPeriod(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"report": report})
+	c.Header("Content-Disposition", "attachment;filename=Invoice.pdf")
+	c.Header("Content_Type", "application/pdf")
+
+	err = report.Output(c.Writer)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pdfFilePath := "Invoice/salesreport.pdf"
+
+	err = report.OutputFileAndClose(pdfFilePath)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.File(pdfFilePath)
+	// c.JSON(http.StatusOK, gin.H{"report": report})
 }
 
 func SalesReportByPayment(c *gin.Context) {
@@ -234,7 +269,25 @@ func SalesReportByPayment(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"report": report})
+
+	c.Header("Content-Disposition", "attachment;filename=Invoice.pdf")
+	c.Header("Content_Type", "application/pdf")
+
+	err = report.Output(c.Writer)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pdfFilePath := "Invoice/salesreport.pdf"
+
+	err = report.OutputFileAndClose(pdfFilePath)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.File(pdfFilePath)
+	// c.JSON(http.StatusOK, gin.H{"report": report})
 }
 
 func PrintInvoice(c *gin.Context) {

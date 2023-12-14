@@ -460,30 +460,93 @@ func ReturnOrder(Token, orderID, pid string) error {
 	return nil
 }
 
-func ExecuteSalesReportByPeriod(period string) (*models.SalesReport, error) {
+func ExecuteSalesReportByPeriod(period string) (*gofpdf.Fpdf, error) {
 	startdate, enddate := utils.CalcualtePeriodDate(period)
 
 	orders, err := repository.GetByDate(startdate, enddate)
 	if err != nil {
 		return nil, errors.New("report fetching failed")
 	}
-	return orders, nil
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	pdf.SetFont("Arial", "B", 16)
+	pdf.Cell(40, 10, "Sales Report")
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Period:"+period)
+	pdf.Ln(10)
+
+	pdf.Cell(0, 10, "Total Sales: "+strconv.FormatFloat(orders.TotalSales, 'f', 2, 64))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Total Orders: "+strconv.Itoa(int(orders.TotalOrders)))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Average Order Price: "+strconv.FormatFloat(orders.AverageOrder, 'f', 2, 64))
+	pdf.Ln(10)
+	return pdf, nil
 }
 
-func ExecuteSalesReportByDate(startdate, enddate time.Time) (*models.SalesReport, error) {
+func ExecuteSalesReportByDate(startdate, enddate time.Time) (*gofpdf.Fpdf, error) {
 	orders, err := repository.GetByDate(startdate, enddate)
 	if err != nil {
 		return nil, errors.New("report fetching failed")
 	}
-	return orders, nil
+
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	pdf.SetFont("Arial", "B", 16)
+	pdf.Cell(40, 10, "Sales Report")
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "From date: "+startdate.Format("02-01-2006"))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "To date: "+enddate.Format("02-01-2006"))
+	pdf.Ln(10)
+
+	pdf.Cell(0, 10, "Total Sales: "+strconv.FormatFloat(orders.TotalSales, 'f', 2, 64))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Total Orders: "+strconv.Itoa(int(orders.TotalOrders)))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Average Order Price: "+strconv.FormatFloat(orders.AverageOrder, 'f', 2, 64))
+	pdf.Ln(10)
+	return pdf, nil
 }
 
-func ExecuteSalesReportByPaymentMethod(startdate, enddate time.Time, paymentmethod string) (*models.SalesReport, error) {
+func ExecuteSalesReportByPaymentMethod(startdate, enddate time.Time, paymentmethod string) (*gofpdf.Fpdf, error) {
+	var payment string
+	if paymentmethod == "1" {
+		payment = "Cash On Delivery"
+	} else if paymentmethod == "2" {
+		payment = "Razorpay"
+	} else if paymentmethod == "3" {
+		payment = "Wallet"
+	} else {
+		return nil, errors.New(`payment method doesn't exist`)
+	}
 	orders, err := repository.GetByPaymentMethod(startdate, enddate, paymentmethod)
 	if err != nil {
 		return nil, errors.New("report fetching failed")
 	}
-	return orders, nil
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	pdf.SetFont("Arial", "B", 16)
+	pdf.Cell(40,10, "Sales Report")
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Payment Method: "+payment)
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "From date: "+startdate.Format("02-01-2006"))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "To date: "+enddate.Format("02-01-2006"))
+	pdf.Ln(10)
+
+	pdf.Cell(0, 10, "Total Sales: "+strconv.FormatFloat(orders.TotalSales, 'f', 2, 64))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Total Orders: "+strconv.Itoa(int(orders.TotalOrders)))
+	pdf.Ln(10)
+	pdf.Cell(0, 10, "Average Order Price: "+strconv.FormatFloat(orders.AverageOrder, 'f', 2, 64))
+	pdf.Ln(10)
+
+	return pdf, nil
 }
 
 func PrintInvoice(orderID int, Token string) (*gofpdf.Fpdf, error) {
