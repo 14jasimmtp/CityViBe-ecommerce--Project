@@ -73,17 +73,31 @@ func UpdatePaymentDetails(orderID int, paymentID string) error {
 }
 
 func UpdateShipmentAndPaymentByOrderID(orderStatus string, paymentStatus string, orderID int) (models.OrderDetails, error) {
-	var Details models.OrderDetails
-	err := initialisers.DB.Raw("UPDATE orders SET payment_status = ?  WHERE id = ? RETURNING total_price", paymentStatus, orderID).Scan(&Details.FinalPrice).Error
-	if err != nil {
-		return models.OrderDetails{}, err
-	}
-	err = initialisers.DB.Exec("UPDATE order_items SET order_status = ?  WHERE order_id = ? ", orderStatus, orderID).Error
-	if err != nil {
-		return models.OrderDetails{}, errors.New(`something went wrong`)
-	}
-	Details.Id = orderID
-	Details.PaymentMethod = "Razorpay"
-	Details.PaymentStatus = "paid"
-	return Details, nil
+    tx := initialisers.DB.Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
+
+    var details models.OrderDetails
+
+    err := tx.Raw("UPDATE orders SET payment_status = ? WHERE id = ? RETURNING total_price", paymentStatus, orderID).Scan(&details.FinalPrice).Error
+    if err != nil {
+        tx.Rollback()
+        return models.OrderDetails{}, err
+    }
+
+    err = tx.Exec("UPDATE order_items SET order_status = ? WHERE order_id = ?", orderStatus, orderID).Error
+    if err != nil {
+        tx.Rollback()
+        return models.OrderDetails{}, errors.New(`something went wrong`)
+    }
+
+    details.Id = orderID
+    details.PaymentMethod = "Razorpay"
+    details.PaymentStatus = "paid"
+
+    tx.Commit()
+    return details, nil
 }

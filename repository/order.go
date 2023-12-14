@@ -29,22 +29,37 @@ func AddAmountToOrder(Amount float64, orderID uint) error {
 	return nil
 }
 
+
+
 func AddOrderProducts(userID uint, orderid int, cart []models.Cart) error {
-	query := `
+    tx := initialisers.DB.Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
+
+    query := `
     INSERT INTO order_items (order_id,product_id,user_id,quantity,total_price)
     VALUES (?, ?, ?, ?, ?) `
-	for _, v := range cart {
-		var productID int
-		if err := initialisers.DB.Raw("SELECT id FROM products WHERE name = $1", v.ProductName).Scan(&productID).Error; err != nil {
-			return errors.New(`something went wrong`)
-		}
-		if err := initialisers.DB.Exec(query, orderid, productID, userID, v.Quantity, v.Price).Error; err != nil {
-			return errors.New(`something went wrong`)
-		}
-	}
-	return nil
 
+    for _, v := range cart {
+        var productID int
+        if err := tx.Raw("SELECT id FROM products WHERE name = $1", v.ProductName).Scan(&productID).Error; err != nil {
+            tx.Rollback()
+            return errors.New(`something went wrong`)
+        }
+        if err := tx.Exec(query, orderid, productID, userID, v.Quantity, v.Price).Error; err != nil {
+            tx.Rollback()
+            return errors.New(`something went wrong`)
+        }
+    }
+
+    tx.Commit()
+    return nil
 }
+
+
 
 func CheckPaymentMethodExist(paymentid uint) bool {
 	query := initialisers.DB.Raw(`SELECT * FROM payment_methods WHERE id = ?`, paymentid)
@@ -59,21 +74,53 @@ func GetOrder(orderID int) (domain.Order, error) {
 	return order, nil
 }
 
-func GetOrderDetails(userID uint) ([]models.ViewOrderDetails, error) {
-	var orderDatails []models.OrderDetails
-	query := initialisers.DB.Raw("SELECT orders.id, total_price as final_price, payment_methods.payment_mode AS payment_method, payment_status FROM orders INNER JOIN payment_methods ON orders.payment_method_id=payment_methods.id WHERE user_id = ? ORDER BY orders.id DESC", userID).Scan(&orderDatails)
-	if query.Error != nil {
-		return []models.ViewOrderDetails{}, errors.New(`something went wrong`)
-	}
-	var fullOrderDetails []models.ViewOrderDetails
-	for _, ok := range orderDatails {
-		var OrderProductDetails []models.OrderProductDetails
-		initialisers.DB.Raw("SELECT order_items.product_id,products.name AS product_name,order_items.order_status,order_items.quantity,order_items.total_price FROM order_items INNER JOIN products ON order_items.product_id = products.id WHERE order_items.order_id = ? ORDER BY order_id DESC", ok.Id).Scan(&OrderProductDetails)
-		fullOrderDetails = append(fullOrderDetails, models.ViewOrderDetails{OrderDetails: ok, OrderProductDetails: OrderProductDetails})
-	}
-	return fullOrderDetails, nil
 
+
+func GetOrderDetails(userID uint) ([]models.ViewOrderDetails, error) {
+    tx := initialisers.DB.Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
+
+    var orderDetails []models.OrderDetails
+    query := tx.Raw(`
+        SELECT orders.id, total_price as final_price, payment_methods.payment_mode AS payment_method, payment_status
+        FROM orders
+        INNER JOIN payment_methods ON orders.payment_method_id = payment_methods.id
+        WHERE user_id = ? ORDER BY orders.id DESC`, userID).Scan(&orderDetails)
+
+    if query.Error != nil {
+        tx.Rollback()
+        return []models.ViewOrderDetails{}, errors.New(`something went wrong`)
+    }
+
+    var fullOrderDetails []models.ViewOrderDetails
+    for _, order := range orderDetails {
+        var orderProductDetails []models.OrderProductDetails
+        query = tx.Raw(`
+            SELECT order_items.product_id, products.name AS product_name, order_items.order_status,
+                   order_items.quantity, order_items.total_price
+            FROM order_items
+            INNER JOIN products ON order_items.product_id = products.id
+            WHERE order_items.order_id = ? ORDER BY order_id DESC`, order.Id).Scan(&orderProductDetails)
+
+        if query.Error != nil {
+            tx.Rollback()
+            return []models.ViewOrderDetails{}, errors.New(`something went wrong`)
+        }
+
+        fullOrderDetails = append(fullOrderDetails, models.ViewOrderDetails{
+            OrderDetails:       order,
+            OrderProductDetails: orderProductDetails,
+        })
+    }
+
+    tx.Commit()
+    return fullOrderDetails, nil
 }
+
 
 func CheckOrder(orderid string, userID uint) error {
 	var count int
@@ -187,48 +234,51 @@ func ShipOrder(userID, orderId int) error {
 }
 
 func DeliverOrder(userID int, orderId string) error {
-	status := "Delivered"
-	err := initialisers.DB.Exec("UPDATE order_items SET order_status = ? WHERE order_id = ? AND user_id = ?", status, orderId, userID).Error
-	if err != nil {
-		return errors.New(`something went wrong`)
-	}
-	err = initialisers.DB.Exec("UPDATE orders SET payment_status = 'paid' WHERE id = ? ", orderId).Error
-	if err != nil {
-		return errors.New(`something went wrong`)
-	}
+	tx := initialisers.DB.Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
 
-	return nil
+    status := "Delivered"
+    if err := tx.Exec("UPDATE order_items SET order_status = ? WHERE order_id = ? AND user_id = ?", status, orderId, userID).Error; err != nil {
+        tx.Rollback()
+        return errors.New(`something went wrong`)
+    }
+
+    if err := tx.Exec("UPDATE orders SET payment_status = 'paid' WHERE id = ? ", orderId).Error; err != nil {
+        tx.Rollback()
+        return errors.New(`something went wrong`)
+    }
+
+    tx.Commit()
+    return nil
 }
 
-func UpdateAmount(oid string, userID uint) error {
-	var Amount float64
-	query := initialisers.DB.Raw(`SELECT SUM(total_price) FROM order_items WHERE order_id = ? AND user_id = ?`, oid, userID).Scan(&Amount)
-	if query.Error != nil {
-		return errors.New(`something went wrong`)
-	}
-	query = initialisers.DB.Exec(`UPDATE FROM orders SET final_price = final_price - ? WHERE id = ?`, Amount, oid)
-	if query.Error != nil {
-		return errors.New(`something went wrong`)
-	}
-	return nil
+func UpdateFinalPrice(userID uint, oid string) error {
+    tx := initialisers.DB.Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
+
+    var amount float64
+    query := tx.Raw(`SELECT SUM(total_price) FROM order_items WHERE order_id = ? AND user_id = ?`, oid, userID).Scan(&amount)
+    if query.Error != nil {
+        tx.Rollback()
+        return errors.New(`something went wrong`)
+    }
+    query = tx.Exec(`UPDATE orders SET final_price = final_price - ? WHERE id = ?`, amount, oid)
+    if query.Error != nil {
+        tx.Rollback()
+        return errors.New(`something went wrong`)
+    }
+    tx.Commit()
+
+    return nil
 }
-
-// func ReturnAmountToWallet(userID uint, orderID, pid string) error {
-// 	var amount float64
-// 	query := initialisers.DB.Raw(`SELECT total_price FROM order_items WHERE product_id = ? AND order_id = ? AND user_id = ?`, pid, orderID, userID).Scan(&amount)
-// 	if query.Error != nil {
-// 		return errors.New(`something went wrong`)
-// 	}
-
-// 	query = initialisers.DB.Exec(`UPDATE users SET wallet = wallet + $1 WHERE id = $2`, amount, userID)
-// 	if query.Error != nil {
-// 		return errors.New(`something went wrong`)
-// 	}
-// 	if query.RowsAffected == 0 {
-// 		return errors.New(`no orders found with this id`)
-// 	}
-// 	return nil
-// }
 
 func ReturnAmountToWallet(userID uint, orderID, pid string) error {
 	tx := initialisers.DB.Begin()
@@ -390,32 +440,50 @@ func GetAddressFromOrders(address_id, userID int) (models.Address, error) {
 
 }
 
+
 func DashBoardOrder() (models.DashboardOrder, error) {
-	var orderDetail models.DashboardOrder
-	err := initialisers.DB.Raw("SELECT COUNT(*) FROM order_items WHERE order_status= 'Delivered'").Scan(&orderDetail.DeliveredOrderProducts).Error
-	if err != nil {
-		return models.DashboardOrder{}, err
-	}
-	err = initialisers.DB.Raw("SELECT COUNT(*) FROM order_items WHERE order_status='pending' OR order_status = 'processing'").Scan(&orderDetail.PendingOrderProducts).Error
-	if err != nil {
-		return models.DashboardOrder{}, err
-	}
-	err = initialisers.DB.Raw("select count(*) from order_items where order_status = 'Cancelled' OR order_status = 'returned'").Scan(&orderDetail.CancelledOrderProducts).Error
-	if err != nil {
-		return models.DashboardOrder{}, nil
-	}
+    tx := initialisers.DB.Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
 
-	err = initialisers.DB.Raw("select count(*) from order_items").Scan(&orderDetail.TotalOrderItems).Error
-	if err != nil {
-		return models.DashboardOrder{}, nil
-	}
+    var orderDetail models.DashboardOrder
+    err := tx.Raw("SELECT COUNT(*) FROM order_items WHERE order_status= 'Delivered'").Scan(&orderDetail.DeliveredOrderProducts).Error
+    if err != nil {
+        tx.Rollback()
+        return models.DashboardOrder{}, err
+    }
 
-	err = initialisers.DB.Raw("select COALESCE(SUM(quantity),0) from order_items").Scan(&orderDetail.TotalOrderQuantity).Error
-	if err != nil {
-		return models.DashboardOrder{}, nil
-	}
-	return orderDetail, nil
+    err = tx.Raw("SELECT COUNT(*) FROM order_items WHERE order_status='pending' OR order_status = 'processing'").Scan(&orderDetail.PendingOrderProducts).Error
+    if err != nil {
+        tx.Rollback()
+        return models.DashboardOrder{}, err
+    }
+
+    err = tx.Raw("SELECT COUNT(*) FROM order_items WHERE order_status = 'Cancelled' OR order_status = 'returned'").Scan(&orderDetail.CancelledOrderProducts).Error
+    if err != nil {
+        tx.Rollback()
+        return models.DashboardOrder{}, err
+    }
+
+    err = tx.Raw("SELECT COUNT(*) FROM order_items").Scan(&orderDetail.TotalOrderItems).Error
+    if err != nil {
+        tx.Rollback()
+        return models.DashboardOrder{}, err
+    }
+
+    err = tx.Raw("SELECT COALESCE(SUM(quantity), 0) FROM order_items").Scan(&orderDetail.TotalOrderQuantity).Error
+    if err != nil {
+        tx.Rollback()
+        return models.DashboardOrder{}, err
+    }
+
+    tx.Commit()
+    return orderDetail, nil
 }
+
 
 func CheckVerifiedPayment(orderID int) (bool, error) {
 	var payment string
