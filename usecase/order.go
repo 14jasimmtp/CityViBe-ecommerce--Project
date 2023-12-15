@@ -34,7 +34,7 @@ func CheckOut(Token string) (interface{}, error) {
 		return models.CheckOutInfo{}, err
 	}
 
-	if AllCartProducts[1].FinalPrice == 0 {
+	if AllCartProducts[0].FinalPrice == 0 {
 		return models.CheckOutInfo{
 			Address:     AllUserAddress,
 			Cart:        AllCartProducts,
@@ -90,7 +90,7 @@ func ExecutePurchase(Token string, OrderInput models.CheckOut) (models.OrderSucc
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
-	if cartItems[1].FinalPrice != 0 {
+	if cartItems[0].FinalPrice != 0 {
 
 		for i := 0; i < len(cartItems); i++ {
 			cartItems[i].Price = cartItems[i].FinalPrice

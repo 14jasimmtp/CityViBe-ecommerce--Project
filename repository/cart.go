@@ -42,6 +42,9 @@ func RemoveProductFromCart(pid int, userid uint) error {
 	if query.Error != nil {
 		return query.Error
 	}
+	if query.RowsAffected == 0 {
+		return errors.New(`no products found in cart`)
+	}
 
 	return nil
 }
@@ -65,6 +68,9 @@ func UpdateQuantity(userid uint, pid, quantity string) ([]models.Cart, error) {
 	query := initialisers.DB.Raw(`UPDATE carts SET quantity = ? WHERE user_id = ? AND product_id = ?`, quantity, userid, pid)
 	if query.Error != nil {
 		return []models.Cart{}, query.Error
+	}
+	if query.RowsAffected == 0{
+		return []models.Cart{},errors.New(`no products found to update in cart`)
 	}
 
 	var Cart []models.Cart

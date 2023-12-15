@@ -14,5 +14,5 @@ type CheckoutCoupon struct {
 type Couponlist struct {
 	Coupon             string  `json:"coupon" validate:"required"`
 	DiscountPercentage float64 `json:"Discount_percentage" validate:"required"`
-	Status             string  `json:"status"`
+	
 }
