@@ -107,7 +107,7 @@ func ExecutePurchase(Token string, OrderInput models.CheckOut) (models.OrderSucc
 		}
 	}
 
-	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, TotalAmount)
+	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}
@@ -186,7 +186,7 @@ func ExecutePurchaseWallet(Token string, OrderInput models.CheckOut) (models.Ord
 		return models.OrderSuccessResponse{}, errors.New(`insufficient Balance in Wallet.Add amount to wallet to purchase`)
 	}
 
-	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount, TotalAmount)
+	OrderID, err := repository.OrderFromCart(OrderInput.AddressID, OrderInput.PaymentID, userId, TotalAmount)
 	if err != nil {
 		return models.OrderSuccessResponse{}, err
 	}

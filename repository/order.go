@@ -11,24 +11,15 @@ import (
 	"main.go/models"
 )
 
-func OrderFromCart(addressid uint, paymentid, userid uint, price, finalprice float64) (int, error) {
+func OrderFromCart(addressid uint, paymentid, userid uint, price float64) (int, error) {
 	var id int
 	query := `
-    INSERT INTO orders (created_at , user_id , address_id ,payment_method_id,total_price,final_price)
-    VALUES (NOW(),?, ?, ?,?,?)
+    INSERT INTO orders (created_at , user_id , address_id ,payment_method_id,total_price)
+    VALUES (NOW(),?, ?, ?,?)
     RETURNING id`
-	initialisers.DB.Raw(query, userid, addressid, paymentid, price, finalprice).Scan(&id)
+	initialisers.DB.Raw(query, userid, addressid, paymentid, price).Scan(&id)
 	return id, nil
 }
-
-func AddAmountToOrder(Amount float64, orderID uint) error {
-	err := initialisers.DB.Exec("UPDATE orders SET final_price = ? WHERE id = ?", Amount, orderID).Error
-	if err != nil {
-		return errors.New(`something went wrong`)
-	}
-	return nil
-}
-
 
 
 func AddOrderProducts(userID uint, orderid int, cart []models.Cart) error {

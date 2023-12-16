@@ -1,0 +1,155 @@
+definitions:
+  models.OTP:
+    properties:
+      otp:
+        type: string
+      phone:
+        type: string
+    required:
+    - otp
+    - phone
+    type: object
+  models.UserLoginDetails:
+    properties:
+      password:
+        maxLength: 20
+        minLength: 6
+        type: string
+      phone:
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  models.UserSignUpDetails:
+    properties:
+      confirm password:
+        type: string
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      password:
+        maxLength: 20
+        minLength: 6
+        type: string
+      phone:
+        maxLength: 10
+        minLength: 10
+        type: string
+    required:
+    - confirm password
+    - email
+    - firstname
+    - lastname
+    - password
+    - phone
+    type: object
+info:
+  contact: {}
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: user can login by giving their phone and password
+      parameters:
+      - description: signup
+        in: body
+        name: Login
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserLoginDetails'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"Enter otp to login
+          schema:
+            type: string
+        "500":
+          description: error":err.Error()
+          schema:
+            type: string
+      summary: User Login
+      tags:
+      - User Login/Signup
+  /logout:
+    post:
+      description: user can logout by sending this request to server
+      parameters:
+      - description: signup
+        in: body
+        name: Logout
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserLoginDetails'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"user logged out successfully
+          schema:
+            type: string
+        "500":
+          description: error":err.Error()
+          schema:
+            type: string
+      summary: User Logout
+      tags:
+      - User Login/Signup
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: user can signup by giving their details
+      parameters:
+      - description: signup
+        in: body
+        name: signup
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSignUpDetails'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"successfully signed up.Enter otp to login
+          schema:
+            type: string
+        "500":
+          description: error":err.Error()
+          schema:
+            type: string
+      summary: User Signup
+      tags:
+      - User
+  /verify:
+    post:
+      consumes:
+      - application/json
+      description: user can login by giving the otp send to the mobile number
+      parameters:
+      - description: Verify
+        in: body
+        name: Verify
+        required: true
+        schema:
+          $ref: '#/definitions/models.OTP'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"user successfully logged in" "user":models.UserLoginResponse
+          schema:
+            type: string
+        "500":
+          description: error":err.Error()
+          schema:
+            type: string
+      summary: Verify OTP
+      tags:
+      - User Login/Signup
+swagger: "2.0"

@@ -1,0 +1,234 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/login": {
+            "post": {
+                "description": "user can login by giving their phone and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Login/Signup"
+                ],
+                "summary": "User Login",
+                "parameters": [
+                    {
+                        "description": "signup",
+                        "name": "Login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserLoginDetails"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\":\"Enter otp to login",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "user can logout by sending this request to server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Login/Signup"
+                ],
+                "summary": "User Logout",
+                "parameters": [
+                    {
+                        "description": "signup",
+                        "name": "Logout",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserLoginDetails"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\":\"user logged out successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/signup": {
+            "post": {
+                "description": "user can signup by giving their details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Signup",
+                "parameters": [
+                    {
+                        "description": "signup",
+                        "name": "signup",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserSignUpDetails"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\":\"successfully signed up.Enter otp to login",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/verify": {
+            "post": {
+                "description": "user can login by giving the otp send to the mobile number",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Login/Signup"
+                ],
+                "summary": "Verify OTP",
+                "parameters": [
+                    {
+                        "description": "Verify",
+                        "name": "Verify",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.OTP"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\":\"user successfully logged in\" \"user\":models.UserLoginResponse",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.OTP": {
+            "type": "object",
+            "required": [
+                "otp",
+                "phone"
+            ],
+            "properties": {
+                "otp": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserLoginDetails": {
+            "type": "object",
+            "required": [
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserSignUpDetails": {
+            "type": "object",
+            "required": [
+                "confirm password",
+                "email",
+                "firstname",
+                "lastname",
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "confirm password": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10
+                }
+            }
+        }
+    }
+}

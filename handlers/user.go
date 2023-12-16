@@ -10,6 +10,15 @@ import (
 	"main.go/utils"
 )
 
+// @Summary		User Signup
+// @Description	user can signup by giving their details
+// @Tags			User
+// @Accept			json
+// @Produce		    json
+// @Param			signup  body  models.UserSignUpDetails  true	"signup"
+// @Success		200	{object}	string "message":"successfully signed up.Enter otp to login"
+// @Failure		500	{object}	string "error":err.Error()
+// @Router			/signup    [POST]
 func UserSignup(c *gin.Context) {
 
 	var User models.UserSignUpDetails
@@ -34,6 +43,15 @@ func UserSignup(c *gin.Context) {
 
 }
 
+// @Summary		User Login
+// @Description	user can login by giving their phone and password
+// @Tags			User Login/Signup
+// @Accept			json
+// @Produce		    json
+// @Param			Login  body  models.UserLoginDetails  true	"signup"
+// @Success		200	{object}	string "message":"Enter otp to login"
+// @Failure		500	{object}	string "error":err.Error()
+// @Router			/login    [POST]
 func UserLogin(c *gin.Context) {
 	var User models.UserLoginDetails
 
@@ -58,12 +76,21 @@ func UserLogin(c *gin.Context) {
 
 }
 
+// @Summary		User Logout
+// @Description	user can logout by sending this request to server
+// @Tags			User Login/Signup
+// @Produce		    json
+// @Param			Logout  body  models.UserLoginDetails  true	"signup"
+// @Success		200	{object}	string "message":"user logged out successfully"
+// @Failure		500	{object}	string "error":err.Error()
+// @Router			/logout    [POST]
 func UserLogout(c *gin.Context) {
 	c.SetCookie("Authorisation", "", -1, "", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "user logged out successfully"})
 	fmt.Println("cookie deleted")
 }
+
 
 func ForgotPassword(c *gin.Context) {
 	var forgotPassword models.Phone

@@ -10,6 +10,15 @@ import (
 	"main.go/utils"
 )
 
+// @Summary		Verify OTP
+// @Description	user can login by giving the otp send to the mobile number
+// @Tags			User Login/Signup
+// @Accept			json
+// @Produce		    json
+// @Param			Verify  body  models.OTP  true	"Verify"
+// @Success		200	{object}	string "message":"user successfully logged in" "user":models.UserLoginResponse
+// @Failure		500	{object}	string "error":err.Error()
+// @Router			/verify    [POST]
 func VerifyLoginOtp(c *gin.Context) {
 	var otp models.OTP
 
