@@ -28,6 +28,6 @@ func main() {
 	r.LoadHTMLGlob("/home/ubuntu/CityViBe-ecommerce--Project/template/*")
 	routes.AdminRoutes(r)
 	routes.UserRoutes(r)
-	r.Run(":3000")
+	r.Run(":9990")
 
 }
