@@ -25,7 +25,7 @@ func main() {
 
 	// Swagger route
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.LoadHTMLGlob("/home/jasim/CityViBe-Project-Ecommerce/template/*")
+	r.LoadHTMLGlob("/home/ubuntu/CityViBe-ecommerce--Project/template/*")
 	routes.AdminRoutes(r)
 	routes.UserRoutes(r)
 	r.Run(":3000")
