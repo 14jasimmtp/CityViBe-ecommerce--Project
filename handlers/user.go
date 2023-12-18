@@ -91,7 +91,14 @@ func UserLogout(c *gin.Context) {
 	fmt.Println("cookie deleted")
 }
 
-
+// @Summary		User Logout
+// @Description	user can logout by sending this request to server
+// @Tags			User Login/Signup
+// @Produce		    json
+// @Param			Logout  body  models.UserLoginDetails  true	"signup"
+// @Success		200	{object}	string "message":"user logged out successfully"
+// @Failure		500	{object}	string "error":err.Error()
+// @Router			/l    [POST]
 func ForgotPassword(c *gin.Context) {
 	var forgotPassword models.Phone
 	if c.ShouldBindJSON(&forgotPassword) != nil {
