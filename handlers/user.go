@@ -91,14 +91,14 @@ func UserLogout(c *gin.Context) {
 	fmt.Println("cookie deleted")
 }
 
-// @Summary		User Logout
-// @Description	user can logout by sending this request to server
+// @Summary		Forgot password
+// @Description	user can will get otp to change password if forgotted
 // @Tags			User Login/Signup
 // @Produce		    json
-// @Param			Logout  body  models.UserLoginDetails  true	"signup"
+// @Param			forgotPassword  body  models.Phone  true	"Forgot password"
 // @Success		200	{object}	string "message":"user logged out successfully"
 // @Failure		500	{object}	string "error":err.Error()
-// @Router			/l    [POST]
+// @Router			/password/forgot    [POST]
 func ForgotPassword(c *gin.Context) {
 	var forgotPassword models.Phone
 	if c.ShouldBindJSON(&forgotPassword) != nil {
@@ -121,6 +121,14 @@ func ForgotPassword(c *gin.Context) {
 
 }
 
+// @Summary		Reset Password
+// @Description user can reset password by entering otp and new password
+// @Tags			User Login/Signup
+// @Produce		    json
+// @Param			ResetPassword  body  models.ForgotPassword  true	"Reset Password"
+// @Success		200	{object}	string "message":"user logged out successfully"
+// @Failure		500	{object}	string "error":err.Error()
+// @Router			/password/forgot/change    [POST]
 func ResetForgottenPassword(c *gin.Context) {
 	var Newpassword models.ForgotPassword
 
@@ -143,6 +151,13 @@ func ResetForgottenPassword(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "password changed successfully"})
 }
 
+// @Summary		View Addresses
+// @Description user can view addresses that he registered
+// @Tags			User Profile
+// @Produce		    json
+// @Success		200	{object}	string "message":"user address","Address":Address
+// @Failure		500	{object}	string "error":err.Error()
+// @Router			/address    [Get]
 func ViewUserAddress(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -160,6 +175,18 @@ func ViewUserAddress(c *gin.Context) {
 
 }
 
+// @Summary Add new address details
+// @Description Add new address details for the authenticated user.
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Param Authorization cookie string true "Authorization token"
+// @Param address_details body models.Address true "New address details to be added"
+// @Success 200 {object} gin.H{"message": "Address added successfully", "Address": AddressRes}
+// @Failure 400 {object} gin.H{"error": "Bad Request"}
+// @Failure 401 {object} gin.H{"error": "Unauthorized"}
+// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Router /address [post]
 func AddNewAddressDetails(c *gin.Context) {
 	var Address models.Address
 
@@ -186,6 +213,19 @@ func AddNewAddressDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Address added successfully", "Address": AddressRes})
 }
 
+// @Summary Edit user address
+// @Description Edit the address for a user.
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Param id query string true "Address ID to be updated"
+// @Param Authorization cookie string true "Authorization token"
+// @Param address body models.Address true "Updated address details"
+// @Success 200 {object} gin.H{"message": "Address updated successfully", "Address": UpdatedAddress}
+// @Failure 400 {object} gin.H{"error": "Enter constraints correctly"}
+// @Failure 401 {object} gin.H{"error": "Unauthorized"}
+// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Router /address [put]
 func EditUserAddress(c *gin.Context) {
 	var UpdateAddress models.Address
 
@@ -216,6 +256,18 @@ func EditUserAddress(c *gin.Context) {
 
 }
 
+// @Summary Remove user address
+// @Description Remove the address associated with a user.
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Param id query string true "Address ID to be removed"
+// @Param Authorization cookie string true "Authorization token"
+// @Success 200 {object} gin.H{"message": "Address removed successfully"}
+// @Failure 400 {object} gin.H{"error": "Bad Request"}
+// @Failure 401 {object} gin.H{"error": "Unauthorized"}
+// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Router /address [delete]
 func RemoveUserAddress(c *gin.Context) {
 	Aid := c.Query("id")
 	Token, err := c.Cookie("Authorisation")
@@ -233,6 +285,17 @@ func RemoveUserAddress(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Address removed successfully"})
 }
 
+// @Summary Get user profile
+// @Description Retrieve the profile details of the authenticated user.
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Param Authorization cookie string true "Authorization token"
+// @Success 200 {object} gin.H{"message": "User Profile", "profile": UserDetails}
+// @Failure 400 {object} gin.H{"error": "Bad Request"}
+// @Failure 401 {object} gin.H{"error": "Unauthorized"}
+// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Router /profile [get]
 func UserProfile(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -250,6 +313,18 @@ func UserProfile(c *gin.Context) {
 
 }
 
+// @Summary Update user profile
+// @Description Update the profile details of the authenticated user.
+// @Tags User Profile
+// @Accept json
+// @Produce json
+// @Param Authorization cookie string true "Authorization token"
+// @Param user_details body models.UserProfile true "Updated user profile details"
+// @Success 200 {object} gin.H{"message": "Updated User Profile", "profile": updatedUserDetails}
+// @Failure 400 {object} gin.H{"error": "Bad Request"}
+// @Failure 401 {object} gin.H{"error": "Unauthorized"}
+// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Router /profile [put]
 func UpdateUserProfile(c *gin.Context) {
 	var UserDetails models.UserProfile
 
