@@ -11,6 +11,18 @@ import (
 	"main.go/utils"
 )
 
+// OrderFromCart godoc
+// @Summary Place an order from the user's cart
+// @Description Place an order using the provided checkout details.
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Param OrderInput body models.CheckOut true "Details for the order checkout"
+// @Success 200 {object} string "message": "Ordered products successfully", "order Details": OrderDetails
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /orders [post]
 func OrderFromCart(c *gin.Context) {
 	var OrderInput models.CheckOut
 
@@ -51,6 +63,17 @@ func OrderFromCart(c *gin.Context) {
 	}
 }
 
+// ViewCheckOut godoc
+// @Summary View the checkout page
+// @Description Retrieve details for the user's checkout page.
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Success 200 {object} string "message": "CheckOut Page loaded successfully", "order Details": OrderDetails
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /checkout [get]
 func ViewCheckOut(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -67,6 +90,17 @@ func ViewCheckOut(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "CheckOut Page loaded successfully", "order Details": OrderDetails})
 }
 
+// ViewOrders godoc
+// @Summary View user orders
+// @Description Retrieve details of orders for the authenticated user.
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Success 200 {object} string "message": "Orders", "order Details": OrderDetails
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /orders [get]
 func ViewOrders(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -84,6 +118,19 @@ func ViewOrders(c *gin.Context) {
 
 }
 
+// CancelOrder godoc
+// @Summary Cancel an order
+// @Description Cancel an order for the authenticated user based on the provided order and product IDs.
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Param order_id query string true "Order ID to be cancelled"
+// @Param product_id query string true "Product ID in the order to be cancelled"
+// @Success 200 {object} string "message": "Order cancelled successfully"
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /orders/cancel [put]
 func CancelOrder(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -104,6 +151,17 @@ func CancelOrder(c *gin.Context) {
 
 }
 
+// CancelOrderByAdmin godoc
+// @Summary Cancel an order by admin
+// @Description Cancel an order by admin based on the provided user ID, order ID, and product ID.
+// @Tags Admin Order Management
+// @Accept json
+// @Produce json
+// @Param cancel body models.AdminOrder true "Details for cancelling an order by admin"
+// @Success 200 {object} string "message": "Order cancelled successfully"
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /admin/orders/cancel [post]
 func CancelOrderByAdmin(c *gin.Context) {
 	var cancel models.AdminOrder
 	if c.ShouldBindJSON(&cancel) != nil {
@@ -124,6 +182,17 @@ func CancelOrderByAdmin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Order cancelled successfully"})
 }
 
+// ShipOrderByAdmin godoc
+// @Summary Ship an order by admin
+// @Description Ship an order by admin based on the provided user ID, order ID, and product ID.
+// @Tags Admin Order Management
+// @Accept json
+// @Produce json
+// @Param ship body models.AdminOrder true "Details for shipping an order by admin"
+// @Success 200 {object} string "message": "Order shipped successfully"
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /orders/ship [post]
 func ShipOrderByAdmin(c *gin.Context) {
 	var Ship models.AdminOrder
 	if c.ShouldBindJSON(&Ship) != nil {
@@ -145,6 +214,17 @@ func ShipOrderByAdmin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Order Shipped successfully"})
 }
 
+// DeliverOrderByAdmin godoc
+// @Summary Deliver an order by admin
+// @Description Deliver an order by admin based on the provided user ID, order ID, and product ID.
+// @Tags Admin Order Management
+// @Accept json
+// @Produce json
+// @Param deliver body models.AdminOrder true "Details for delivering an order by admin"
+// @Success 200 {object} string "message": "Order delivered successfully"
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /orders/deliver [post]
 func DeliverOrderByAdmin(c *gin.Context) {
 	var Deliver models.AdminOrder
 
@@ -168,6 +248,19 @@ func DeliverOrderByAdmin(c *gin.Context) {
 
 }
 
+// ReturnOrder godoc
+// @Summary Return an order
+// @Description Return an order for the authenticated user based on the provided order and product IDs.
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Param order_id query string true "Order ID to be returned"
+// @Param product_id query string true "Product ID in the order to be returned"
+// @Success 200 {object} string "message": "Order returned successfully. Amount will be credited to wallet."
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /orders/return [put]
 func ReturnOrder(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -187,6 +280,17 @@ func ReturnOrder(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "order returned successfully.Amount will be credited to wallet."})
 }
 
+// SalesReportByDate godoc
+// @Summary Generate and download sales report for a specific date range
+// @Description Generate and download sales report in PDF format for a specific date range.
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param start formData string true "Start date (format: DD-MM-YYYY)"
+// @Param end formData string true "End date (format: DD-MM-YYYY)"
+// @Success 200 {file} application/pdf
+// @Failure 400 {object} string "error": "Bad Request"
+// @Router /admin/salesreportbydate [post]
 func SalesReportByDate(c *gin.Context) {
 	startDateStr := c.PostForm("start")
 	endDateStr := c.PostForm("end")
@@ -226,6 +330,16 @@ func SalesReportByDate(c *gin.Context) {
 	// c.JSON(http.StatusOK, gin.H{"report": report})
 }
 
+// SalesReportByPeriod godoc
+// @Summary Generate and download sales report for a specific period
+// @Description Generate and download sales report in PDF format for a specific period.
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param period formData string true "Period (e.g., 'last week', 'last month')"
+// @Success 200 {file} application/pdf
+// @Failure 400 {object} string "error": "Bad Request"
+// @Router /admin/salesreportbyperiod [post]
 func SalesReportByPeriod(c *gin.Context) {
 	period := c.PostForm("period")
 
@@ -253,6 +367,18 @@ func SalesReportByPeriod(c *gin.Context) {
 	// c.JSON(http.StatusOK, gin.H{"report": report})
 }
 
+// SalesReportByPayment godoc
+// @Summary Generate and download sales report for a specific payment method and date range
+// @Description Generate and download sales report in PDF format for a specific payment method and date range.
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param start formData string true "Start date (format: DD-MM-YYYY)"
+// @Param end formData string true "End date (format: DD-MM-YYYY)"
+// @Param paymentmethod formData string true "Payment method (e.g., 'credit card', 'wallet')"
+// @Success 200 {file} application/pdf
+// @Failure 400 {object} string "error": "Bad Request"
+// @Router /admin/salesreportbypayment [post]
 func SalesReportByPayment(c *gin.Context) {
 	startDateStr := c.PostForm("start")
 	endDateStr := c.PostForm("end")
@@ -290,6 +416,16 @@ func SalesReportByPayment(c *gin.Context) {
 	// c.JSON(http.StatusOK, gin.H{"report": report})
 }
 
+// PrintInvoice godoc
+// @Summary Generate and download invoice for a specific order
+// @Description Generate and download invoice in PDF format for a specific order.
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Param orderid query int true "Order ID"
+// @Success 200 {file} application/pdf
+// @Failure 400 {object} string "error": "Bad Request"
+// @Router /Invoice [get]
 func PrintInvoice(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {
@@ -327,6 +463,19 @@ func PrintInvoice(c *gin.Context) {
 
 }
 
+// ApplyCoupon godoc
+// @Summary Apply a coupon to the user's account
+// @Description Apply a coupon code to the user's account for potential discounts or benefits.
+// @Tags User Order
+// @Accept json
+// @Produce json
+// @Param coupon formData string true "Coupon Code"
+// @Security ApiKeyAuth
+// @Success 200 {object} string "message": "coupon applied successfully"
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /applycoupon [post]
 func ApplyCoupon(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
 	if err != nil {

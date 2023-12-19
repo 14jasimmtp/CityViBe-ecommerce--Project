@@ -20,7 +20,7 @@ func UserRoutes(r *gin.Engine) {
 	r.GET("/products/search", handlers.SearchProducts) //search
 
 	//filtering
-	r.GET("/products/filter/", handlers.FilterProducts)
+	r.GET("/products/filter", handlers.FilterProducts)
 
 	//wishlist
 	r.POST("/products/wishlist", middlewares.UserAuthMiddleware, handlers.AddProductToWishlist)

@@ -4,6 +4,1737 @@
         "contact": {}
     },
     "paths": {
+        "/Invoice": {
+            "get": {
+                "description": "Generate and download invoice in PDF format for a specific order.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Order"
+                ],
+                "summary": "Generate and download invoice for a specific order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/address": {
+            "get": {
+                "description": "user can view addresses that he registered",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "View Addresses",
+                "responses": {
+                    "200": {
+                        "description": "message\":\"user address\",\"Address\":Address",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit the address for a user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Edit user address",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Address ID to be updated",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated address details",
+                        "name": "address",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Address"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Address updated successfully\", \"Address\": UpdatedAddress}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Enter constraints correctly",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add new address details for the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Add new address details",
+                "parameters": [
+                    {
+                        "description": "New address details to be added",
+                        "name": "address_details",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Address"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Address added successfully\", \"Address\": AddressRes",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove the address associated with a user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Remove user address",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Address ID to be removed",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Address removed successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/category": {
+            "get": {
+                "description": "Retrieve all categories.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Category Management"
+                ],
+                "summary": "Get all categories",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Categories\", \"categories\": category",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update the name of a category based on the provided details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Category Management"
+                ],
+                "summary": "Update category name",
+                "parameters": [
+                    {
+                        "description": "Current and new names for the category",
+                        "name": "categoryUpdate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SetNewName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Category updated successfully\", \"updated category\": Newcate",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new category using the provided details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Category Management"
+                ],
+                "summary": "Add a new category",
+                "parameters": [
+                    {
+                        "description": "Details of the category to be added",
+                        "name": "category",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Successfully added category\", \"category\": Cate",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a category based on the provided category ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Category Management"
+                ],
+                "summary": "Delete a category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID to be deleted",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Successfully deleted category",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/category/offer": {
+            "post": {
+                "description": "Add an offer to a category based on the provided category ID and offer ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Offer AManagement"
+                ],
+                "summary": "Add offer to a category",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID to add offer for",
+                        "name": "categoryid",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offer ID to be associated with the category",
+                        "name": "offer",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "offer added\": productlist",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon": {
+            "get": {
+                "description": "Retrieve details of all coupons for admin.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Coupon Management"
+                ],
+                "summary": "View all coupons for admin",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"All Coupons\", \"Coupons\": Coupons",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new coupon using the provided details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Coupon Management"
+                ],
+                "summary": "Create a new coupon",
+                "parameters": [
+                    {
+                        "description": "Details of the coupon to be created",
+                        "name": "coupon",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Coupon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Coupon created successfully\", \"coupon\": CouponDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon/disable": {
+            "put": {
+                "description": "Disable a coupon based on the provided coupon ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Disable a coupon",
+                "parameters": [
+                    {
+                        "description": "Coupon ID to be disabled",
+                        "name": "coupon",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CouponStatus"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Coupon disabled successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon/enable": {
+            "put": {
+                "description": "Enable a coupon based on the provided coupon ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Enable a coupon",
+                "parameters": [
+                    {
+                        "description": "Coupon ID to be enabled",
+                        "name": "coupon",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Coupon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Coupon enabled successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon/update": {
+            "put": {
+                "description": "Update a coupon based on the provided details and coupon ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Coupon Management"
+                ],
+                "summary": "Update a coupon",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Coupon ID to be updated",
+                        "name": "couponID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Details of the coupon to be updated",
+                        "name": "updateCoupon",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Coupon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Coupon updated successfully\", \"coupon\": Coupon",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/dashboard": {
+            "get": {
+                "description": "Retrieve information for the admin dashboard.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get admin dashboard information",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Admin dashboard\", \"dashboard\": adminDashboard",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/login": {
+            "post": {
+                "description": "Authenticate and log in as an admin.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Admin login",
+                "parameters": [
+                    {
+                        "description": "Admin credentials for login",
+                        "name": "admin_details",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Admin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Admin logged in successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/orders": {
+            "get": {
+                "description": "Retrieve all order details for administrative purposes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Order Management"
+                ],
+                "summary": "Get all order details for admin",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Order details retrieved successfully\", \"All orders\": allOrderDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/orders/cancel": {
+            "post": {
+                "description": "Cancel an order by admin based on the provided user ID, order ID, and product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Order Management"
+                ],
+                "summary": "Cancel an order by admin",
+                "parameters": [
+                    {
+                        "description": "Details for cancelling an order by admin",
+                        "name": "cancel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminOrder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Order cancelled successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/orders/details": {
+            "get": {
+                "description": "Retrieve order details for administrative purposes based on the given order ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Order Management"
+                ],
+                "summary": "view single orders",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID to retrieve details for",
+                        "name": "orderID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order Products\": OrderDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/product/offer": {
+            "post": {
+                "description": "Add an offer to a product based on the provided product ID and offer ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Offer management"
+                ],
+                "summary": "Add offer to a product",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID to add offer for",
+                        "name": "productid",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offer ID to be associated with the product",
+                        "name": "offer",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "offer added\": prod",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/products": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of all products.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Product Management"
+                ],
+                "summary": "Get all products",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"successfully retrieved products\", \"products\": [object]",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Edit the details of an existing product by providing the product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Product Management"
+                ],
+                "summary": "Edit product details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to be edited",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated product details",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddProduct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"product updated successfully\", \"product\": models.AddProduct",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add a new product with details and an image.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Product Management"
+                ],
+                "summary": "Add a new product",
+                "parameters": [
+                    {
+                        "description": "Product details",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddProduct"
+                        }
+                    },
+                    {
+                        "type": "file",
+                        "description": "Product image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"product added successfully\", \"product\": models.AddProduct",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/products/remove/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a product by providing the product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Product Management"
+                ],
+                "summary": "Delete a product by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to be deleted",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"product removed successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/salesreportbydate": {
+            "post": {
+                "description": "Generate and download sales report in PDF format for a specific date range.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Generate and download sales report for a specific date range",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date (format: DD-MM-YYYY)",
+                        "name": "start",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (format: DD-MM-YYYY)",
+                        "name": "end",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/salesreportbypayment": {
+            "post": {
+                "description": "Generate and download sales report in PDF format for a specific payment method and date range.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Generate and download sales report for a specific payment method and date range",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date (format: DD-MM-YYYY)",
+                        "name": "start",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (format: DD-MM-YYYY)",
+                        "name": "end",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Payment method (e.g., 'credit card', 'wallet')",
+                        "name": "paymentmethod",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/salesreportbyperiod": {
+            "post": {
+                "description": "Generate and download sales report in PDF format for a specific period.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Generate and download sales report for a specific period",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Period (e.g., 'last week', 'last month')",
+                        "name": "period",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users": {
+            "get": {
+                "description": "Retrieve a list of all users.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin User Management"
+                ],
+                "summary": "view users",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Users are\", \"users\": Users",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/block": {
+            "post": {
+                "description": "Block a user by their ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin User Management"
+                ],
+                "summary": "Block user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID to be blocked",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"User successfully blocked",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/unblock": {
+            "post": {
+                "description": "Unblock a user by their ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin User Management"
+                ],
+                "summary": "Unblock user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID to be unblocked",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"User successfully unblocked",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/applycoupon": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Apply a coupon code to the user's account for potential discounts or benefits.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Order"
+                ],
+                "summary": "Apply a coupon to the user's account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Coupon Code",
+                        "name": "coupon",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"coupon applied successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/cart": {
+            "get": {
+                "description": "Retrieve details of the user's cart.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "View user's cart",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Cart details\", \"Cart\": UserCart",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a product to the user's cart based on the provided product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add product to user's cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to add to the cart",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Product added to cart successfully\", \"Cart\": Cart",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a product from the user's cart based on the provided product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Remove product from user's cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to remove from the cart",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Product removed from cart successfully\", \"Cart\": Cart",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/cart/add-quantity": {
+            "put": {
+                "description": "Increase the quantity of a product in the user's cart based on the provided product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Increase quantity of a product in the user's cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to increase quantity",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Quantity added successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/cart/reduce-quantity": {
+            "put": {
+                "description": "Decrease the quantity of a product in the user's cart based on the provided product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Decrease quantity of a product in the user's cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to decrease quantity",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Quantity decreased by 1 successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/checkout": {
+            "get": {
+                "description": "Retrieve details for the user's checkout page.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Order"
+                ],
+                "summary": "View the checkout page",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"CheckOut Page loaded successfully\", \"order Details\": OrderDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/coupons": {
+            "get": {
+                "description": "Retrieve details of coupons for the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "View coupons for user",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Coupons\", \"Coupons\": coupons",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "user can login by giving their phone and password",
@@ -74,6 +1805,777 @@
                     },
                     "500": {
                         "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders": {
+            "get": {
+                "description": "Retrieve details of orders for the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Order"
+                ],
+                "summary": "View user orders",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Orders\", \"order Details\": OrderDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Place an order using the provided checkout details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Order"
+                ],
+                "summary": "Place an order from the user's cart",
+                "parameters": [
+                    {
+                        "description": "Details for the order checkout",
+                        "name": "OrderInput",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CheckOut"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Ordered products successfully\", \"order Details\": OrderDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/cancel": {
+            "put": {
+                "description": "Cancel an order for the authenticated user based on the provided order and product IDs.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Order"
+                ],
+                "summary": "Cancel an order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID to be cancelled",
+                        "name": "order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Product ID in the order to be cancelled",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Order cancelled successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/deliver": {
+            "post": {
+                "description": "Deliver an order by admin based on the provided user ID, order ID, and product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Order Management"
+                ],
+                "summary": "Deliver an order by admin",
+                "parameters": [
+                    {
+                        "description": "Details for delivering an order by admin",
+                        "name": "deliver",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminOrder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Order delivered successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/return": {
+            "put": {
+                "description": "Return an order for the authenticated user based on the provided order and product IDs.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Order"
+                ],
+                "summary": "Return an order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID to be returned",
+                        "name": "order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Product ID in the order to be returned",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Order returned successfully. Amount will be credited to wallet.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/ship": {
+            "post": {
+                "description": "Ship an order by admin based on the provided user ID, order ID, and product ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin Order Management"
+                ],
+                "summary": "Ship an order by admin",
+                "parameters": [
+                    {
+                        "description": "Details for shipping an order by admin",
+                        "name": "ship",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminOrder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Order shipped successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/password/forgot": {
+            "post": {
+                "description": "user can will get otp to change password if forgotted",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Login/Signup"
+                ],
+                "summary": "Forgot password",
+                "parameters": [
+                    {
+                        "description": "Forgot password",
+                        "name": "forgotPassword",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Phone"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\":\"user logged out successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/password/forgot/change": {
+            "post": {
+                "description": "user can reset password by entering otp and new password",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Login/Signup"
+                ],
+                "summary": "Reset Password",
+                "parameters": [
+                    {
+                        "description": "Reset Password",
+                        "name": "ResetPassword",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ForgotPassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\":\"user logged out successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":err.Error()",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/payment/razorpay": {
+            "get": {
+                "description": "Execute RazorPay payment for a specified order. Returns necessary details for the payment process.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Execute RazorPay payment for a given order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "order_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "final_price\": \"Final Price\", \"razor_id\": \"RazorPay ID\", \"user_name\": \"User Name\", \"total\": \"Total Price",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "error\": \"Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/payment/verify": {
+            "post": {
+                "description": "Verify payment for a specified order using payment details. Returns updated order details after verification.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Verify payment for a given order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Payment Verification Details",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.PaymentVerify"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Updated payment details successfully\", \"Order Details\": models.Order",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of all products.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get all products",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"products list\", \"products\": [object]",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "error\": \"Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/filter": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Filter products based on category, size, and price range.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Filter products based on specified criteria",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Product size",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum price",
+                        "name": "minPrice",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum price",
+                        "name": "maxPrice",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"filtered products\", \"products\": object",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/search": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Search for products using a specified keyword.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Search for products based on a keyword",
+                "parameters": [
+                    {
+                        "description": "Search keyword",
+                        "name": "search",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Search"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Products\": object, \"message\": \"Searched Products",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve details of a specific product by providing its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get details of a single product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"product details\", \"product\": object",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "get": {
+                "description": "Retrieve the profile details of the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Get user profile",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"User Profile\", \"profile\": UserDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update the profile details of the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "description": "Updated user profile details",
+                        "name": "user_details",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserProfile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Updated User Profile\", \"profile\": updatedUserDetails",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -160,9 +2662,355 @@
                     }
                 }
             }
+        },
+        "/wishlist": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve and display the products currently present in the user's wishlist.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "View products in user's wishlist",
+                "responses": {
+                    "200": {
+                        "description": "message\": \"Products in wishlist\", \"wishlist\": []models.Product",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add a specific product to the wishlist of the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Add a product to the user's wishlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to add to wishlist",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"product added to wishlist successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove a specific product from the wishlist of the authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Remove a product from the user's wishlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID to remove from wishlist",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"product removed from wishlist successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error\": \"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "models.AddProduct": {
+            "type": "object",
+            "required": [
+                "category",
+                "color",
+                "description",
+                "name",
+                "price",
+                "size",
+                "stock"
+            ],
+            "properties": {
+                "category": {
+                    "type": "integer"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "imageurl": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Address": {
+            "type": "object",
+            "required": [
+                "city",
+                "house_name",
+                "name",
+                "phone",
+                "pin",
+                "state",
+                "street"
+            ],
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "house_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Admin": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AdminOrder": {
+            "type": "object",
+            "required": [
+                "order_id",
+                "product_id",
+                "user_id"
+            ],
+            "properties": {
+                "order_id": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Category": {
+            "type": "object",
+            "required": [
+                "category"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CheckOut": {
+            "type": "object",
+            "required": [
+                "address_id",
+                "payment_id"
+            ],
+            "properties": {
+                "address_id": {
+                    "type": "integer"
+                },
+                "coupon": {
+                    "type": "string"
+                },
+                "payment_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Coupon": {
+            "type": "object",
+            "required": [
+                "DiscountRate",
+                "coupon",
+                "usage_limit"
+            ],
+            "properties": {
+                "DiscountRate": {
+                    "type": "number"
+                },
+                "coupon": {
+                    "type": "string"
+                },
+                "usage_limit": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.CouponStatus": {
+            "type": "object",
+            "properties": {
+                "coupon_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ForgotPassword": {
+            "type": "object",
+            "required": [
+                "new password",
+                "otp",
+                "phone"
+            ],
+            "properties": {
+                "new password": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
+                },
+                "otp": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10
+                }
+            }
+        },
         "models.OTP": {
             "type": "object",
             "required": [
@@ -174,6 +3022,61 @@
                     "type": "string"
                 },
                 "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PaymentVerify": {
+            "type": "object",
+            "required": [
+                "order_id",
+                "payment_id",
+                "signature"
+            ],
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "payment_id": {
+                    "type": "string"
+                },
+                "signature": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Phone": {
+            "type": "object",
+            "required": [
+                "phone"
+            ],
+            "properties": {
+                "phone": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10
+                }
+            }
+        },
+        "models.Search": {
+            "type": "object",
+            "properties": {
+                "search": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SetNewName": {
+            "type": "object",
+            "required": [
+                "current",
+                "new"
+            ],
+            "properties": {
+                "current": {
+                    "type": "string"
+                },
+                "new": {
                     "type": "string"
                 }
             }
@@ -192,6 +3095,34 @@
                 },
                 "phone": {
                     "type": "string"
+                }
+            }
+        },
+        "models.UserProfile": {
+            "type": "object",
+            "required": [
+                "email",
+                "firstname",
+                "lastname",
+                "phone"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "minLength": 10
+                },
+                "wallet": {
+                    "type": "number"
                 }
             }
         },

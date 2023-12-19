@@ -1,4 +1,143 @@
 definitions:
+  models.AddProduct:
+    properties:
+      category:
+        type: integer
+      color:
+        type: string
+      description:
+        type: string
+      imageurl:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      size:
+        type: integer
+      stock:
+        type: integer
+    required:
+    - category
+    - color
+    - description
+    - name
+    - price
+    - size
+    - stock
+    type: object
+  models.Address:
+    properties:
+      city:
+        type: string
+      house_name:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      pin:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+    required:
+    - city
+    - house_name
+    - name
+    - phone
+    - pin
+    - state
+    - street
+    type: object
+  models.Admin:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      password:
+        maxLength: 20
+        minLength: 6
+        type: string
+      token:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.AdminOrder:
+    properties:
+      order_id:
+        type: integer
+      product_id:
+        type: integer
+      user_id:
+        type: integer
+    required:
+    - order_id
+    - product_id
+    - user_id
+    type: object
+  models.Category:
+    properties:
+      category:
+        type: string
+    required:
+    - category
+    type: object
+  models.CheckOut:
+    properties:
+      address_id:
+        type: integer
+      coupon:
+        type: string
+      payment_id:
+        type: integer
+    required:
+    - address_id
+    - payment_id
+    type: object
+  models.Coupon:
+    properties:
+      DiscountRate:
+        type: number
+      coupon:
+        type: string
+      usage_limit:
+        type: integer
+    required:
+    - DiscountRate
+    - coupon
+    - usage_limit
+    type: object
+  models.CouponStatus:
+    properties:
+      coupon_id:
+        type: integer
+    type: object
+  models.ForgotPassword:
+    properties:
+      new password:
+        maxLength: 20
+        minLength: 6
+        type: string
+      otp:
+        type: string
+      phone:
+        maxLength: 10
+        minLength: 10
+        type: string
+    required:
+    - new password
+    - otp
+    - phone
+    type: object
   models.OTP:
     properties:
       otp:
@@ -8,6 +147,43 @@ definitions:
     required:
     - otp
     - phone
+    type: object
+  models.PaymentVerify:
+    properties:
+      order_id:
+        type: string
+      payment_id:
+        type: string
+      signature:
+        type: string
+    required:
+    - order_id
+    - payment_id
+    - signature
+    type: object
+  models.Phone:
+    properties:
+      phone:
+        maxLength: 10
+        minLength: 10
+        type: string
+    required:
+    - phone
+    type: object
+  models.Search:
+    properties:
+      search:
+        type: string
+    type: object
+  models.SetNewName:
+    properties:
+      current:
+        type: string
+      new:
+        type: string
+    required:
+    - current
+    - new
     type: object
   models.UserLoginDetails:
     properties:
@@ -19,6 +195,26 @@ definitions:
         type: string
     required:
     - password
+    - phone
+    type: object
+  models.UserProfile:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      phone:
+        maxLength: 10
+        minLength: 10
+        type: string
+      wallet:
+        type: number
+    required:
+    - email
+    - firstname
+    - lastname
     - phone
     type: object
   models.UserSignUpDetails:
@@ -50,6 +246,1161 @@ definitions:
 info:
   contact: {}
 paths:
+  /Invoice:
+    get:
+      consumes:
+      - application/json
+      description: Generate and download invoice in PDF format for a specific order.
+      parameters:
+      - description: Order ID
+        in: query
+        name: orderid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+      summary: Generate and download invoice for a specific order
+      tags:
+      - User Order
+  /address:
+    delete:
+      consumes:
+      - application/json
+      description: Remove the address associated with a user.
+      parameters:
+      - description: Address ID to be removed
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Address removed successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Remove user address
+      tags:
+      - User Profile
+    get:
+      description: user can view addresses that he registered
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"user address","Address":Address
+          schema:
+            type: string
+        "500":
+          description: error":err.Error()
+          schema:
+            type: string
+      summary: View Addresses
+      tags:
+      - User Profile
+    post:
+      consumes:
+      - application/json
+      description: Add new address details for the authenticated user.
+      parameters:
+      - description: New address details to be added
+        in: body
+        name: address_details
+        required: true
+        schema:
+          $ref: '#/definitions/models.Address'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Address added successfully", "Address": AddressRes'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Add new address details
+      tags:
+      - User Profile
+    put:
+      consumes:
+      - application/json
+      description: Edit the address for a user.
+      parameters:
+      - description: Address ID to be updated
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Updated address details
+        in: body
+        name: address
+        required: true
+        schema:
+          $ref: '#/definitions/models.Address'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Address updated successfully", "Address": UpdatedAddress}'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Enter constraints correctly'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Edit user address
+      tags:
+      - User Profile
+  /admin/category:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category based on the provided category ID.
+      parameters:
+      - description: Category ID to be deleted
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Successfully deleted category'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Delete a category
+      tags:
+      - Admin Category Management
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all categories.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Categories", "categories": category'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Get all categories
+      tags:
+      - Admin Category Management
+    post:
+      consumes:
+      - application/json
+      description: Add a new category using the provided details.
+      parameters:
+      - description: Details of the category to be added
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Successfully added category", "category": Cate'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Add a new category
+      tags:
+      - Admin Category Management
+    put:
+      consumes:
+      - application/json
+      description: Update the name of a category based on the provided details.
+      parameters:
+      - description: Current and new names for the category
+        in: body
+        name: categoryUpdate
+        required: true
+        schema:
+          $ref: '#/definitions/models.SetNewName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Category updated successfully", "updated category":
+            Newcate'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Update category name
+      tags:
+      - Admin Category Management
+  /admin/category/offer:
+    post:
+      consumes:
+      - application/json
+      description: Add an offer to a category based on the provided category ID and
+        offer ID.
+      parameters:
+      - description: Category ID to add offer for
+        in: formData
+        name: categoryid
+        required: true
+        type: integer
+      - description: Offer ID to be associated with the category
+        in: formData
+        name: offer
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'offer added": productlist'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Add offer to a category
+      tags:
+      - Admin Offer AManagement
+  /admin/coupon:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of all coupons for admin.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "All Coupons", "Coupons": Coupons'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: View all coupons for admin
+      tags:
+      - Admin Coupon Management
+    post:
+      consumes:
+      - application/json
+      description: Create a new coupon using the provided details.
+      parameters:
+      - description: Details of the coupon to be created
+        in: body
+        name: coupon
+        required: true
+        schema:
+          $ref: '#/definitions/models.Coupon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Coupon created successfully", "coupon": CouponDetails'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Create a new coupon
+      tags:
+      - Admin Coupon Management
+  /admin/coupon/disable:
+    put:
+      consumes:
+      - application/json
+      description: Disable a coupon based on the provided coupon ID.
+      parameters:
+      - description: Coupon ID to be disabled
+        in: body
+        name: coupon
+        required: true
+        schema:
+          $ref: '#/definitions/models.CouponStatus'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Coupon disabled successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Disable a coupon
+      tags:
+      - Coupons
+  /admin/coupon/enable:
+    put:
+      consumes:
+      - application/json
+      description: Enable a coupon based on the provided coupon ID.
+      parameters:
+      - description: Coupon ID to be enabled
+        in: body
+        name: coupon
+        required: true
+        schema:
+          $ref: '#/definitions/models.Coupon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Coupon enabled successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Enable a coupon
+      tags:
+      - Coupons
+  /admin/coupon/update:
+    put:
+      consumes:
+      - application/json
+      description: Update a coupon based on the provided details and coupon ID.
+      parameters:
+      - description: Coupon ID to be updated
+        in: query
+        name: couponID
+        required: true
+        type: string
+      - description: Details of the coupon to be updated
+        in: body
+        name: updateCoupon
+        required: true
+        schema:
+          $ref: '#/definitions/models.Coupon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Coupon updated successfully", "coupon": Coupon'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Update a coupon
+      tags:
+      - Admin Coupon Management
+  /admin/dashboard:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve information for the admin dashboard.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Admin dashboard", "dashboard": adminDashboard'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Get admin dashboard information
+      tags:
+      - Admin
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate and log in as an admin.
+      parameters:
+      - description: Admin credentials for login
+        in: body
+        name: admin_details
+        required: true
+        schema:
+          $ref: '#/definitions/models.Admin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Admin logged in successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Admin login
+      tags:
+      - Admin
+  /admin/orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all order details for administrative purposes.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Order details retrieved successfully", "All orders":
+            allOrderDetails'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Get all order details for admin
+      tags:
+      - Admin Order Management
+  /admin/orders/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancel an order by admin based on the provided user ID, order ID,
+        and product ID.
+      parameters:
+      - description: Details for cancelling an order by admin
+        in: body
+        name: cancel
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Order cancelled successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Cancel an order by admin
+      tags:
+      - Admin Order Management
+  /admin/orders/details:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve order details for administrative purposes based on the
+        given order ID.
+      parameters:
+      - description: Order ID to retrieve details for
+        in: query
+        name: orderID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Order Products": OrderDetails'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: view single orders
+      tags:
+      - Admin Order Management
+  /admin/product/offer:
+    post:
+      consumes:
+      - application/json
+      description: Add an offer to a product based on the provided product ID and
+        offer ID.
+      parameters:
+      - description: Product ID to add offer for
+        in: formData
+        name: productid
+        required: true
+        type: integer
+      - description: Offer ID to be associated with the product
+        in: formData
+        name: offer
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'offer added": prod'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Add offer to a product
+      tags:
+      - Admin Offer management
+  /admin/products:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all products.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "successfully retrieved products", "products": [object]'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get all products
+      tags:
+      - Admin Product Management
+    post:
+      consumes:
+      - application/json
+      description: Add a new product with details and an image.
+      parameters:
+      - description: Product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddProduct'
+      - description: Product image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "product added successfully", "product": models.AddProduct'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Add a new product
+      tags:
+      - Admin Product Management
+    put:
+      consumes:
+      - application/json
+      description: Edit the details of an existing product by providing the product
+        ID.
+      parameters:
+      - description: Product ID to be edited
+        in: query
+        name: product_id
+        required: true
+        type: string
+      - description: Updated product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddProduct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "product updated successfully", "product": models.AddProduct'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Edit product details
+      tags:
+      - Admin Product Management
+  /admin/products/remove/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product by providing the product ID.
+      parameters:
+      - description: Product ID to be deleted
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "product removed successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a product by ID
+      tags:
+      - Admin Product Management
+  /admin/salesreportbydate:
+    post:
+      consumes:
+      - application/json
+      description: Generate and download sales report in PDF format for a specific
+        date range.
+      parameters:
+      - description: 'Start date (format: DD-MM-YYYY)'
+        in: formData
+        name: start
+        required: true
+        type: string
+      - description: 'End date (format: DD-MM-YYYY)'
+        in: formData
+        name: end
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+      summary: Generate and download sales report for a specific date range
+      tags:
+      - Admin
+  /admin/salesreportbypayment:
+    post:
+      consumes:
+      - application/json
+      description: Generate and download sales report in PDF format for a specific
+        payment method and date range.
+      parameters:
+      - description: 'Start date (format: DD-MM-YYYY)'
+        in: formData
+        name: start
+        required: true
+        type: string
+      - description: 'End date (format: DD-MM-YYYY)'
+        in: formData
+        name: end
+        required: true
+        type: string
+      - description: Payment method (e.g., 'credit card', 'wallet')
+        in: formData
+        name: paymentmethod
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+      summary: Generate and download sales report for a specific payment method and
+        date range
+      tags:
+      - Admin
+  /admin/salesreportbyperiod:
+    post:
+      consumes:
+      - application/json
+      description: Generate and download sales report in PDF format for a specific
+        period.
+      parameters:
+      - description: Period (e.g., 'last week', 'last month')
+        in: formData
+        name: period
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+      summary: Generate and download sales report for a specific period
+      tags:
+      - Admin
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all users.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Users are", "users": Users'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: view users
+      tags:
+      - Admin User Management
+  /admin/users/block:
+    post:
+      consumes:
+      - application/json
+      description: Block a user by their ID.
+      parameters:
+      - description: User ID to be blocked
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "User successfully blocked'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Block user
+      tags:
+      - Admin User Management
+  /admin/users/unblock:
+    post:
+      consumes:
+      - application/json
+      description: Unblock a user by their ID.
+      parameters:
+      - description: User ID to be unblocked
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "User successfully unblocked'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Unblock user
+      tags:
+      - Admin User Management
+  /applycoupon:
+    post:
+      consumes:
+      - application/json
+      description: Apply a coupon code to the user's account for potential discounts
+        or benefits.
+      parameters:
+      - description: Coupon Code
+        in: formData
+        name: coupon
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "coupon applied successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Apply a coupon to the user's account
+      tags:
+      - User Order
+  /cart:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a product from the user's cart based on the provided product
+        ID.
+      parameters:
+      - description: Product ID to remove from the cart
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Product removed from cart successfully", "Cart":
+            Cart'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Remove product from user's cart
+      tags:
+      - Cart
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of the user's cart.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Cart details", "Cart": UserCart'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: View user's cart
+      tags:
+      - Cart
+    post:
+      consumes:
+      - application/json
+      description: Add a product to the user's cart based on the provided product
+        ID.
+      parameters:
+      - description: Product ID to add to the cart
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Product added to cart successfully", "Cart": Cart'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Add product to user's cart
+      tags:
+      - Cart
+  /cart/add-quantity:
+    put:
+      consumes:
+      - application/json
+      description: Increase the quantity of a product in the user's cart based on
+        the provided product ID.
+      parameters:
+      - description: Product ID to increase quantity
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Quantity added successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Increase quantity of a product in the user's cart
+      tags:
+      - Cart
+  /cart/reduce-quantity:
+    put:
+      consumes:
+      - application/json
+      description: Decrease the quantity of a product in the user's cart based on
+        the provided product ID.
+      parameters:
+      - description: Product ID to decrease quantity
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Quantity decreased by 1 successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Decrease quantity of a product in the user's cart
+      tags:
+      - Cart
+  /checkout:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details for the user's checkout page.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "CheckOut Page loaded successfully", "order Details":
+            OrderDetails'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: View the checkout page
+      tags:
+      - User Order
+  /coupons:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of coupons for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Coupons", "Coupons": coupons'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: View coupons for user
+      tags:
+      - User Profile
   /login:
     post:
       consumes:
@@ -100,6 +1451,518 @@ paths:
       summary: User Logout
       tags:
       - User Login/Signup
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of orders for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Orders", "order Details": OrderDetails'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: View user orders
+      tags:
+      - User Order
+    post:
+      consumes:
+      - application/json
+      description: Place an order using the provided checkout details.
+      parameters:
+      - description: Details for the order checkout
+        in: body
+        name: OrderInput
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckOut'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Ordered products successfully", "order Details":
+            OrderDetails'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Place an order from the user's cart
+      tags:
+      - User Order
+  /orders/cancel:
+    put:
+      consumes:
+      - application/json
+      description: Cancel an order for the authenticated user based on the provided
+        order and product IDs.
+      parameters:
+      - description: Order ID to be cancelled
+        in: query
+        name: order_id
+        required: true
+        type: string
+      - description: Product ID in the order to be cancelled
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Order cancelled successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Cancel an order
+      tags:
+      - User Order
+  /orders/deliver:
+    post:
+      consumes:
+      - application/json
+      description: Deliver an order by admin based on the provided user ID, order
+        ID, and product ID.
+      parameters:
+      - description: Details for delivering an order by admin
+        in: body
+        name: deliver
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Order delivered successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Deliver an order by admin
+      tags:
+      - Admin Order Management
+  /orders/return:
+    put:
+      consumes:
+      - application/json
+      description: Return an order for the authenticated user based on the provided
+        order and product IDs.
+      parameters:
+      - description: Order ID to be returned
+        in: query
+        name: order_id
+        required: true
+        type: string
+      - description: Product ID in the order to be returned
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Order returned successfully. Amount will be credited
+            to wallet.'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Return an order
+      tags:
+      - User Order
+  /orders/ship:
+    post:
+      consumes:
+      - application/json
+      description: Ship an order by admin based on the provided user ID, order ID,
+        and product ID.
+      parameters:
+      - description: Details for shipping an order by admin
+        in: body
+        name: ship
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Order shipped successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Ship an order by admin
+      tags:
+      - Admin Order Management
+  /password/forgot:
+    post:
+      description: user can will get otp to change password if forgotted
+      parameters:
+      - description: Forgot password
+        in: body
+        name: forgotPassword
+        required: true
+        schema:
+          $ref: '#/definitions/models.Phone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"user logged out successfully
+          schema:
+            type: string
+        "500":
+          description: error":err.Error()
+          schema:
+            type: string
+      summary: Forgot password
+      tags:
+      - User Login/Signup
+  /password/forgot/change:
+    post:
+      description: user can reset password by entering otp and new password
+      parameters:
+      - description: Reset Password
+        in: body
+        name: ResetPassword
+        required: true
+        schema:
+          $ref: '#/definitions/models.ForgotPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"user logged out successfully
+          schema:
+            type: string
+        "500":
+          description: error":err.Error()
+          schema:
+            type: string
+      summary: Reset Password
+      tags:
+      - User Login/Signup
+  /payment/razorpay:
+    get:
+      consumes:
+      - application/json
+      description: Execute RazorPay payment for a specified order. Returns necessary
+        details for the payment process.
+      parameters:
+      - description: Order ID
+        in: query
+        name: order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'final_price": "Final Price", "razor_id": "RazorPay ID", "user_name":
+            "User Name", "total": "Total Price'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "404":
+          description: 'error": "Not Found'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Execute RazorPay payment for a given order
+      tags:
+      - Payments
+  /payment/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify payment for a specified order using payment details. Returns
+        updated order details after verification.
+      parameters:
+      - description: Order ID
+        in: query
+        name: orderId
+        required: true
+        type: integer
+      - description: Payment Verification Details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.PaymentVerify'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Updated payment details successfully", "Order Details":
+            models.Order'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Verify payment for a given order
+      tags:
+      - Payments
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all products.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "products list", "products": [object]'
+          schema:
+            type: string
+        "404":
+          description: 'error": "Not Found'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get all products
+      tags:
+      - Products
+  /products/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve details of a specific product by providing its ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "product details", "product": object'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get details of a single product
+      tags:
+      - Products
+  /products/filter:
+    get:
+      consumes:
+      - application/json
+      description: Filter products based on category, size, and price range.
+      parameters:
+      - description: Product category
+        in: query
+        name: category
+        type: string
+      - description: Product size
+        in: query
+        name: size
+        type: string
+      - description: Minimum price
+        in: query
+        name: minPrice
+        type: number
+      - description: Maximum price
+        in: query
+        name: maxPrice
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "filtered products", "products": object'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Filter products based on specified criteria
+      tags:
+      - Products
+  /products/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for products using a specified keyword.
+      parameters:
+      - description: Search keyword
+        in: body
+        name: search
+        required: true
+        schema:
+          $ref: '#/definitions/models.Search'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Products": object, "message": "Searched Products'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Search for products based on a keyword
+      tags:
+      - Products
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the profile details of the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "User Profile", "profile": UserDetails'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Get user profile
+      tags:
+      - User Profile
+    put:
+      consumes:
+      - application/json
+      description: Update the profile details of the authenticated user.
+      parameters:
+      - description: Updated user profile details
+        in: body
+        name: user_details
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserProfile'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Updated User Profile", "profile": updatedUserDetails'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      summary: Update user profile
+      tags:
+      - User Profile
   /signup:
     post:
       consumes:
@@ -152,4 +2015,99 @@ paths:
       summary: Verify OTP
       tags:
       - User Login/Signup
+  /wishlist:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a specific product from the wishlist of the authenticated
+        user.
+      parameters:
+      - description: Product ID to remove from wishlist
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "product removed from wishlist successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Remove a product from the user's wishlist
+      tags:
+      - Wishlist
+    get:
+      consumes:
+      - application/json
+      description: Retrieve and display the products currently present in the user's
+        wishlist.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "Products in wishlist", "wishlist": []models.Product'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: View products in user's wishlist
+      tags:
+      - Wishlist
+    post:
+      consumes:
+      - application/json
+      description: Add a specific product to the wishlist of the authenticated user.
+      parameters:
+      - description: Product ID to add to wishlist
+        in: query
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "product added to wishlist successfully'
+          schema:
+            type: string
+        "400":
+          description: 'error": "Bad Request'
+          schema:
+            type: string
+        "401":
+          description: 'error": "Unauthorized'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Add a product to the user's wishlist
+      tags:
+      - Wishlist
 swagger: "2.0"

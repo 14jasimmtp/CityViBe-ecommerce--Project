@@ -65,3 +65,7 @@ type Offer struct {
 	Category   int       `json:"category"`
 	ProductId  int       `json:"product_id"`
 }
+
+type Search struct {
+	Search string `json:"search"`
+}

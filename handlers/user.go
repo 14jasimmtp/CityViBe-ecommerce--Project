@@ -180,12 +180,11 @@ func ViewUserAddress(c *gin.Context) {
 // @Tags User Profile
 // @Accept json
 // @Produce json
-// @Param Authorization cookie string true "Authorization token"
 // @Param address_details body models.Address true "New address details to be added"
-// @Success 200 {object} gin.H{"message": "Address added successfully", "Address": AddressRes}
-// @Failure 400 {object} gin.H{"error": "Bad Request"}
-// @Failure 401 {object} gin.H{"error": "Unauthorized"}
-// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Success 200 {object} string "message": "Address added successfully", "Address": AddressRes
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
 // @Router /address [post]
 func AddNewAddressDetails(c *gin.Context) {
 	var Address models.Address
@@ -219,12 +218,11 @@ func AddNewAddressDetails(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id query string true "Address ID to be updated"
-// @Param Authorization cookie string true "Authorization token"
 // @Param address body models.Address true "Updated address details"
-// @Success 200 {object} gin.H{"message": "Address updated successfully", "Address": UpdatedAddress}
-// @Failure 400 {object} gin.H{"error": "Enter constraints correctly"}
-// @Failure 401 {object} gin.H{"error": "Unauthorized"}
-// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Success 200 {object} string "message": "Address updated successfully", "Address": UpdatedAddress}
+// @Failure 400 {object} string "error": "Enter constraints correctly"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
 // @Router /address [put]
 func EditUserAddress(c *gin.Context) {
 	var UpdateAddress models.Address
@@ -262,11 +260,10 @@ func EditUserAddress(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id query string true "Address ID to be removed"
-// @Param Authorization cookie string true "Authorization token"
-// @Success 200 {object} gin.H{"message": "Address removed successfully"}
-// @Failure 400 {object} gin.H{"error": "Bad Request"}
-// @Failure 401 {object} gin.H{"error": "Unauthorized"}
-// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Success 200 {object} string "message": "Address removed successfully"
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
 // @Router /address [delete]
 func RemoveUserAddress(c *gin.Context) {
 	Aid := c.Query("id")
@@ -290,11 +287,10 @@ func RemoveUserAddress(c *gin.Context) {
 // @Tags User Profile
 // @Accept json
 // @Produce json
-// @Param Authorization cookie string true "Authorization token"
-// @Success 200 {object} gin.H{"message": "User Profile", "profile": UserDetails}
-// @Failure 400 {object} gin.H{"error": "Bad Request"}
-// @Failure 401 {object} gin.H{"error": "Unauthorized"}
-// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Success 200 {object} string "message": "User Profile", "profile": UserDetails
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
 // @Router /profile [get]
 func UserProfile(c *gin.Context) {
 	Token, err := c.Cookie("Authorisation")
@@ -318,12 +314,11 @@ func UserProfile(c *gin.Context) {
 // @Tags User Profile
 // @Accept json
 // @Produce json
-// @Param Authorization cookie string true "Authorization token"
 // @Param user_details body models.UserProfile true "Updated user profile details"
-// @Success 200 {object} gin.H{"message": "Updated User Profile", "profile": updatedUserDetails}
-// @Failure 400 {object} gin.H{"error": "Bad Request"}
-// @Failure 401 {object} gin.H{"error": "Unauthorized"}
-// @Failure 500 {object} gin.H{"error": "Internal Server Error"}
+// @Success 200 {object} string "message": "Updated User Profile", "profile": updatedUserDetails
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 401 {object} string "error": "Unauthorized"
+// @Failure 500 {object} string "error": "Internal Server Error"
 // @Router /profile [put]
 func UpdateUserProfile(c *gin.Context) {
 	var UserDetails models.UserProfile

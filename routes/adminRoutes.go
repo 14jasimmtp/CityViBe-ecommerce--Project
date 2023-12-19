@@ -49,8 +49,8 @@ func AdminRoutes(r *gin.Engine) {
 	r.GET("/admin/dashboard", middlewares.AdminAuthMiddleware, handlers.DashBoard)
 
 	//offer
-	r.POST("admin/offer", middlewares.AdminAuthMiddleware, handlers.AddOffer)
-	r.GET("admin/offer", middlewares.AdminAuthMiddleware, handlers.AllOffer)
+	// r.POST("admin/offer", middlewares.AdminAuthMiddleware, handlers.AddOffer)
+	// r.GET("admin/offer", middlewares.AdminAuthMiddleware, handlers.AllOffer)
 	r.POST("admin/product/offer", middlewares.AdminAuthMiddleware, handlers.AddProductOffer)
 	r.POST("admin/category/offer", middlewares.AdminAuthMiddleware, handlers.AddCategoryOffer)
 }

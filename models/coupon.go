@@ -16,3 +16,7 @@ type Couponlist struct {
 	DiscountPercentage float64 `json:"Discount_percentage" validate:"required"`
 	
 }
+
+type CouponStatus struct {
+	CouponID uint `json:"coupon_id"`
+}

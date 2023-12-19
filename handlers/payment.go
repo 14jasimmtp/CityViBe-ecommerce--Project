@@ -10,6 +10,18 @@ import (
 	"main.go/utils"
 )
 
+// ExecuteRazorPayPayment godoc
+// @Summary Execute RazorPay payment for a given order
+// @Description Execute RazorPay payment for a specified order. Returns necessary details for the payment process.
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param order_id query int true "Order ID"
+// @Success 200 {object} string "final_price": "Final Price", "razor_id": "RazorPay ID", "user_name": "User Name", "total": "Total Price"
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 404 {object} string "error": "Not Found"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /payment/razorpay [Get]
 func ExecuteRazorPayPayment(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Query("order_id"))
 	if err != nil {
@@ -44,6 +56,19 @@ func ExecuteRazorPayPayment(c *gin.Context) {
 	}
 	c.HTML(http.StatusNotFound, "notfound.html", nil)
 }
+
+// VerifyPayment godoc
+// @Summary Verify payment for a given order
+// @Description Verify payment for a specified order using payment details. Returns updated order details after verification.
+// @Tags Payments
+// @Accept json
+// @Produce json
+// @Param orderId query int true "Order ID"
+// @Param input body models.PaymentVerify true "Payment Verification Details"
+// @Success 200 {object} string "message": "Updated payment details successfully", "Order Details": models.Order
+// @Failure 400 {object} string "error": "Bad Request"
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /payment/verify [post]
 func VerifyPayment(c *gin.Context) {
 	var Verify models.PaymentVerify
 	if c.ShouldBindJSON(&Verify) != nil {
