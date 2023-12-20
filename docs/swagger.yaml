@@ -1963,6 +1963,41 @@ paths:
       summary: Update user profile
       tags:
       - User Profile
+  /sales/report:
+    post:
+      consumes:
+      - application/json
+      description: Generate a stylish Excel sales report based on the provided start
+        and end dates.
+      parameters:
+      - description: 'Start date (format: dd-mm-yyyy)'
+        in: formData
+        name: StartDate
+        required: true
+        type: string
+      - description: 'End date (format: dd-mm-yyyy)'
+        in: formData
+        name: EndDate
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Excel sales report
+          schema:
+            type: file
+        "400":
+          description: error":"Bad Request
+          schema:
+            type: string
+        "500":
+          description: error":"Internal Server Error
+          schema:
+            type: string
+      summary: Generate Excel Sales Report
+      tags:
+      - Admin
   /signup:
     post:
       consumes:
@@ -1988,7 +2023,7 @@ paths:
             type: string
       summary: User Signup
       tags:
-      - User
+      - User Login/Signup
   /verify:
     post:
       consumes:

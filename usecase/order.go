@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jung-kurt/gofpdf"
+	"github.com/xuri/excelize/v2"
 	"main.go/domain"
 	"main.go/models"
 	"main.go/repository"
@@ -530,7 +531,7 @@ func ExecuteSalesReportByPaymentMethod(startdate, enddate time.Time, paymentmeth
 	pdf.AddPage()
 
 	pdf.SetFont("Arial", "B", 16)
-	pdf.Cell(40,10, "Sales Report")
+	pdf.Cell(40, 10, "Sales Report")
 	pdf.Ln(10)
 	pdf.Cell(0, 10, "Payment Method: "+payment)
 	pdf.Ln(10)
@@ -634,4 +635,74 @@ func ApplyCoupon(coupon, Token string) error {
 	}
 
 	return nil
+}
+
+func SalesReportXL(start, end time.Time) (*excelize.File, error) {
+	report, err := repository.XLBYDATE(start, end)
+	if err != nil {
+		return nil, err
+	}
+
+	f := excelize.NewFile()
+	sheetName := "Sheet1"
+	f.NewSheet(sheetName)
+
+	streamWriter, err := f.NewStreamWriter(sheetName)
+	if err != nil {
+		return nil, err
+	}
+
+	styleID, err := f.NewStyle(&excelize.Style{
+		Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
+		Fill:      excelize.Fill{Type: "pattern", Color: []string{"#DFEBF6"}, Pattern: 1},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Set merged cell for the title
+	if err := streamWriter.MergeCell("A", "E"); err != nil {
+		return nil, err
+	}
+	if err := f.SetColWidth("Sheet1", "A1", "E1", 20); err != nil {
+		return nil, err
+	}
+	// Set title
+	if err := streamWriter.SetRow("A1", []interface{}{
+		excelize.Cell{Value: "CityVibe Sales Report", StyleID: styleID},
+	}, excelize.RowOpts{Height: 30, Hidden: false}); err != nil {
+		return nil, err
+	}
+
+	// Set header
+	header := []interface{}{
+		"Order number", "Customer Name", "Product Name", "Quantity", "Price",
+	}
+	if err := streamWriter.SetRow("A2", header); err != nil {
+		return nil, err
+	}
+
+	// Set data from report
+	for rowIndex, record := range report {
+		row := []interface{}{
+			record.OrderID,
+			record.CustomerName,
+			record.ProductName,
+			record.Quantity,
+			record.Price,
+		}
+
+		// Set the entire row at once
+		startCell, _ := excelize.CoordinatesToCellName(1, rowIndex+3)
+		// endCell, _ := excelize.CoordinatesToCellName(len(header), rowIndex+3)
+		if err := streamWriter.SetRow(startCell, row, excelize.RowOpts{Height: 15}); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := streamWriter.Flush(); err != nil {
+		return nil, err
+	}
+
+	return f, nil
 }

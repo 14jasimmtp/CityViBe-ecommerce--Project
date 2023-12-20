@@ -490,3 +490,53 @@ func ApplyCoupon(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "coupon applied successfully"})
 }
+
+// @Summary Generate Excel Sales Report
+// @Description Generate a stylish Excel sales report based on the provided start and end dates.
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param StartDate formData string true "Start date (format: dd-mm-yyyy)"
+// @Param EndDate formData string true "End date (format: dd-mm-yyyy)"
+// @Success 200 {file} binary "Excel sales report"
+// @Failure 400 {object}  string "error":"Bad Request"
+// @Failure 500 {object}  string "error":"Internal Server Error"
+// @Router /sales/report [post]
+func SalesReportXL(c *gin.Context){
+	strStartDate:=c.PostForm("StartDate")
+	strEndDate:=c.PostForm("EndDate")
+
+	if strStartDate == "" || strEndDate == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Start date and end date are required"})
+		return
+	}
+	
+	startDate, err := time.Parse("2-1-2006", strStartDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	
+	endDate, err := time.Parse("2-1-2006", strEndDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	report,err:=usecase.SalesReportXL(startDate,endDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+	}
+
+	c.Header("Content-Type", "application/octet-stream")
+	c.Header("Content-Disposition", "attachment; filename=salesReport.xlsx")
+	c.Header("Expires", "0")
+
+	
+
+	err = report.Write(c.Writer)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Failed to write Excel file")
+		return
+	}
+
+}

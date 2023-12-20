@@ -491,3 +491,21 @@ func CheckVerifiedPayment(orderID int) (bool, error) {
 
 	return false, nil
 }
+
+func XLBYDATE(start,end time.Time)([]models.SalesReportXL,error){
+	var report []models.SalesReportXL
+	query:=initialisers.DB.Raw(
+		`SELECT 
+		 order_items.id as order_id,users.lastname as customer_name,products.name as product_name,order_items.quantity as Quantity,order_items.total_price as Price
+		 FROM
+		 order_items INNER JOIN products ON order_items.product_id=products.id
+		 INNER JOIN users ON order_items.user_id=users.id
+		 INNER JOIN orders ON order_items.order_id=orders.id
+		 WHERE orders.created_at BETWEEN ? AND ? ORDER BY order_items.id ASC`,
+		 start,end,
+		).Scan(&report)
+		if query.Error != nil{
+			return []models.SalesReportXL{},errors.New(`something went wrong`)
+		}
+		return report,nil
+}

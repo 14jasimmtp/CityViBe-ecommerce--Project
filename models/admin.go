@@ -25,11 +25,12 @@ type TimePeriod struct {
 
 type DashBoardUser struct {
 	TotalUsers  int `json:"Totaluser"`
-	BlockedUser int `json:"Blockuser"`
+	BlockedUser []int `json:"Blocked users"`
 }
 type DashBoardProduct struct {
 	TotalProducts     int `json:"Totalproduct"`
-	OutofStockProduct int `json:"Outofstock"`
+	OutofStockProductID []int `json:"Outofstock"`
+	LowStockProductsID []int `json:"less Stock Products"`
 }
 type DashboardOrder struct {
 	DeliveredOrderProducts int
@@ -53,4 +54,12 @@ type CompleteAdminDashboard struct {
 	DashboardOrder   DashboardOrder
 	DashboardRevenue DashboardRevenue
 	DashboardAmount  DashboardAmount
+}
+
+type SalesReportXL struct {
+	OrderID int `json:"OrderID"`
+	CustomerName string `json:"CustomerName"`
+	ProductName string `json:"ProductName"`
+	Quantity int `json:"Quantity"`
+	Price float64 `json:"Price"`
 }

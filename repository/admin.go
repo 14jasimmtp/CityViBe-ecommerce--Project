@@ -78,7 +78,7 @@ func DashBoardUserDetails() (models.DashBoardUser, error) {
 	if err != nil {
 		return models.DashBoardUser{}, nil
 	}
-	err = initialisers.DB.Raw("SELECT COUNT(*) FROM users WHERE blocked=true").Scan(&userDetails.BlockedUser).Error
+	err = initialisers.DB.Raw("SELECT id FROM users WHERE blocked=true").Scan(&userDetails.BlockedUser).Error
 	if err != nil {
 		return models.DashBoardUser{}, nil
 	}
@@ -91,7 +91,11 @@ func DashBoardProductDetails() (models.DashBoardProduct, error) {
 	if err != nil {
 		return models.DashBoardProduct{}, nil
 	}
-	err = initialisers.DB.Raw("SELECT COUNT(*) FROM products WHERE stock<=0").Scan(&productDetails.OutofStockProduct).Error
+	err = initialisers.DB.Raw("SELECT id FROM products WHERE stock=0").Scan(&productDetails.OutofStockProductID).Error
+	if err != nil {
+		return models.DashBoardProduct{}, nil
+	}
+	err = initialisers.DB.Raw("SELECT id FROM products WHERE stock<=5").Scan(&productDetails.LowStockProductsID).Error
 	if err != nil {
 		return models.DashBoardProduct{}, nil
 	}

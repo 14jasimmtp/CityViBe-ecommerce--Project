@@ -12,7 +12,7 @@ import (
 
 // @Summary		User Signup
 // @Description	user can signup by giving their details
-// @Tags			User
+// @Tags			User Login/Signup
 // @Accept			json
 // @Produce		    json
 // @Param			signup  body  models.UserSignUpDetails  true	"signup"

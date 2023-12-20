@@ -44,6 +44,7 @@ func AdminRoutes(r *gin.Engine) {
 	r.GET("admin/salesreportbyperiod", middlewares.AdminAuthMiddleware, handlers.SalesReportByPeriod)
 	r.GET("admin/salesreportbydate", middlewares.AdminAuthMiddleware, handlers.SalesReportByDate)
 	r.GET("admin/salesreportbypayment", middlewares.AdminAuthMiddleware, handlers.SalesReportByPayment)
+	r.POST("admin/salesreport/excel",middlewares.AdminAuthMiddleware,handlers.SalesReportXL)
 
 	//dashboard
 	r.GET("/admin/dashboard", middlewares.AdminAuthMiddleware, handlers.DashBoard)

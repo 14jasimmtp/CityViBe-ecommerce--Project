@@ -2594,6 +2594,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/sales/report": {
+            "post": {
+                "description": "Generate a stylish Excel sales report based on the provided start and end dates.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Generate Excel Sales Report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date (format: dd-mm-yyyy)",
+                        "name": "StartDate",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (format: dd-mm-yyyy)",
+                        "name": "EndDate",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Excel sales report",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "error\":\"Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\":\"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/signup": {
             "post": {
                 "description": "user can signup by giving their details",
@@ -2604,7 +2655,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "User Login/Signup"
                 ],
                 "summary": "User Signup",
                 "parameters": [
