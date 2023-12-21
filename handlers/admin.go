@@ -185,7 +185,7 @@ func AllOffer(c *gin.Context) {
 // AddProductOffer godoc
 // @Summary Add offer to a product
 // @Description Add an offer to a product based on the provided product ID and offer ID.
-// @Tags Admin Offer management
+// @Tags Admin Offer Management
 // @Accept json
 // @Produce json
 // @Param productid formData integer true "Product ID to add offer for"
@@ -218,7 +218,7 @@ func AddProductOffer(c *gin.Context) {
 // AddCategoryOffer godoc
 // @Summary Add offer to a category
 // @Description Add an offer to a category based on the provided category ID and offer ID.
-// @Tags Admin Offer AManagement
+// @Tags Admin Offer Management
 // @Accept json
 // @Produce json
 // @Param categoryid formData integer true "Category ID to add offer for"

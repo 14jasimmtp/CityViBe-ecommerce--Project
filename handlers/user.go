@@ -80,7 +80,6 @@ func UserLogin(c *gin.Context) {
 // @Description	user can logout by sending this request to server
 // @Tags			User Login/Signup
 // @Produce		    json
-// @Param			Logout  body  models.UserLoginDetails  true	"signup"
 // @Success		200	{object}	string "message":"user logged out successfully"
 // @Failure		500	{object}	string "error":err.Error()
 // @Router			/logout    [POST]

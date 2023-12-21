@@ -87,8 +87,6 @@ definitions:
     properties:
       address_id:
         type: integer
-      coupon:
-        type: string
       payment_id:
         type: integer
     required:
@@ -523,7 +521,7 @@ paths:
             type: string
       summary: Add offer to a category
       tags:
-      - Admin Offer AManagement
+      - Admin Offer Management
   /admin/coupon:
     get:
       consumes:
@@ -601,7 +599,7 @@ paths:
             type: string
       summary: Disable a coupon
       tags:
-      - Coupons
+      - Admin Coupon Management
   /admin/coupon/enable:
     put:
       consumes:
@@ -613,7 +611,7 @@ paths:
         name: coupon
         required: true
         schema:
-          $ref: '#/definitions/models.Coupon'
+          $ref: '#/definitions/models.CouponStatus'
       produces:
       - application/json
       responses:
@@ -631,7 +629,7 @@ paths:
             type: string
       summary: Enable a coupon
       tags:
-      - Coupons
+      - Admin Coupon Management
   /admin/coupon/update:
     put:
       consumes:
@@ -831,7 +829,7 @@ paths:
             type: string
       summary: Add offer to a product
       tags:
-      - Admin Offer management
+      - Admin Offer Management
   /admin/products:
     get:
       consumes:
@@ -1457,13 +1455,6 @@ paths:
   /logout:
     post:
       description: user can logout by sending this request to server
-      parameters:
-      - description: signup
-        in: body
-        name: Logout
-        required: true
-        schema:
-          $ref: '#/definitions/models.UserLoginDetails'
       produces:
       - application/json
       responses:
@@ -1990,6 +1981,37 @@ paths:
       summary: Update user profile
       tags:
       - User Profile
+  /removecoupon:
+    post:
+      consumes:
+      - application/json
+      description: Removes a coupon associated with the provided authorization token.
+      parameters:
+      - description: Authorization header with bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message": "coupon removed successfully'
+          schema:
+            type: string
+        "401":
+          description: 'error": "error in token .relogin again.'
+          schema:
+            type: string
+        "500":
+          description: 'error": "Internal Server Error'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Remove Coupon
+      tags:
+      - Orders
   /signup:
     post:
       consumes:

@@ -44,7 +44,7 @@ func MakeCoupon(c *gin.Context) {
 // DisableCoupon godoc
 // @Summary Disable a coupon
 // @Description Disable a coupon based on the provided coupon ID.
-// @Tags Coupons
+// @Tags Admin Coupon Management
 // @Accept json
 // @Produce json
 // @Param coupon body models.CouponStatus true "Coupon ID to be disabled"
@@ -70,10 +70,10 @@ func DisableCoupon(c *gin.Context) {
 // EnableCoupon godoc
 // @Summary Enable a coupon
 // @Description Enable a coupon based on the provided coupon ID.
-// @Tags Coupons
+// @Tags Admin Coupon Management
 // @Accept json
 // @Produce json
-// @Param coupon body models.Coupon true "Coupon ID to be enabled"
+// @Param coupon body models.CouponStatus true "Coupon ID to be enabled"
 // @Success 200 {object} string "message": "Coupon enabled successfully"
 // @Failure 400 {object} string "error": "Bad Request"
 // @Failure 500 {object} string "error": "Internal Server Error"
@@ -169,4 +169,30 @@ func ViewCouponsUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Coupons", "Coupons": coupons})
+}
+
+// @Summary Remove Coupon
+// @Description Removes a coupon associated with the provided authorization token.
+// @Tags Orders
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization header with bearer token"
+// @Success 200 {object} string "message": "coupon removed successfully"
+// @Failure 401 {object} string "error": "error in token .relogin again."
+// @Failure 500 {object} string "error": "Internal Server Error"
+// @Router /removecoupon [post]
+func RemoveCoupon(c *gin.Context) {
+	Token, err := c.Cookie("Authorisation")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "error in token .relogin again."})
+		return
+	}
+
+	if err := usecase.RemoveCoupon(Token); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "coupon removed successfully"})
+
 }

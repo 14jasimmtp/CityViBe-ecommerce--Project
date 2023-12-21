@@ -76,7 +76,6 @@ type CombinedOrderDetails struct {
 type CheckOut struct {
 	AddressID uint   `json:"address_id" validate:"required"`
 	PaymentID uint   `json:"payment_id" validate:"required"`
-	Coupon    string `json:"coupon"`
 }
 
 type CancelDetails struct {

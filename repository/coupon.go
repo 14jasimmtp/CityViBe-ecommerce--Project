@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	initialisers "main.go/Initialisers"
 	"main.go/domain"
@@ -142,6 +143,33 @@ func ViewUserCoupons(userID uint) ([]models.Couponlist, error) {
 	if query.RowsAffected == 0 {
 		return []models.Couponlist{}, errors.New(`no coupons found`)
 	}
-	
+
 	return coupons, nil
+}
+
+func CouponAppliedOrNot(userID uint) error {
+	var final_price float64
+	query := initialisers.DB.Raw(`select final_price from carts where user_id = ? LIMIT 1`, userID).Scan(&final_price)
+	if query.Error != nil {
+		fmt.Println(query.Error)
+		return errors.New(`something went wrong`)
+	}
+	if query.RowsAffected == 0 {
+		return errors.New(`no products found`)
+	}
+
+	if final_price == 0.0 {
+		return errors.New(`coupon is not applied to remove`)
+	}
+	return nil
+}
+
+func RemoveCouponAndChangePrice(userID uint) error {
+	query := initialisers.DB.Exec(`update carts set final_price = 0 where user_id = ?`, userID)
+	if query.Error != nil {
+		fmt.Println(query.Error)
+		return errors.New(`something went wrong`)
+
+	}
+	return nil
 }

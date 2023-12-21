@@ -83,3 +83,17 @@ func ViewCouponsUser(Token string)([]models.Couponlist,error){
 
 	return Coupons,nil
 }
+
+func RemoveCoupon(Token string)error{
+	userID,err:=utils.ExtractUserIdFromToken(Token)
+	if err != nil {
+		return err
+	}
+	if err:=repository.CouponAppliedOrNot(userID);err != nil {
+		return err
+	}
+	if err:=repository.RemoveCouponAndChangePrice(userID);err != nil {
+		return err
+	}
+	return nil
+}

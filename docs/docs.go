@@ -403,7 +403,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin Offer AManagement"
+                    "Admin Offer Management"
                 ],
                 "summary": "Add offer to a category",
                 "parameters": [
@@ -527,7 +527,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Coupons"
+                    "Admin Coupon Management"
                 ],
                 "summary": "Disable a coupon",
                 "parameters": [
@@ -573,7 +573,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Coupons"
+                    "Admin Coupon Management"
                 ],
                 "summary": "Enable a coupon",
                 "parameters": [
@@ -583,7 +583,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Coupon"
+                            "$ref": "#/definitions/models.CouponStatus"
                         }
                     }
                 ],
@@ -866,7 +866,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin Offer management"
+                    "Admin Offer Management"
                 ],
                 "summary": "Add offer to a product",
                 "parameters": [
@@ -1847,17 +1847,6 @@ const docTemplate = `{
                     "User Login/Signup"
                 ],
                 "summary": "User Logout",
-                "parameters": [
-                    {
-                        "description": "signup",
-                        "name": "Logout",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.UserLoginDetails"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "message\":\"user logged out successfully",
@@ -2645,6 +2634,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/removecoupon": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Removes a coupon associated with the provided authorization token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Remove Coupon",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization header with bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message\": \"coupon removed successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "error\": \"error in token .relogin again.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error\": \"Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/signup": {
             "post": {
                 "description": "user can signup by giving their details",
@@ -3002,9 +3040,6 @@ const docTemplate = `{
             "properties": {
                 "address_id": {
                     "type": "integer"
-                },
-                "coupon": {
-                    "type": "string"
                 },
                 "payment_id": {
                     "type": "integer"

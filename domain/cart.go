@@ -10,5 +10,5 @@ type Cart struct {
 	Products   Product `json:"-" gorm:"foreignkey:ProductID"`
 	Quantity   float64 `json:"quantity"`
 	Price      float64 `json:"price"`
-	FinalPrice float64 `json:"final_price"`
+	FinalPrice float64 `json:"final_price" gorm:"default:0"`
 }

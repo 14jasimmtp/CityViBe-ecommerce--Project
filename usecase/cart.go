@@ -70,6 +70,9 @@ func AddToCart(pid, Token string) (models.CartResponse, error) {
 			return models.CartResponse{}, err
 		}
 	} else {
+		if err:=repository.CheckStock(ProId);err != nil {
+			return models.CartResponse{},err
+		}
 		err := repository.AddToCart(ProId, UserId, productPrize)
 		if err != nil {
 			return models.CartResponse{}, err
