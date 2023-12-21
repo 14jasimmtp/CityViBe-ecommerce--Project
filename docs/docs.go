@@ -2649,7 +2649,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Orders"
+                    "User Order"
                 ],
                 "summary": "Remove Coupon",
                 "parameters": [

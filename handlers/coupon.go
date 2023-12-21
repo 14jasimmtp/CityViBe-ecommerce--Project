@@ -173,7 +173,7 @@ func ViewCouponsUser(c *gin.Context) {
 
 // @Summary Remove Coupon
 // @Description Removes a coupon associated with the provided authorization token.
-// @Tags Orders
+// @Tags User Order
 // @Security ApiKeyAuth
 // @Accept json
 // @Produce json

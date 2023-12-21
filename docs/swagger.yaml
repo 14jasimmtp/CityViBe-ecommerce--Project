@@ -2011,7 +2011,7 @@ paths:
       - ApiKeyAuth: []
       summary: Remove Coupon
       tags:
-      - Orders
+      - User Order
   /signup:
     post:
       consumes:
