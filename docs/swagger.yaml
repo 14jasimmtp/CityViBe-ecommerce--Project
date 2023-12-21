@@ -51,21 +51,13 @@ definitions:
     - state
     - street
     type: object
-  models.Admin:
+  models.AdminLogin:
     properties:
       email:
-        type: string
-      firstname:
-        type: string
-      id:
-        type: integer
-      lastname:
         type: string
       password:
         maxLength: 20
         minLength: 6
-        type: string
-      token:
         type: string
     required:
     - email
@@ -705,7 +697,7 @@ paths:
         name: admin_details
         required: true
         schema:
-          $ref: '#/definitions/models.Admin'
+          $ref: '#/definitions/models.AdminLogin'
       produces:
       - application/json
       responses:
@@ -977,6 +969,41 @@ paths:
       summary: Delete a product by ID
       tags:
       - Admin Product Management
+  /admin/salesreport/excel:
+    post:
+      consumes:
+      - application/json
+      description: Generate a stylish Excel sales report based on the provided start
+        and end dates.
+      parameters:
+      - description: 'Start date (format: dd-mm-yyyy)'
+        in: query
+        name: StartDate
+        required: true
+        type: string
+      - description: 'End date (format: dd-mm-yyyy)'
+        in: query
+        name: EndDate
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Excel sales report
+          schema:
+            type: file
+        "400":
+          description: error":"Bad Request
+          schema:
+            type: string
+        "500":
+          description: error":"Internal Server Error
+          schema:
+            type: string
+      summary: Generate Excel Sales Report
+      tags:
+      - Admin
   /admin/salesreportbydate:
     post:
       consumes:
@@ -1963,41 +1990,6 @@ paths:
       summary: Update user profile
       tags:
       - User Profile
-  /sales/report:
-    post:
-      consumes:
-      - application/json
-      description: Generate a stylish Excel sales report based on the provided start
-        and end dates.
-      parameters:
-      - description: 'Start date (format: dd-mm-yyyy)'
-        in: formData
-        name: StartDate
-        required: true
-        type: string
-      - description: 'End date (format: dd-mm-yyyy)'
-        in: formData
-        name: EndDate
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Excel sales report
-          schema:
-            type: file
-        "400":
-          description: error":"Bad Request
-          schema:
-            type: string
-        "500":
-          description: error":"Internal Server Error
-          schema:
-            type: string
-      summary: Generate Excel Sales Report
-      tags:
-      - Admin
   /signup:
     post:
       consumes:

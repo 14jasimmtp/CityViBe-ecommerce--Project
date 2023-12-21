@@ -10,7 +10,7 @@ import (
 	"main.go/utils"
 )
 
-func AdminLogin(adminDetails models.Admin) (models.Admin, error) {
+func AdminLogin(adminDetails models.AdminLogin) (models.Admin, error) {
 	var details models.Admin
 	if err := initialisers.DB.Raw("SELECT * FROM admins WHERE email=?", adminDetails.Email).Scan(&details).Error; err != nil {
 		return models.Admin{}, err
@@ -20,11 +20,12 @@ func AdminLogin(adminDetails models.Admin) (models.Admin, error) {
 
 func GetAllUsers() ([]models.UserDetailsResponse, error) {
 	var users []models.UserDetailsResponse
-	result := initialisers.DB.Raw("SELECT id,email,firstname,lastname,phone,blocked FROM users").Scan(&users)
+	result := initialisers.DB.Raw("SELECT id,email,firstname,lastname,phone,blocked,wallet FROM users").Scan(&users)
 	if result.Error != nil {
 		fmt.Println("data fetching error")
 		return []models.UserDetailsResponse{}, result.Error
 	}
+	
 	return users, nil
 }
 

@@ -9,6 +9,11 @@ type Admin struct {
 	TokenString string `json:"token"`
 }
 
+type AdminLogin struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6,max=20"`
+}
+
 type AdminOrder struct {
 	UserID    int `json:"user_id" validate:"required,number"`
 	OrderID   int `json:"order_id" validate:"required,number"`
@@ -24,13 +29,13 @@ type TimePeriod struct {
 }
 
 type DashBoardUser struct {
-	TotalUsers  int `json:"Totaluser"`
+	TotalUsers  int   `json:"Totaluser"`
 	BlockedUser []int `json:"Blocked users"`
 }
 type DashBoardProduct struct {
-	TotalProducts     int `json:"Totalproduct"`
-	OutofStockProductID []int `json:"Outofstock"`
-	LowStockProductsID []int `json:"less Stock Products"`
+	TotalProducts       int   `json:"Totalproduct"`
+	OutofStockProductID []int `json:"Outofstock products"`
+	LowStockProductsID  []int `json:"less Stock Products"`
 }
 type DashboardOrder struct {
 	DeliveredOrderProducts int
@@ -57,9 +62,9 @@ type CompleteAdminDashboard struct {
 }
 
 type SalesReportXL struct {
-	OrderID int `json:"OrderID"`
-	CustomerName string `json:"CustomerName"`
-	ProductName string `json:"ProductName"`
-	Quantity int `json:"Quantity"`
-	Price float64 `json:"Price"`
+	OrderID      int     `json:"OrderID"`
+	CustomerName string  `json:"CustomerName"`
+	ProductName  string  `json:"ProductName"`
+	Quantity     int     `json:"Quantity"`
+	Price        float64 `json:"Price"`
 }

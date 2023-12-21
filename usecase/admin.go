@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
@@ -11,7 +12,7 @@ import (
 	"main.go/utils"
 )
 
-func AdminLogin(admin models.Admin) (models.Admin, error) {
+func AdminLogin(admin models.AdminLogin) (models.Admin, error) {
 	AdminDetails, err := repository.AdminLogin(admin)
 	fmt.Println(err)
 	if err != nil {
@@ -32,7 +33,6 @@ func AdminLogin(admin models.Admin) (models.Admin, error) {
 
 	return models.Admin{
 		Firstname:   AdminDetails.Firstname,
-		Lastname:    admin.Lastname,
 		TokenString: tokenString,
 	}, nil
 
@@ -126,10 +126,10 @@ func ExecuteAddProductOffer(productid, offer int) (*models.Product, error) {
 	}
 
 	amount := float64(offer) / 100.0 * float64(product.Price)
-	product.OfferPrize = product.Price - amount
+	product.OfferPrize = math.Round((float64(product.Price)-amount)*100) / 100
 	err1 := repository.UpdateProduct(product)
 	if err1 != nil {
-		return nil, err
+		return nil, err1
 	}
 	return product, nil
 }
@@ -147,10 +147,10 @@ func ExecuteCategoryOffer(catid, offer int) ([]models.Product, error) {
 		product := &(productlist)[i]
 
 		amount := float64(offer) / 100.0 * float64(product.Price)
-		product.OfferPrize = product.Price - amount
-		err := repository.UpdateProduct(product)
-		if err != nil {
-			return nil, err
+		product.OfferPrize = math.Round((float64(product.Price)-amount)*100) / 100
+		err1 := repository.UpdateProduct(product)
+		if err1 != nil {
+			return nil, err1
 		}
 	}
 	return productlist, nil
@@ -186,5 +186,3 @@ func DashBoard() (models.CompleteAdminDashboard, error) {
 		DashboardAmount:  amountDetails,
 	}, nil
 }
-
-

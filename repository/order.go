@@ -322,7 +322,7 @@ func UpdateOrderFinalPrice(orderID int, amount float64) error {
 func UpdateCartAmount(userID, discount uint) (float64, error) {
 	var finalprice float64
 	perc := 1 - (float64(discount) / 100)
-	query := initialisers.DB.Exec(`UPDATE carts SET final_price = price * ? WHERE user_id = ?`, perc, userID)
+	query := initialisers.DB.Exec(`UPDATE carts SET final_price = ROUND(price * ?,2) WHERE user_id = ?`, perc, userID)
 	if query.Error != nil {
 		return 0.0, errors.New(`something went wrong`)
 	}
@@ -494,6 +494,7 @@ func CheckVerifiedPayment(orderID int) (bool, error) {
 
 func XLBYDATE(start,end time.Time)([]models.SalesReportXL,error){
 	var report []models.SalesReportXL
+	end = end.Add(+24 * time.Hour)
 	query:=initialisers.DB.Raw(
 		`SELECT 
 		 order_items.id as order_id,users.lastname as customer_name,products.name as product_name,order_items.quantity as Quantity,order_items.total_price as Price

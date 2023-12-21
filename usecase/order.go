@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 
@@ -601,7 +602,7 @@ func PrintInvoice(orderID int, Token string) (*gofpdf.Fpdf, error) {
 		pdf.Ln(10)
 	}
 	pdf.Ln(10)
-	pdf.Cell(0, 10, "Total Amount: "+strconv.FormatFloat(float64(orde.FinalPrice), 'f', 2, 64))
+	pdf.Cell(0, 10, "Total Amount: "+strconv.FormatFloat(float64(orde.TotalPrice), 'f', 2, 64))
 	pdf.Ln(20)
 	pdf.Cell(40, 10, "CityVibe: Thanks for shopping!")
 	return pdf, nil
@@ -643,66 +644,138 @@ func SalesReportXL(start, end time.Time) (*excelize.File, error) {
 		return nil, err
 	}
 
-	f := excelize.NewFile()
-	sheetName := "Sheet1"
-	f.NewSheet(sheetName)
-
-	streamWriter, err := f.NewStreamWriter(sheetName)
+	corereport, err := repository.GetByDate(start, end)
 	if err != nil {
 		return nil, err
 	}
 
+	f := excelize.NewFile()
+	sheetName := "Sheet1"
+	f.NewSheet(sheetName)
+
+	f.SetColWidth("Sheet1", "A", "G", 20)
+	// Set header style
+	headerStyleID, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Bold:  true,
+			Color: "#FFFFFF", // Header text color
+		},
+		Fill: excelize.Fill{
+			Type:    "pattern",
+			Color:   []string{"#4F81BD"}, // Header background color
+			Pattern: 1,
+		},
+		Alignment: &excelize.Alignment{
+			Horizontal: "center",
+			Vertical:   "center",
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
 	styleID, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Bold: true,
+		},
 		Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
 		Fill:      excelize.Fill{Type: "pattern", Color: []string{"#DFEBF6"}, Pattern: 1},
 	})
 	if err != nil {
 		return nil, err
 	}
+	f.SetCellValue(sheetName, "A1", fmt.Sprintf("CityVibe Sales Report (%s - %s)", start.Format("02-01-2006"), end.Format("02-01-2006")))
+	f.SetCellStyle(sheetName, "A1", "A1", styleID)
 
-	// Set merged cell for the title
-	if err := streamWriter.MergeCell("A", "E"); err != nil {
+	if err := f.MergeCell(sheetName, "A1", "G1"); err != nil {
 		return nil, err
 	}
-	if err := f.SetColWidth("Sheet1", "A1", "E1", 20); err != nil {
-		return nil, err
-	}
-	// Set title
-	if err := streamWriter.SetRow("A1", []interface{}{
-		excelize.Cell{Value: "CityVibe Sales Report", StyleID: styleID},
-	}, excelize.RowOpts{Height: 30, Hidden: false}); err != nil {
-		return nil, err
-	}
-
 	// Set header
-	header := []interface{}{
-		"Order number", "Customer Name", "Product Name", "Quantity", "Price",
+	headers := []string{"Order number", "Customer Name", "Product Name", "Quantity", "Price"}
+	for colIndex, header := range headers {
+		cell := ConvertToAlphaString(colIndex+1) + "2"
+		f.SetCellValue(sheetName, cell, header)
+
+		// Apply header style
+		f.SetCellStyle(sheetName, cell, cell, headerStyleID)
+
+		// Auto adjust column width
+		f.SetColWidth(sheetName, cell[:1], cell[:1], float64(len(header)*2)) // Adjust multiplier as needed
 	}
-	if err := streamWriter.SetRow("A2", header); err != nil {
+
+	// Set data style
+	dataStyleID, err := f.NewStyle(&excelize.Style{
+		Alignment: &excelize.Alignment{
+			Horizontal: "left",
+			Vertical:   "center",
+		},
+	})
+	if err != nil {
 		return nil, err
 	}
 
 	// Set data from report
 	for rowIndex, record := range report {
-		row := []interface{}{
-			record.OrderID,
-			record.CustomerName,
-			record.ProductName,
-			record.Quantity,
-			record.Price,
-		}
+		for colIndex, value := range []interface{}{record.OrderID, record.CustomerName, record.ProductName, record.Quantity, math.Round((float64(record.Price))*100) / 100} {
+			cell := ConvertToAlphaString(colIndex+1) + fmt.Sprint(rowIndex+3)
+			if err := f.SetCellValue(sheetName, cell, value); err != nil {
+				return nil, err
+			}
 
-		// Set the entire row at once
-		startCell, _ := excelize.CoordinatesToCellName(1, rowIndex+3)
-		// endCell, _ := excelize.CoordinatesToCellName(len(header), rowIndex+3)
-		if err := streamWriter.SetRow(startCell, row, excelize.RowOpts{Height: 15}); err != nil {
-			return nil, err
+			// Apply data style
+			f.SetCellStyle(sheetName, cell, cell, dataStyleID)
+
+			// Auto adjust column width
+			cellLetter := cell[:1]
+			contentLength := len(fmt.Sprintf("%v", value)) * 2 // Adjust multiplier as needed
+			currentWidth, _ := f.GetColWidth(sheetName, cellLetter)
+			if contentLength > int(currentWidth) {
+				f.SetColWidth(sheetName, cellLetter, cellLetter, float64(contentLength))
+			}
 		}
 	}
 
-	if err := streamWriter.Flush(); err != nil {
+	// Set total values style
+	totalStyleID, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{
+			Bold: true,
+		},
+		Alignment: &excelize.Alignment{
+			Horizontal: "right",
+			Vertical:   "center",
+		},
+	})
+	if err != nil {
 		return nil, err
 	}
 
+	// Set total values
+	f.SetCellValue(sheetName, "F2", "Total Revenue Generated")
+	f.SetCellValue(sheetName, "F3", "Total Orders")
+	f.SetCellValue(sheetName, "F4", "Average Order Amount")
+	f.SetCellValue(sheetName, "G2", corereport.TotalSales)
+	f.SetCellValue(sheetName, "G3", corereport.TotalOrders)
+	f.SetCellValue(sheetName, "G4", corereport.AverageOrder)
+	f.SetCellValue(sheetName, "A1", fmt.Sprintf("CityVibe Sales Report (%s - %s)", start.Format("2006-01-02"), end.Format("2006-01-02")))
+
+	// Apply total values style
+	f.SetCellStyle(sheetName, "G2", "G4", totalStyleID)
+	f.SetCellStyle(sheetName, "F2", "F4", totalStyleID)
+
+	// Auto adjust column width for total values
+	f.SetColWidth(sheetName, "G", "G", 15) // Adjust as needed
+	f.SetColWidth(sheetName, "F", "F", 25) // Adjust as needed
+
+	// ... rest of the code
+
 	return f, nil
+}
+
+func ConvertToAlphaString(index int) string {
+	result := ""
+	for index > 0 {
+		index--
+		result = string('A'+index%26) + result
+		index /= 26
+	}
+	return result
 }

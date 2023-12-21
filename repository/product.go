@@ -76,7 +76,7 @@ func GetSingleProduct(id string) (models.Product, error) {
 		return models.Product{}, errors.New("error while converting id to int")
 	}
 
-	query := initialisers.DB.Raw("SELECT name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE products.id = ?", idint).Scan(&product)
+	query := initialisers.DB.Raw("SELECT products.id as id,name,description,categories.category,sizes.size,stock,color,price FROM products INNER JOIN categories ON categories.id = products.category_id INNER JOIN sizes ON sizes.id=products.size_id WHERE products.id = ?", idint).Scan(&product)
 	if product.Name == "" {
 		return models.Product{}, errors.New("no products found with this id")
 	}

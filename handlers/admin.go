@@ -17,14 +17,14 @@ import (
 // @Tags Admin
 // @Accept json
 // @Produce json
-// @Param admin_details body models.Admin true "Admin credentials for login"
+// @Param admin_details body models.AdminLogin true "Admin credentials for login"
 // @Success 200 {object} string "message": "Admin logged in successfully"
 // @Failure 400 {object} string "error": "Bad Request"
 // @Failure 401 {object} string "error": "Unauthorized"
 // @Failure 500 {object} string "error": "Internal Server Error"
 // @Router /admin/login [post]
 func AdminLogin(c *gin.Context) {
-	var admin models.Admin
+	var admin models.AdminLogin
 
 	if c.ShouldBindJSON(&admin) != nil {
 		fmt.Println("binding error")

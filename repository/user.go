@@ -63,6 +63,9 @@ func GetUserById(id int) (models.UserDetailsResponse, error) {
 		fmt.Println("error fetching user")
 		return models.UserDetailsResponse{}, result.Error
 	}
+	if result.RowsAffected == 0{
+		return models.UserDetailsResponse{},errors.New(`no users found with this id`)
+	}
 	return user, nil
 }
 
