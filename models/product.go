@@ -39,7 +39,7 @@ type AddProduct struct {
 	Stock       int    `json:"stock" validate:"required,numeric" form:"stock"`
 	Price       int    `json:"price" validate:"required,numeric" form:"price"`
 	Color       string `json:"color" validate:"required" form:"color"`
-	ImageURL    string `json:"imageurl"`
+	ImageURL    string `json:"-"`
 }
 
 type Category struct {

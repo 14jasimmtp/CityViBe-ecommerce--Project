@@ -7,8 +7,6 @@ definitions:
         type: string
       description:
         type: string
-      imageurl:
-        type: string
       name:
         type: string
       price:
@@ -856,12 +854,34 @@ paths:
       - application/json
       description: Add a new product with details and an image.
       parameters:
-      - description: Product details
-        in: body
-        name: product
+      - in: formData
+        name: category_id
         required: true
-        schema:
-          $ref: '#/definitions/models.AddProduct'
+        type: integer
+      - in: formData
+        name: color
+        required: true
+        type: string
+      - in: formData
+        name: description
+        required: true
+        type: string
+      - in: formData
+        name: name
+        required: true
+        type: string
+      - in: formData
+        name: price
+        required: true
+        type: integer
+      - in: formData
+        name: size_id
+        required: true
+        type: integer
+      - in: formData
+        name: stock
+        required: true
+        type: integer
       - description: Product image
         in: formData
         name: image

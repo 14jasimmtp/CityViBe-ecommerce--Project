@@ -17,7 +17,7 @@ import (
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param product body models.AddProduct true "Product details"
+// @Param product formData models.AddProduct true "Product details"
 // @Param image formData file true "Product image"
 // @Success 200 {object} string "message": "product added successfully", "product": models.AddProduct
 // @Failure 400 {object} string "error": "Bad Request"
